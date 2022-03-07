@@ -1,0 +1,12 @@
+﻿<div class="notification-outer">
+    <div class="notification-logo">@((MarkupString)Notification.HtmlImage)</div><div>
+        <p class="notification-header">@((MarkupString)Notification.ScreenName)</p>
+        <p class="notification-text">@((MarkupString)Notification.HtmlText)</p>
+        <p class="notification-date">@Notification.ReadyDate</p>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public NotificationViewer Notification { get; set; }
+} 

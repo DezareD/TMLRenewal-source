@@ -1,0 +1,18 @@
+﻿@inject IRolePermissionServices _roleServices
+
+@if(role != null)
+{
+    <div class="@role.RoleStyle">@role.RoleName</div>
+}
+
+@code {
+    [Parameter]
+    public int RoleId { get; set; }
+
+    private Role role { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        role = await _roleServices.GetRoleAsync(RoleId);
+    }
+} 

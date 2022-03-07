@@ -1,0 +1,463 @@
+﻿@page "/profile/{userId:int}/settings"
+
+@using Microsoft.AspNetCore.Hosting;
+
+@inject IVirtualFileServices _fileManager
+@inject IWebHostEnvironment _webhostManager
+@inject INotificationServices _notificationServices 
+
+@inherits RenewalTMLComponentBase
+
+<div class="block p-normal -js-page-maxheight-relaod" style="@(_isComplete? "max-height:900px; display: flex; ":"max-height:90px;")">
+    @if (_isComplete)
+    {
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 18px;">
+                <h3 style="padding-top: 10px;">Основные настройки</h3>
+                @if (SettingsInformationBlock != null && SettingsInformationBlock.isShow)
+                {
+                    <div style="margin: 0 20px 0 20px;">
+                        <ValidationBlock block="SettingsInformationBlock" />
+                    </div>
+                }
+                <Fields Class="modal-form-wrapper">
+                    <Validation AsyncValidator="@ValidateScreeNameAsync">
+                        <Field Style="position: relative;">
+                            <div style="margin-right: 30px;">
+                                <TextEdit Placeholder="Никнейм"
+                                          DelayTextOnKeyPress="true"
+                                          DelayTextOnKeyPressInterval="850"
+                                          Text="@screenNameText">
+                                </TextEdit>
+                                @if (!String.IsNullOrEmpty(screenNameErrorMessage))
+                                {
+                                    <div class="invalid-feedback">@screenNameErrorMessage</div>
+                                }
+                            </div>
+                            <InputLoader isShowAcceptOrErrorStatus="true" state="screenNameState" />
+                        </Field>
+                    </Validation>
+                    <p class="note-form">Ваш никнейм будет отображаться в вашем профиле и ссылках на ваш профиль.</p>
+                </Fields>
+                <Fields Class="modal-form-wrapper">
+                    <Button Class="primary normal icon" @onclick="() => ShowEditPasswordModel()">
+                        <ChildContent>Изменить пароль<i class="fal fa-lock"></i></ChildContent>
+                    </Button>
+                    <p class="note-form">Пароль используется при входе не через ВК, так же он может понадобиться для подтверждения некоторых действий.</p>
+                </Fields>
+            </div>
+            <div style="flex: 1;">
+                <div class="settings-header-image">
+                    <div class="image-outer">
+                        <ClientAvatar @ref="ClientAvatarRef" AvatarSize="AvatarSize._200x200" Client="user"></ClientAvatar>
+                        <!--<img class="user-image-settings @(userImageSettings == null? "sloader" : "")" src="@(userImageSettings != null? userImageSettings : "")" />-->
+                        <div class="image-changer">
+                            <i class="fas fa-user-circle" @onclick="() => ShowEditImageModel()"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            /* MODALS */
+
+            <Modal @ref="modalRefEditPassword">
+                <ModalContent Centered="true">
+                    <ModalHeader>
+                        <ModalTitle>Смена пароля</ModalTitle>
+                        <i class="modal_x fal fa-times" @onclick="HideEditPasswordModel"></i>
+                    </ModalHeader>
+                    <ModalBody>
+                        @if (editPasswordModel != null)
+                        {
+                            @if (EditPasswordValidationBlock != null && EditPasswordValidationBlock.isShow)
+                            {
+                                <div>
+                                    <ValidationBlock block="EditPasswordValidationBlock" />
+                                </div>
+                            }
+                            <EditForm Model="@editPasswordModel">
+                                <Validations @ref="editPasswordValidation" Mode="ValidationMode.Auto" ValidateOnLoad="false" EditContext="@_edcEditPassword">
+                                    <Fields Class="modal-form-wrapper">
+                                        <Field>
+                                            <Validation>
+                                                <TextEdit @bind-Text="@editPasswordModel.OldPassword" Role="TextRole.Password" Placeholder="Текущий пароль">
+                                                    <Feedback>
+                                                        <ValidationError />
+                                                    </Feedback>
+                                                </TextEdit>
+                                                <ValidationMessage For="() => editPasswordModel.OldPassword" />
+                                            </Validation>
+                                        </Field>
+                                        <Field>
+                                            <Validation>
+                                                <TextEdit @bind-Text="@editPasswordModel.NewPassword" Placeholder="Новый пароль">
+                                                    <Feedback>
+                                                        <ValidationError />
+                                                    </Feedback>
+                                                </TextEdit>
+                                                <ValidationMessage For="() => editPasswordModel.NewPassword" />
+                                            </Validation>
+                                        </Field>
+                                        <Field>
+                                            <Validation>
+                                                <TextEdit @bind-Text="@editPasswordModel.NewPasswordRewrite" Placeholder="Повторите новый пароль">
+                                                    <Feedback>
+                                                        <ValidationError />
+                                                    </Feedback>
+                                                </TextEdit>
+                                                <p class="note-form form-row">Пароль используется при входе не через ВК, так же он может понадобиться для подтверждения некоторых действий. Осторожно относитесь к выборе нового пароля. Если вас взломают - аккаунт администрация вернуть не сможет.</p>
+                                                <ValidationMessage For="() => editPasswordModel.NewPasswordRewrite" />
+                                            </Validation>
+                                        </Field>
+                                    </Fields>
+                                </Validations>
+                            </EditForm>
+                        }
+                    </ModalBody>
+                    <ModalFooter>
+                        <div class="footer-buttons" style="display: flex; justify-content: center;">
+                            <Button Class="primary normal icon" Clicked="@EditPasswordModelExecuted" Loading="@isEditPasswordLoading">
+                                <ChildContent>Обновить пароль<i class="fal fa-lock"></i></ChildContent>
+                                <LoadingTemplate><div class="btn-loader"></div></LoadingTemplate>
+                            </Button>
+                            <Button Class="primary outline icon" Clicked="@HideEditPasswordModel">
+                                <ChildContent>Отменить</ChildContent>
+                            </Button>
+                        </div>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+
+            <Modal @ref="modalRefEditImage">
+                <ModalContent Centered="true" Size="ModalSize.Large">
+                    <ModalHeader>
+                        <ModalTitle>Смена аватара</ModalTitle>
+                        <i class="modal_x fal fa-times" @onclick="HideEditImageModel"></i>
+                    </ModalHeader>
+                    <ModalBody>
+                        <div style="display: flex; gap: 20px;">
+                            <div class="circle-avatar-outer" style="flex:1;">
+                                <img width="250" height="250" style="opacity: 0;" class="-js-get-cropped" src="@(mainUserAvatarImage != null? mainUserAvatarImage : "")" />
+                            </div>
+                            <div style="flex:1;">
+                                @if (EditImageValidationBlock != null && EditImageValidationBlock.isShow)
+                                {
+                                    <div style="margin-bottom:15px">
+                                        <ValidationBlock block="EditImageValidationBlock" />
+                                    </div>
+                                }
+                                <p class="input-upper-label">Загрузить фотографию</p>
+                                <FileEdit Changed="@OnChangedFile" Progressed="@OnProgressed" AutoReset="false" Placeholder="Выбрать файл..." Filter="image/jpeg, image/png"></FileEdit>
+                                @if (isProgressBarImageLoader)
+                                {
+                                    <Progress Color="@(progressBarImageLoader >= 100? Color.Success : Color.Primary)" Value="@progressBarImageLoader" />
+                                }
+                                <div class="input-uili-info">
+                                    <p>Загрузите новую фотографию в поле сверху, либо обрежте вашу старую фотографию по новому. Правила загрузки изоображения для автара:</p>
+                                    <ul>
+                                        <li>Аватар должен быть почти квадратный, старайтесь загружать как можно более квадратные изоображения. Но в любом случае вам придется обрезать загруженное изоображение. Изоображения будут показываться в виде ромба. Примерное соотношение сторон: ~ 1.113</li>
+                                        <li>Максимальный размер изоображения: <strong>2МБ</strong></li>
+                                        <li>После обрезки или(и) загрузки нового изоображений нажмите на кнопку 'обновить аватар' иначе данные не сохранятся.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </ModalBody>
+                    <ModalFooter>
+                        <div class="footer-buttons" style="display: flex; justify-content: center;">
+                            <Button Class="primary normal icon" Clicked="@EditImageExecuted" Loading="@isEditImagePasswordLoading">
+                                <ChildContent>Обновить аватар<i class="fas fa-user-circle"></i></ChildContent>
+                                <LoadingTemplate><div class="btn-loader"></div></LoadingTemplate>
+                            </Button>
+                            <Button Class="primary outline icon" Clicked="@HideEditImageModel">
+                                <ChildContent>Отменить</ChildContent>
+                            </Button>
+                        </div>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+        }
+    else
+    {
+        <div class="loader-wrapper"><div class="btn-loader page"></div></div>
+    }
+</div>
+
+@using System.Text.RegularExpressions
+@using System.Threading
+
+@code {
+    [CascadingParameter(Name = "mainbar_updateImage")]
+    public EventCallback mainbar_updateImage { get; set; }
+
+    [Parameter]
+    public int UserId { get; set; }
+
+    [CascadingParameter(Name = "navbar_update")]
+    public EventCallback navbar_update { get; set; }
+
+    private Client user { get; set; }
+    private Client viewer { get; set; }
+
+    private InputLoaderState screenNameState { get; set; }
+    private bool screenNameStartValiation { get; set; }
+    private string screenNameText { get; set; }
+    private string screenNameErrorMessage { get; set; }
+
+    private Modal modalRefEditPassword { get; set; }
+
+    private Modal modalRefEditImage { get; set; }
+    private ClientAvatar ClientAvatarRef { get; set; }
+
+    /* Change password */
+    private EditPasswordModel editPasswordModel { get; set; }
+    private EditContext _edcEditPassword { get; set; }
+    private Validations editPasswordValidation { get; set; }
+    private bool isEditPasswordLoading { get; set; }
+    private ValidationMessageBlock EditPasswordValidationBlock { get; set; }
+
+
+    private ValidationMessageBlock SettingsInformationBlock { get; set; }
+
+    /* IMAGING */
+
+    private bool isEditImagePasswordLoading { get; set; }
+
+    private string mainUserAvatarImage { get; set; }
+
+    private bool isImageUploaded { get; set; }
+    private IFileEntry imageUploaded { get; set; }
+
+    private int progressBarImageLoader { get; set; }
+    private bool isProgressBarImageLoader { get; set; }
+
+    private ValidationMessageBlock EditImageValidationBlock { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await _userServices.FindUserById(UserId);
+        viewer = await _userServices.GetClient();
+
+
+        if (user == null || viewer == null)
+            await _virtualNavigationServices.ReRedirectClient(VirtualNavigationServices.errorUrl + 404, hardLoad: true);
+
+        StateHasChanged();
+
+        if (user.Id == viewer.Id)
+        {
+            screenNameText = user.ScreenName;
+            editPasswordModel = new EditPasswordModel();
+            _edcEditPassword = new EditContext(editPasswordModel);
+
+            await _js.InvokeVoidAsync("loadScript", "libs/cropper.js/cropper.min.js");
+            await _js.InvokeVoidAsync("loadScript", "libs/cropper.js/jquery-cropper.min.js");
+            await _js.InvokeVoidAsync("loadScript", "libs/tippy.js/tippy.min.js");
+
+            await _js.InvokeVoidAsync("CreateTippyElement",
+            new List<TooltipModel>() {
+                new TooltipModel(".-tp-autosave-info", "Данное поле автосохраняемое, просто вводите текст, а этот индикатор покажет статус изменения.", ToolTipStyles.DefaultStyle, width: 350)
+                    });
+
+            await ChangePageLoadStatus(true);
+
+            StateHasChanged();
+
+            await _js.InvokeVoidAsync("MaxHeightLoader");
+        }
+        else await _virtualNavigationServices.ReRedirectClient(VirtualNavigationServices.accessDeniedUrl, hardLoad: true);
+    }
+
+    /* VALIDATORS */
+
+    async Task ValidateScreeNameAsync(ValidatorEventArgs e, CancellationToken cancellationToken)
+    {
+        screenNameText = Convert.ToString(e.Value);
+        screenNameErrorMessage = null;
+
+        if (screenNameStartValiation)
+        {
+            screenNameState = InputLoaderState.Loading;
+            StateHasChanged();
+
+            var screename = Convert.ToString(e.Value);
+            var screenNamePattern = new Regex("^.[^{}:\"]{4,20}$");
+
+            if (!screenNamePattern.IsMatch(screename))
+            {
+                screenNameState = InputLoaderState.Error;
+                screenNameErrorMessage = "Ошибка ввода. Никнйем не сохранился.";
+            }
+            else
+            {
+                await _userServices.UpdateUserScreenName(user, screenNameText);
+                await navbar_update.InvokeAsync();
+                screenNameState = InputLoaderState.Succes;
+            }
+        }
+        else screenNameStartValiation = true;
+
+        StateHasChanged();
+    }
+
+    /* EDIT PASSWORD */
+
+    private async Task EditPasswordModelExecuted()
+    {
+        if (isEditPasswordLoading == true)
+            return;
+
+        isEditPasswordLoading = true;
+        StateHasChanged();
+
+        if (editPasswordValidation.ValidateAll())
+        {
+            try
+            {
+                var isComplete = await _userServices.UserPasswordIsOk(user, editPasswordModel.OldPassword);
+
+                if (!isComplete)
+                {
+                    EditPasswordValidationBlock = new ValidationMessageBlock("Неверно указан текущий пароль.", "error");
+                    isEditPasswordLoading = false;
+                    return;
+                }
+
+                await _userServices.UpdateUserPassword(user, editPasswordModel.NewPassword);
+
+                SettingsInformationBlock = new ValidationMessageBlock("Пароль успешно изменён.", "ok");
+
+                HideEditPasswordModel();
+            }
+            catch (Exception)
+            {
+                EditPasswordValidationBlock = new ValidationMessageBlock("Ошибка смены пароля.", "error");
+            }
+        }
+
+        isEditPasswordLoading = false;
+    }
+
+    private void ShowEditPasswordModel()
+    {
+        editPasswordModel = new EditPasswordModel() { };
+
+        modalRefEditPassword.Show();
+    }
+
+    private void HideEditPasswordModel()
+    {
+        editPasswordModel = new EditPasswordModel() { };
+        EditPasswordValidationBlock = null;
+        modalRefEditPassword.Hide();
+    }
+
+    /* IMAGING */
+
+    private async Task EditImageExecuted()
+    {
+        isEditImagePasswordLoading = true;
+        isProgressBarImageLoader = false;
+        progressBarImageLoader = 0;
+
+        StateHasChanged();
+
+        var fileStatic = new VirtualFileStatic(_webhostManager, _fileManager);
+
+        var jsonStringify = await _js.InvokeAsync<string>("CropperConnector.GetDataCropper", ".-js-get-cropped"); // получаем данные с кропера
+        var editFileAvatar = JsonConvert.DeserializeObject<CroppedImageInfo>(jsonStringify); // преобразуем данные в класс.
+
+        if (isImageUploaded)
+        {
+            var megafile = await fileStatic.GenerateWebpFile(imageUploaded, Convert.ToDouble(imageUploaded.Size) / (1024.0 * 1024.0));
+            await fileStatic.RecroppedImage(user.UserAvatar_cropp, megafile.MainImageId, editFileAvatar);
+
+            user.UserAvatar_main = megafile.MainImageId;
+            await _userServices.UpdateUser(user);
+        }
+        else
+        {
+            await fileStatic.RecroppedImage(user.UserAvatar_cropp, user.UserAvatar_main, editFileAvatar);
+        }
+
+        isEditImagePasswordLoading = false;
+        HideEditImageModel();
+
+        await ClientAvatarRef.ReGenerateImage();
+        //userImageSettings = (await _fileManager.GetPhysicCroppedFile(user.UserAvatar_cropp)) + "?_v=" + ClientAuthServices.GenerateRandomString(10, false).ToUpperInvariant();
+        await mainbar_updateImage.InvokeAsync();
+    }
+
+    private async Task ShowEditImageModel()
+    {
+        var croppedFile = await _fileManager.GetCroppedImageFile(user.UserAvatar_cropp);
+        mainUserAvatarImage = await _fileManager.GetPhysicFileUrl(user.UserAvatar_main);
+        StateHasChanged();
+        await _js.InvokeVoidAsync("CropperConnector.InjectCropperToImage", ".-js-get-cropped", croppedFile.x, croppedFile.y, croppedFile.width, croppedFile.height);
+        isProgressBarImageLoader = true;
+
+        modalRefEditImage.Show();
+    }
+
+    private void HideEditImageModel()
+    {
+        imageUploaded = null;
+        isImageUploaded = false;
+        mainUserAvatarImage = null;
+        isProgressBarImageLoader = false;
+        progressBarImageLoader = 0;
+
+        EditImageValidationBlock = null;
+
+        modalRefEditImage.Hide();
+    }
+
+    void OnProgressed(FileProgressedEventArgs e)
+    {
+        int percent = (Convert.ToInt32(e.Percentage - 10) < 0) ? 0 : Convert.ToInt32(e.Percentage - 10);
+        progressBarImageLoader = percent;
+        //StateHasChanged();
+    }
+
+    async Task OnChangedFile(FileChangedEventArgs e)
+    {
+        var file = e.Files.FirstOrDefault();
+
+        if (file == null)
+        {
+            EditImageValidationBlock = new ValidationMessageBlock("Что-то пошло не так при загрузке файлов.", "error");
+            return;
+        }
+        if (!VirtualFileManager.imageMimeTypes.Contains(file.Type))
+        {
+            EditImageValidationBlock = new ValidationMessageBlock("Загружаемый файл не является изоображением.", "error");
+            return;
+        }
+
+        if ((file.Size / (1024 * 1024)) > 2) // 2 mb limit
+        {
+            EditImageValidationBlock = new ValidationMessageBlock("Загружаемый файл слишком большой.", "error");
+            return;
+        }
+
+        isProgressBarImageLoader = true;
+        progressBarImageLoader = 0;
+        StateHasChanged();
+
+        imageUploaded = file;
+        isImageUploaded = true;
+
+        var fileStatic = new VirtualFileStatic(_webhostManager, _fileManager);
+
+
+        // TODO: DAY TO DELETE THIS IMAGE: 1
+        var megafile = await fileStatic.GenerateWebpFile(imageUploaded, Convert.ToDouble(imageUploaded.Size) / (1024.0 * 1024.0),
+            hourseToDelete: 1); // delete 1 hourse later
+        mainUserAvatarImage = await _fileManager.GetPhysicFileUrl(megafile.MainImageId);
+
+        progressBarImageLoader = 100;
+
+        StateHasChanged();
+
+        await _js.InvokeVoidAsync("CropperConnector.InjectCropperToImage", ".-js-get-cropped"); // reinject
+    }
+}

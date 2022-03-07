@@ -1,0 +1,66 @@
+﻿@inject NavigationManager _nm
+
+@if (Model != null && Model.isShow && IsRender)
+{
+    <div class="block main-menu  @(Model.isMenuCollapsed ? "hidden" : "")">
+        <div class="menu-header @(Model.isMenuCollapsed ? "hidden" : "")">
+            <p class="side-block-primary">@Model.name</p>
+            @if (Model.isHasCollapsed)
+            {
+                <i @onclick="() => OnClickHeader(Model)" class="fas fa-caret-down drop-i @(Model.isMenuCollapsed ? "menu-on" : "") mega"></i>
+            }
+        </div>
+        <div class="@(Model.isMenuCollapsed ? "group-hidden" : "")">
+            @foreach (var item in Model.menuFields)
+            {
+                <div>
+                    <div @onclick="() => OnClickNavMenu(item)" class="menu-item @(item.item.isActive ? "" : "disable")">
+                        <ToLink IsActive="@item.item.isActive" Url="@item.item.url" Class="@((item.item.isFocus ? "focus" : "") + " " + (item.item.isActive ? "" : "disable"))">@((MarkupString)item.item.icon)@item.item.name@((MarkupString)item.item.addedContent)</ToLink>
+                        @if (item.childItems != null)
+                        {
+                            <i class="fas fa-caret-down drop-i @((item.isOpen ? "menu-on" : "") + " " + (item.item.isActive ? "" : "disable"))"></i>
+                        }
+                    </div>
+                    @if (item.childItems != null && item.item.isActive)
+                    {
+                        <div class="menu-group @(item.isOpen ? "on" : "")" style="@(item.isOpen ? "max-height: " + (item.childItems.Count * 50) + "px !important;" : "")">
+                            @foreach (var _item in item.childItems)
+                            {
+                                <div class="menu-item @(_item.isActive ? "" : "disable")">
+                                    <ToLink IsActive="@_item.isActive" Url="@_item.url" Class="@((_item.isFocus ? "focus" : "") + " " + (_item.isActive ? "" : "disable"))">@((MarkupString)_item.icon)@_item.name@((MarkupString)_item.addedContent)</ToLink>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public MainMenuModel Model { get; set; }
+
+    [Parameter]
+    public bool IsRender { get; set; }
+
+    private async Task OnClickNavMenu(MenuField item)
+    {
+        if (item.item.isActive)
+        {
+            item.isOpen = !item.isOpen;
+        }
+    }
+
+    private async Task OnClickHeader(MainMenuModel item)
+    {
+        if (item.isHasCollapsed)
+        {
+            item.isMenuCollapsed = !item.isMenuCollapsed;
+        }
+    }
+
+    public void SHC() => StateHasChanged();
+}

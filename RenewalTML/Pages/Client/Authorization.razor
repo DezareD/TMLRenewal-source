@@ -1,0 +1,335 @@
+﻿@page "/auth"
+
+@inject ISystemConfigurationServices _systemConfigurationServices
+
+@inherits RenewalTMLComponentBase
+
+<div class="auth-panel block">
+    <div class="left-block" style="flex: 5;">
+        <div class="auth-info-block">
+            <div class="auth-info-bar">
+                <div class="auth-left-logo">
+                    <i class="fal fa-globe-europe"></i>
+                </div>
+                <div class="auth-right-info">
+                    <span class="main-text">Глобальная экономика</span>
+                    <span class="secondary-text">Экономика TML Renewal динамическая, а значит любые события могут повлиять на всю экономику.</span>
+                </div>
+            </div>
+            <div class="auth-info-bar" style="opacity: 0.65; user-select: none;">
+                <div class="auth-left-logo">
+                    <i class="fal fa-shopping-basket"></i>
+                </div>
+                <div class="auth-right-info">
+                    <span class="main-text">Покупайте товары</span>
+                    <span class="secondary-text">Покупайте товары и прокачивайтесь, открыая новые функции, особенности и улучшения.</span>
+                </div>
+            </div>
+            <div class="auth-info-bar" style="opacity: 0.65; user-select: none;">
+                <div class="auth-left-logo">
+                    <i class="fal fa-briefcase"></i>
+                </div>
+                <div class="auth-right-info">
+                    <span class="main-text">Создавайте бизнес</span>
+                    <span class="secondary-text">Создавайте свои организации, предприятия, выпускайте товары и зарабатывайте деньги.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="flex: 6; @(_isComplete? "": "display: flex; justify-content: center; align-items: center;")">
+        @if (_isComplete)
+        {
+            <div class="loading-template-auth" style="display:@(authVKIsLoading ? "flex" : "none" )">
+                <i class="fal fa-clock"></i>
+                <p class="main-text">Авторизуйтесь через ВК</p><p class="mini-text">Приложение ожидает авторизации через Вконтакте для предоставления данных.</p>
+            </div>
+            @if (isStartedTwoPhaseVKRegister)
+            {
+                <div class="auth-outer">
+                    <p class="auth-name">Вторая стадия регистрации</p>
+                    @if (AuthErrorMessage != null && AuthErrorMessage.isShow)
+                    {
+                        <div style="margin: 0 35px 0 35px; margin-top:25px">
+                            <ValidationBlock block="AuthErrorMessage" />
+                        </div>
+                    }
+                    <div style="margin: 0 35px 0 35px; margin-top: @((AuthErrorMessage != null && AuthErrorMessage.isShow) ? "10px" : "25px")">
+                        <ValidationBlock block="TwoPhaseInfo" />
+                    </div>
+                        <Validations @ref="_twoPhaseRegistrationModule._validationContext" Mode="ValidationMode.Auto" Model="_twoPhaseRegistrationModule._model" ValidateOnLoad="false">
+                            <Fields Class="login-wrapper" Style="height: auto;">
+                                <Field>
+                                    <Validation @ref="@_twoPhaseRegistrationModule._fieldValidationStatus["Name"]">
+                                        <Addons>
+                                            <Addon AddonType="AddonType.Start">
+                                                <AddonLabel>@@</AddonLabel>
+                                            </Addon>
+                                            <Addon AddonType="AddonType.Body">
+                                                <TextEdit @bind-Text="@_twoPhaseRegistrationModule._model.Name" Placeholder="Логин" Class="input-left-none">
+                                                    <Feedback>
+                                                        <ValidationError />
+                                                    </Feedback>
+                                                </TextEdit>
+                                            </Addon>
+                                        </Addons>
+                                    </Validation>
+                                </Field>
+                                <p class="note-form">Логин - уникаленьная запись пользователя, по которой вас будут искать, по которой на вашу страницу будут переходить.</p>
+                                <Field>
+                                    <Validation @ref="@_twoPhaseRegistrationModule._fieldValidationStatus["ScreenName"]">
+                                        <TextEdit @bind-Text="@_twoPhaseRegistrationModule._model.ScreenName" Placeholder="Никнейм" Class="input-left-none">
+                                            <Feedback>
+                                                <ValidationError />
+                                            </Feedback>
+                                        </TextEdit>
+                                    </Validation>
+                                </Field>
+                                <p class="note-form">Никнейм - не уникальная запись, другие пользователи будут видеть именно эту запись вместо логина.</p>
+                                <Field>
+                                    <Validation @ref="@_twoPhaseRegistrationModule._fieldValidationStatus["Password"]">
+                                        <TextEdit @bind-Text="@_twoPhaseRegistrationModule._model.Password" Placeholder="Пароль" Role="TextRole.Password">
+                                            <Feedback>
+                                                <ValidationError />
+                                            </Feedback>
+                                        </TextEdit>
+                                    </Validation>
+                                </Field>
+                            </Fields>
+                        </Validations>
+                        <div class="align-center button-checkbox-panel" style="margin-bottom: 25px;">
+                            <Button Type="ButtonType.Submit" Class="primary normal icon" @onclick="TwoPhaseExecuded" Loading="@authIsLoadingTwoPhase">
+                                <ChildContent>Закончить регистрацию<i class="fal fa-key"></i></ChildContent>
+                                <LoadingTemplate><div class="btn-loader"></div></LoadingTemplate>
+                            </Button>
+                        </div>
+                </div>
+            }
+            else
+            {
+                <div class="auth-outer">
+                    <p class="auth-name">Авторизация</p>
+                    @if (AuthErrorMessage != null && AuthErrorMessage.isShow)
+                    {
+                        <div style="margin: 0 35px 0 35px; margin-top:25px">
+                            <ValidationBlock block="AuthErrorMessage" />
+                        </div>
+                    }
+
+                <Validations @ref="_userLoginModule._validationContext" Model="@_userLoginModule._model" Mode="ValidationMode.Auto" ValidateOnLoad="false">
+                    <Fields Class="login-wrapper">
+                        <Field>
+                            <Validation @ref="@_userLoginModule._fieldValidationStatus["Name"]">
+                                <Addons>
+                                    <Addon AddonType="AddonType.Start">
+                                        <AddonLabel>@@</AddonLabel>
+                                    </Addon>
+                                    <Addon AddonType="AddonType.Body">
+                                        <TextEdit @bind-Text="@_userLoginModule._model.Name" Placeholder="Имя" Class="input-left-none">
+                                            <Feedback>
+                                                <ValidationError />
+                                            </Feedback>
+                                        </TextEdit>
+                                    </Addon>
+                                </Addons>
+                            </Validation>
+                        </Field>
+                        <Field>
+                            <Validation @ref="@_userLoginModule._fieldValidationStatus["Password"]">
+                                <TextEdit @bind-Text="@_userLoginModule._model.Password" Placeholder="Пароль" Role="TextRole.Password">
+                                    <Feedback>
+                                        <ValidationError />
+                                    </Feedback>
+                                </TextEdit>
+                            </Validation>
+                        </Field>
+                    </Fields>
+                    <div class="align-center button-checkbox-panel">
+                        <div class="-tp-remember-me">
+                            <Check @bind-Checked="_userLoginModule._model.isPersistant" TValue="bool">Запомнить меня?</Check>
+                        </div>
+                        <Button Type="ButtonType.Submit" Class="primary normal icon" Loading="@authIsLoading" @onclick="async () => await LoginExecuted()">
+                            <ChildContent>Вход<i class="fal fa-key"></i></ChildContent>
+                            <LoadingTemplate><div class="btn-loader"></div></LoadingTemplate>
+                        </Button>
+                    </div>
+                </Validations>
+                    <div class="separator-wrapper" style="padding: 0 35px 0 35px; margin-top: 30px; margin-bottom: 20px;">
+                        <div class="separator primary"></div>
+                        <div class="separator-text"><p>Аутентификация через ВК</p></div>
+                        <div class="separator primary"></div>
+                    </div>
+                    <div @onclick="ExecutedVkAuthorization" class="vk-icon-block">
+                        <VKLogotype />
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="loader-wrapper"><div class="btn-loader page"></div></div>
+        }
+    </div>
+</div>
+
+@code {
+    [CascadingParameter(Name = "loyout_update")]
+    public EventCallback loyout_update { get; set; }
+
+    [CascadingParameter(Name = "navbar_update")]
+    public EventCallback navbar_update { get; set; }
+
+    [CascadingParameter(Name = "mainbar_updateImage")]
+    public EventCallback<bool> mainbar_updateImage { get; set; }
+
+    /* main auth */
+    private bool authIsLoading { get; set; }
+    private bool authVKIsLoading { get; set; }
+
+    private ContextValidationModule<UserLoginModel> _userLoginModule { get; set; }
+
+    /* two phase register */
+    private ContextValidationModule<TwoPhaseRegistrationVK> _twoPhaseRegistrationModule { get; set; }
+    private VKAuthorizeDataInterop vkSessionObject { get; set; }
+    private bool isStartedTwoPhaseVKRegister { get; set; }
+    private bool authIsLoadingTwoPhase { get; set; }
+
+    public ValidationMessageBlock AuthErrorMessage { get; set; }
+    public ValidationMessageBlock TwoPhaseInfo { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _userLoginModule = new ContextValidationModule<UserLoginModel>(new UserLoginModel());
+        _twoPhaseRegistrationModule = new ContextValidationModule<TwoPhaseRegistrationVK>(new TwoPhaseRegistrationVK());
+
+        TwoPhaseInfo = new ValidationMessageBlock("Вы проходите второй этап регистрации. Для завершения регистрации укажите никнейм и пароль по которому будет производиться вход в аккаунт. На логин и пароль действуют ограничения: <ul><li>Длина логина от 4 до 20 символов. Доступны символы латинского алфавита, а так же знак точки.</li><li>Длина пароля от 6 до 20 символов. Ограничений на знаки нет.</li></ul> В случае незаврешения данного этапа, регистрация будет отменена.", "info");
+
+        /* tippy loader and create */
+
+        await _js.InvokeVoidAsync("loadScript", "libs/tippy.js/tippy.min.js");
+
+        await _js.InvokeVoidAsync("CreateTippyElement",
+        new List<TooltipModel>() {
+                                new TooltipModel(".-tp-remember-me", "Запомнить ваш аккаунт на день или на год?", ToolTipStyles.DefaultStyle, width: 350)
+                                                    });
+
+        await ChangePageLoadStatus(true);
+    }
+
+    private async Task LoginExecuted()
+    {
+        authIsLoading = true;
+
+        _userLoginModule.SetFielAllStatus(ValidationStatus.None);
+
+        if (_userLoginModule._validationContext.ValidateAll())
+        {
+            var isLoginReady = await _userServices.LoginIsReady(_userLoginModule._model);
+
+            if (!isLoginReady)
+            {
+                _userLoginModule.SetFielAllStatus(ValidationStatus.Error);
+                AuthErrorMessage = new ValidationMessageBlock("Неверные данные для входа.", "error");
+            }
+            else
+            {
+
+                var user = await _userServices.FindUserByNickname(_userLoginModule._model.Name);
+                await _userServices.Authenticate(user, _userLoginModule._model.isPersistant);
+                //await mainbar_updateImage.InvokeAsync(true); // flag true = reupdate user
+                //await navbar_update.InvokeAsync(); // Обновляем саму менюшку, если добавились поля с авторизацией или типо того
+
+                //await _virtualNavigationServices.ReRedirectClient("");
+                await _js.InvokeVoidAsync("LoadingRepositry.reloadPage");
+            }
+        }
+        authIsLoading = false;
+    }
+
+    private async Task TwoPhaseExecuded()
+    {
+        authIsLoadingTwoPhase = true;
+
+        if (isStartedTwoPhaseVKRegister)
+        {
+            var registerison = await _systemConfigurationServices.Get("system_main.registerison");
+
+            _twoPhaseRegistrationModule.SetFielAllStatus(ValidationStatus.None);
+
+            if (Convert.ToBoolean(registerison) == false)
+            {
+                AuthErrorMessage = new ValidationMessageBlock("Регистрация на сайте временно отключена.", "error");
+                authIsLoadingTwoPhase = false;
+                return;
+            }
+
+            if (_twoPhaseRegistrationModule._validationContext.ValidateAll())
+            {
+                var isFreenickname = await _userServices.IsFreeNickName(_twoPhaseRegistrationModule._model.Name);
+
+                if (!isFreenickname)
+                {
+                    _twoPhaseRegistrationModule.SetFieldStatus("Name", ValidationStatus.Error);
+                    AuthErrorMessage = new ValidationMessageBlock("Такой никнейм уже существует.", "error");
+                }
+                else
+                {
+                    var user = await _userServices.RegisterClient(_twoPhaseRegistrationModule._model, vkSessionObject);
+                    await _userServices.Authenticate(user, true);
+                    await _js.InvokeVoidAsync("LoadingRepositry.reloadPage");
+                }
+            }
+        }
+        authIsLoadingTwoPhase = false;
+    }
+
+    /* VK AUTHORIZATION */
+
+    private async Task ExecutedVkAuthorization()
+    {
+        authVKIsLoading = true;
+        await _js.InvokeVoidAsync("VKAuthorizeFunction.AuthorizeVk", DotNetObjectReference.Create(this));
+    }
+
+    [JSInvokable]
+    public async Task VKAuthorizeComplete(string jsonStringify)
+    {
+        if (!ErrorCatchingFunc.isHaveError(jsonStringify).haveError)
+        {
+            vkSessionObject = JsonConvert.DeserializeObject<VKAuthorizeDataInterop>(jsonStringify);
+
+            var sessionAccepted = _userServices.IsSessionAuthComplete(vkSessionObject);
+
+            if (sessionAccepted)
+            {
+                var isRegister = await _userServices.IsUserRegisterVK(vkSessionObject);
+
+                if (isRegister)
+                {
+                    // Пользовтель уже зарегистрирован, просто входим в аккаунт.
+                    var user = await _userServices.GetUserWithVK(vkSessionObject);
+
+                    await _userServices.Authenticate(user, true);
+
+                    //await navbar_update.InvokeAsync(); // Обновляем саму менюшку, если добавились поля с авторизацией или типо того
+                    //await mainbar_updateImage.InvokeAsync(true);
+
+                    //await _virtualNavigationServices.ReRedirectClient("");
+                    await _js.InvokeVoidAsync("LoadingRepositry.reloadPage");
+                }
+                else
+                {
+                    isStartedTwoPhaseVKRegister = true;
+                    if (AuthErrorMessage != null)
+                        AuthErrorMessage.isShow = false; // Если выдало ошибку при входе, то при переходе на регистрацию ошибка все ещё весела.
+                    StateHasChanged();
+                    // Нужно пройти второй этап регистрации и заполнить дополнительные данные.
+                }
+            }
+        }
+
+        authVKIsLoading = false;
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+
+    // TODO: Проверить вход на обновление навбара
+}

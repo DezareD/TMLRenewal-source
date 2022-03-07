@@ -1,0 +1,32 @@
+﻿@inherits NavMenuBase
+
+<div class="navmenu-outer" style="display: @(isShowNavMenuWapper? "flex": "none")">
+    <NavigationBlock @ref="MainNavigationBlock" Model="MainMenuModel" IsRender="RtBlock.isShowMenu"></NavigationBlock>
+    <NavigationBlock @ref="ProfileMenuBlock" Model="ProfileMenu" IsRender="RtBlock.isShowMenu"></NavigationBlock>
+    <NavigationBlock @ref="AdminMenuBlock" Model="AdminMenu" IsRender="RtBlock.isShowMenu"></NavigationBlock>
+</div>
+
+@code {
+    [Parameter]
+    public CompleteVirtualRedirect RtBlock { get; set; }
+
+    public bool isShowNavMenuWapper { get; set; }
+    public bool isShowNVMWPFlag { get; set; } = true;
+
+    // Need update menu on routing
+    public async Task EventNavbarUpdate()
+    {
+        await CheckMenuUrling(); // Проверяем, нужно ли открыть какие либо доп меню.
+
+        isShowNavMenuWapper = CheckIsNavBlockShow(MainMenuModel) ||
+                                 CheckIsNavBlockShow(ProfileMenu) ||
+                                 CheckIsNavBlockShow(AdminMenu);
+
+        StateHasChanged();
+    }
+
+    public bool CheckIsNavBlockShow(MainMenuModel nv)
+    {
+        return nv != null && nv.isShow;
+    }
+}

@@ -1,0 +1,170 @@
+﻿@page "/apanel/userlist"
+@using RenewalTML.Shared.Navigation
+
+@using System.Threading
+
+@inherits RenewalTMLComponentBase
+
+    <div class="block p-normal">
+        <div class="admin-header">
+            <p class="header-name">Пользователи</p>
+            <div>
+                @if (isSearched)
+                {
+                    <div class="btn-loader inputloader" style="display: inline-block; margin-right: 10px;"></div>
+                }
+
+                <div style="position: relative; display: inline-block;">
+                    <Validation AsyncValidator="@OnUpdateSearch">
+                        <Field Style="position: relative;">
+                            <TextEdit Placeholder="Поиск..."
+                                      DelayTextOnKeyPress="true"
+                                      DelayTextOnKeyPressInterval="850"
+                                      Text="@SearchInput"
+                                      Class="search-input">
+                            </TextEdit>
+                        </Field>
+                    </Validation>
+                    <i class="far fa-search search-icon"></i>
+                </div>
+
+                <Button Class="primary normal icon">
+                    <ChildContent>Создать пользователя<i class="fal fa-plus"></i></ChildContent>
+                </Button>
+            </div>
+        </div>
+        <div class="admin-page">
+            @if (ClientList != null)
+            {
+                if (ClientList.Count() > 0)
+                {
+                    <div class="admin-items-list-outer" style="margin-bottom: 20px;">
+                        <div style="color: #333; font-size: 15px;">Аватар</div>
+                        <div style="color: #333; font-size: 15px;">Никнейм и логин</div>
+                        <div style="color: #333; font-size: 15px;">Кол-во денег</div>
+                        <div style="color: #333; font-size: 15px;">Роль</div>
+                        <div style="color: #333; font-size: 15px;">Действия</div>
+                    </div>
+                    foreach (var user in ClientList)
+                    {
+                        <div class="admin-items-list-outer">
+                            <div class="admin-user-item-outer">
+                                <!-- TODO: Все аватарки почему то одинаковые -->
+                                <ClientAvatar Client="user" AvatarSize="AvatarSize.mini" @key="user"></ClientAvatar>
+                            </div>
+                            <div>
+                                <p style="color: #333;">@user.UserName</p>
+                                <p style="font-size: 13px;"><span>@@</span>@user.ScreenName</p>
+                            </div>
+
+                            <!-- NOTE: '@@key' используется для уникализации каждого элемента, иначе они будут сохранятся и не обновлятся -->
+                            <p><span style="color: #333; font-size: 15px;margin-right: 5px;">@CurrencyAddon.Format(user.Balance)</span><MoneyLogotype Class="mini black-grey" /></p>
+                            <div><ClientRoleFormat @key="user" RoleId="user.RoleId"></ClientRoleFormat></div>
+                            <div class="admin-badges-panel" style=" display: flex; justify-content: center;">
+                                @if (isHavePermissionAdministrateUser || isHavePermissionModerateUser)
+                                {
+                                    <ToLink Url="@("/apanel/userSingle/" + user.Id)" IsActive="true" Class="a-badge a-edit">
+                                        <i class="fal fa-cog"></i>
+                                    </ToLink>
+                                }
+                                else
+                                {
+                                    <div class="a-badge a-edit disable"><i class="fal fa-cog"></i></div>
+                                }
+
+                                <!-- <div class="a-badge a-delete @(isHavePermissionAdministrateUser? "" : "disable")"><i class="fal fa-ban"><span class="admin-badge-text">Заблокировать</span></i></div> -->
+                                </div>
+                            </div>
+                        }
+
+                        <PagingBlock @ref="PagingBlock" ItemOnPage="UserPageSize" ElementCount="AllList.Count()" CurrentPageChanged="OnPageChanged"></PagingBlock>
+                    }
+                    else
+                    {
+                        <p>Not Found</p>
+                    }
+                }
+                else
+                {
+                    <div class="loader-wrapper"><div class="btn-loader page"></div></div>
+                }
+            </div>
+        </div>
+
+    @code {
+        private IEnumerable<Client> AllList { get; set; }
+        private IEnumerable<Client> ClientList { get; set; }
+
+        private PagingBlock PagingBlock { get; set; }
+        private const int UserPageSize = 16;
+        private string SearchInput { get; set; }
+
+        private bool isSearched { get; set; }
+        private bool searchedStart { get; set; }
+
+        private bool isHavePermissionAdministrateUser { get; set; }
+        private bool isHavePermissionModerateUser { get; set; }
+
+        async Task OnUpdateSearch(ValidatorEventArgs e, CancellationToken cancellationToken)
+        {
+            SearchInput = Convert.ToString(e.Value);
+
+            if (searchedStart)
+            {
+                isSearched = true;
+                StateHasChanged();
+
+                var search = Convert.ToString(e.Value);
+
+                PagingBlock._currentPage = 1;
+
+                AllList = await _userServices.GetAllFilterClient(true, true, true);
+
+                if(search != "")
+                    AllList = AllList.Where(m => m.UserName.ToLower().Contains(search.ToLower()) || m.ScreenName.ToLower().Contains(search.ToLower())).ToList();
+
+                ClientList = AllList.Take(UserPageSize).ToList();
+
+                StateHasChanged();
+
+                PagingBlock.UpdatePageCount();
+            }
+            else searchedStart = true;
+
+            isSearched = false;
+
+            StateHasChanged();
+        }
+
+        private void OnPageChanged()
+        {
+            PagingBlock.ToggleStatus();
+            ClientList = null;
+            StateHasChanged();
+
+            ClientList = AllList.Skip(UserPageSize * (PagingBlock._currentPage - 1)).Take(UserPageSize).ToList();
+            StateHasChanged();
+            PagingBlock.ToggleStatus();
+        }
+
+        protected override async Task OnInitializedAsync()
+        {
+            var user = await _userServices.GetClient();
+            var role = await _roleServices.GetRoleAsync(user.RoleId);
+
+            if (role.isHaveAccesToAdminPanel && role.isHaveToViewUserList)
+            {
+                AllList = await _userServices.GetAllFilterClient(true, true, true);
+                ClientList = AllList.Take(UserPageSize).ToList();
+
+                if (role.isHaveToAdministrateUserAccount)
+                    isHavePermissionAdministrateUser = true;
+
+                if (role.isHaveToModerateUserAccount)
+                    isHavePermissionModerateUser = true;
+
+                await ChangePageLoadStatus(true);
+            }
+            else await _virtualNavigationServices.ReRedirectClient(VirtualNavigationServices.accessDeniedUrl, hardLoad: true);
+        }
+    }

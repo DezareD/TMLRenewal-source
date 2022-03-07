@@ -1,0 +1,87 @@
+﻿@if (isLoading)
+{
+    <div class="dowork-block @Class" style="@Style">
+        <img src="@emojiSrc" />
+        <p class="header-dowork-text">@headerName</p>
+        <p class="info-dowork-text">@InformationText</p>
+    </div>
+}
+else
+{
+    <div class="sloader @Class" style="@Style"></div>
+}
+
+@code {
+    [Parameter]
+    public string InformationText { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
+
+    [Parameter]
+    public string Style { get; set; }
+
+    private string emojiSrc { get; set; }
+    private string headerName { get; set; }
+
+    private bool isLoading { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var rnd = new Random();
+
+        emojiSrc = "../imgs/emoji/" + emojiNames[rnd.Next(0, emojiNames.Length)] + ".png";
+        headerName = templateNames[rnd.Next(0, templateNames.Length)];
+
+        isLoading = true;
+    }
+
+    public static string[] emojiNames = new string[]
+    {
+        "brain",
+        "clown",
+        "crown",
+        "doughnut",
+        "exploding",
+        "frog",
+        "full-moon",
+        "money",
+        "monkey",
+        "monocle",
+        "new-moon",
+        "peach",
+        "pleading",
+        "rainbow",
+        "smile",
+        "tech",
+        "ukraine",
+        "watermelon",
+        "winking",
+        "yawning"
+        };
+
+    public static string[] templateNames = new string[]
+    {
+        "Да, тут ещё идет работа.",
+        "Скоро тут что-то будет.",
+        "Уже почти... Подожди.",
+        "Путин едет, делаем быстрей...",
+        "Ту-ту-ру, ту-ту-ру...",
+        "Zzz...",
+        "Блок готов, но я не покажу его тебе!",
+        "Что бы посмотреть блок, опла... Шучу!",
+        "Блок умер.",
+        "Делаю я, делаю... не торопите.",
+        "Блок ещё не готов, правда.",
+        "Идите в обход, тут идёт стройка.",
+        "В проекте...",
+        "Проектирую...",
+        "Загрузка... 99%...",
+        "Блок захватило НЛО...",
+        "Че смотришь?",
+        "Трррррр, что говоришь? Тррррр.... не слышу?",
+        "РО-БО-ТЫ ЗАХВАТИЛИ ЭТОТ БЛОК. БИП.",
+        "После трансцендентных испытаний этот блок вознесся.",
+        "Блок захвачен террористами."
+        };
+} 

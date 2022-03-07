@@ -1,0 +1,209 @@
+@inject IVirtualNavigationServices _virtualNavigationManager
+
+@inherits MainLoyoutBase
+@implements IAsyncDisposable
+
+<Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true">
+    <Found Context="routeData">
+        <CascadingValue Value="this" Name="_applicationContainer">
+            <CascadingValue Value="loyout_update" Name="loyout_update">
+                    <CascadingValue Value="_virtualNavigationManager" Name="_virtualNavigationServices">
+                        <CascadingValue Value="mainbar_updateImage" Name="mainbar_updateImage">
+                            <div class="_cl_application_page container">
+                                @if (preRenderRoutingCheck)
+                                {
+                                    <MainBar @ref="mainbar_ref" RtBlock="_currentRedirector" />
+                                    <NavMenu @ref="navbar_ref" RtBlock="_currentRedirector" />
+                                    <div class="index-application">
+                                        <div class="page">
+                                            <RouteView RouteData="@routeData" />
+                                            <!--<div class="_cl_application_page container">
+                                <div class="loading-template-auth" style="display: flex; padding: 60px;">
+                                    <i class="fal fa-ban"></i>
+                                    <p class="main-text">ƒоступ ограничен</p><p class="mini-text">¬аш аккаунт заблокирован. ќбратитесь к администрации за дополнительной информацией.</p>
+                                </div>
+                            </div>-->
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </CascadingValue>
+                    </CascadingValue>
+                </CascadingValue>
+            </CascadingValue>
+    </Found>
+    <NotFound>
+        <!--<CascadingValue Value="loyout_update" Name="loyout_update">
+            <CascadingValue Value="off_loyoutRender" Name="off_loyoutRender">
+                <div class="_cl_application_page container">
+                    <MainBar RtBlock="@(new RouterBlock("404", isShowBarMenu: false))" />
+                    <div class="index-application">
+                        <div class="page">
+                            @if (logicRenderFinished && _rtBlock != null && _rtBlock.isRendered == false)
+                            {
+                                <RenewalTML.Pages.Error Code="404"></RenewalTML.Pages.Error>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </CascadingValue>
+        </CascadingValue>-->
+    </NotFound>
+</Router>
+
+@code {
+
+    // TODO:
+    // ƒобавить событие ( через js и signalr что бы при изменение роли на забанненого у пользовател€ ( если такой есть на сайте,
+    // обновить данному пользователю страницу )
+
+    EventCallback _loyout_update = EventCallback.Empty;
+    EventCallback loyout_update
+    {
+        get
+        {
+            if (_loyout_update.Equals(EventCallback.Empty))
+                _loyout_update = EventCallback.Factory.Create(this, EventLoyoutUpdate);
+            return _loyout_update;
+        }
+    }
+
+    EventCallback _navbar_update = EventCallback.Empty;
+    EventCallback navbar_update
+    {
+        get
+        {
+            if (_navbar_update.Equals(EventCallback.Empty))
+                _navbar_update = EventCallback.Factory.Create(this, UpdateContextNavBar);
+            return _navbar_update;
+        }
+    }
+
+    EventCallback<bool> _mainbar_updateImage = EventCallback<bool>.Empty;
+    EventCallback<bool> mainbar_updateImage
+    {
+        get
+        {
+            if (_mainbar_updateImage.Equals(EventCallback<bool>.Empty))
+                _mainbar_updateImage = EventCallback.Factory.Create<bool>(this, async (arg) =>
+                {
+                    await UpdateMainBarImage(arg);
+                });
+            return _mainbar_updateImage;
+        }
+    }
+
+    public NavMenu navbar_ref { get; set; }
+    public MainBar mainbar_ref { get; set; }
+
+    private Client user { get; set; }
+    private Role role { get; set; }
+
+    private HubConnection hubConnection { get; set; }
+
+    private CompleteVirtualRedirect _currentRedirector { get; set; }
+    private bool preRenderRoutingCheck { get; set; }
+
+    public async Task RedirectingStart(CompleteVirtualRedirect block, bool isPopState = false)
+    {
+        if(!isPopState)
+            await _js.InvokeVoidAsync("LoadingRepositry.startLoading");
+
+        _currentRedirector = block;
+    }
+
+    public async Task RedirectingComplete()
+    {
+        await _js.InvokeVoidAsync("setTitle", _currentRedirector.Title);
+
+        if (mainbar_ref != null)
+            await mainbar_ref.SetFirstLoadNotificationTitle();
+
+        if (navbar_ref != null)
+            await navbar_ref.EventNavbarUpdate();
+
+        await _js.InvokeVoidAsync("LoadingRepositry.endLoading");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        /* APPLICATION */
+
+        var dotNetPtr = DotNetObjectReference.Create(this);
+        await _js.InvokeVoidAsync("GLOBAL.SetDotnetReference", dotNetPtr);
+
+        _virtualNavigationManager.PageAddedServices(this, _clientAuthServices);
+
+        user = await _clientAuthServices.GetClient();
+
+        hubConnection = new HubConnectionBuilder()
+            .WithAutomaticReconnect()
+            .WithUrl(nm.ToAbsoluteUri("/system"))
+            .Build();
+
+
+        hubConnection.On<Notification>("AddNotification", async (notification) => await mainbar_ref.AddNotificationToUserLogic(notification));
+        hubConnection.On<int>("ChangeBarBalance", async (balance) => await mainbar_ref.EditUserBalance(balance));
+
+        await hubConnection.StartAsync();
+
+        if (user != null)
+            await hubConnection.SendAsync("CompleteHubConnection", user.Id);
+
+        /* Urling and Design */
+
+        _currentRedirector = await _virtualNavigationManager.ReRedirectClient(nm.ToBaseRelativePath(nm.Uri));
+        //await RedirectingComplete();
+        preRenderRoutingCheck = true;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            if (user != null)
+                await hubConnection.SendAsync("CompleteHubConnectionDispose", user.Id);
+
+            await hubConnection.DisposeAsync();
+        }
+    }
+
+    protected async Task UpdateMainBarImage(bool isAuth)
+    {
+        await mainbar_ref.UpdateUserImage(isAuth);
+    }
+
+    protected async Task UpdateContextNavBar()
+    {
+        if (navbar_ref != null) // if user == null
+        {
+            await navbar_ref.EventNavbarUpdate();
+        }
+    }
+
+    [JSInvokable("GetCurrencyFormat")]
+    public string GetCurrencyFormat(double number) => CurrencyAddon.Format((int)number, true);
+
+    // Need update page
+    protected async Task EventLoyoutUpdate()
+    {
+        _currentRedirector = await _virtualNavigationManager.ReRedirectClient(nm.ToBaseRelativePath(nm.Uri));
+    }
+
+    // browser navigator
+    [JSInvokable("UpdateRtLayoutBlock")]
+    public async Task UpdateRtLayoutBlock(string Url)
+    {
+        // browser navigation event
+
+        _currentRedirector = await _virtualNavigationManager.ReRedirectClient(nm.ToBaseRelativePath(Url), isPopsatate: true);
+    }
+
+    // Ќавигации при нажатии на ссылки
+
+    [JSInvokable("GoToDynamicHrefUrl")]
+    public async Task GoToDynamicHrefUrl(string Url)
+    {
+        _currentRedirector = await _virtualNavigationManager.ReRedirectClient(Url);
+    }
+}

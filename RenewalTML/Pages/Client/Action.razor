@@ -1,0 +1,490 @@
+﻿@page "/profile/{userId:int}/actions"
+
+@using RenewalTML.Data.Dto.Admin;
+
+@inject ITransactionServices _transactionServices
+@inject IRawTextHtmlizer _rawHtmlizer
+@inject IEconomicsServices _economicServices
+@inject ISystemConfigurationServices _systemConfiguration
+@inject ITicketServices _ticketServices
+
+@inject NavigationManager _navigationManager
+
+@inherits RenewalTMLComponentBase
+
+<div class="block p-normal -js-page-maxheight-relaod" style="@(_isComplete ? "max-height:900px; display: flex; " : "max-height:90px;")">
+    @if (_isComplete)
+    {
+        <!--
+
+            TODO: Слева небольшой навигации ( может даже маленькая полоска из иконок, или сверху блоки пока не придумал
+
+            Справа уже блок действия, т.е он будет переключатся в зависимости от выбранной на панеле иконки
+
+            url будет менятся но страница не будет перезагружатся
+
+        -->
+        <div style="display: flex; gap: 15px; width: 100%;">
+            <div class="action-left-menu">
+                <a @onclick="() => ActionHub(ActionList.Skip(0).Take(1).First())" class="-tp-transfer-money @(CurrentAction == ActionList.Skip(0).Take(1).First() ? "active" : "")"><i class="fal fa-exchange-alt"></i></a>
+                <a @onclick="() => ActionHub(ActionList.Skip(1).Take(1).First())" class="-tp-request-money @(CurrentAction == ActionList.Skip(1).Take(1).First() ? "active" : "")"><i class="fal fa-wallet"></i></a>
+            </div>
+            <div>
+                @if (CurrentAction == "transferMoney")
+                {
+                    @if (!isEconomicBlocked || user.Level >= 2)
+                    {
+                        <p class="auth-name">Перевод с счёта на счёт</p>
+                        @if (TransferMoneyInformation != null && TransferMoneyInformation.isShow)
+                        {
+                            <div style="margin: 0 35px 0 35px; margin-top:10px">
+                                <ValidationBlock block="TransferMoneyInformation" />
+                            </div>
+                        }
+
+                        @if (TransferMoneyError != null && TransferMoneyError.isShow)
+                        {
+                            <div style="margin: 0 35px 0 35px; margin-top:10px">
+                                <ValidationBlock block="TransferMoneyError" />
+                            </div>
+                        }
+
+                        <div class="user-form-factor-action-panel">
+                            <Validations @ref="_sendMoneyModule._validationContext" Model="@_sendMoneyModule._model" Mode="ValidationMode.Auto" ValidateOnLoad="false">
+                                <Validation @ref="@_sendMoneyModule._fieldValidationStatus["UserName"]">
+                                    <p class="form-note req">Получатель перевода:</p>
+                                    <UserAutoComplete @bind-Text="_sendMoneyModule._model.UserName" Field="(() => _sendMoneyModule._model.UserName)" Placeholder="Введие пользователя">
+                                        <Feedback>
+                                            <ValidationError />
+                                        </Feedback>
+                                    </UserAutoComplete>
+                                </Validation>
+                                <Validation @ref="@_sendMoneyModule._fieldValidationStatus["Money"]">
+                                    <p class="form-note req">Количество:</p>
+                                    <NumericEdit @bind-Value="_sendMoneyModule._model.Money" Placeholder="Введите количество" TValue="int">
+                                        <Feedback>
+                                            <ValidationError />
+                                        </Feedback>
+                                    </NumericEdit>
+                                </Validation>
+                                <Check @bind-Checked="_sendMoneyModule._model.AddTexes" TValue="bool">Включить налог в сумму?</Check>
+
+                                @{
+                                    if (_sendMoneyModule._model.AddTexes) // налог включен в вашу сумму
+                                    {
+                                        _sendMoneyModule._model.SpendMoney = _sendMoneyModule._model.Money;
+                                        _sendMoneyModule._model.TransMoney = _sendMoneyModule._model.SpendMoney;
+                                        _sendMoneyModule._model.SpendMoney += (int)((_sendMoneyModule._model.SpendMoney / 100) * _sendMoneyModule._model.Tax);
+                                    }
+                                    else
+                                    {
+                                        _sendMoneyModule._model.SpendMoney = _sendMoneyModule._model.Money;
+                                        _sendMoneyModule._model.TransMoney = _sendMoneyModule._model.SpendMoney - (int)((_sendMoneyModule._model.SpendMoney / 100) * _sendMoneyModule._model.Tax);
+                                    }
+                                }
+
+                                <ul style="color: #333; font-weight: 500; margin-left: 25px; font-size: 13px;">
+                                    <li>С вашего счёта будет снято: <bold>@_sendMoneyModule._model.SpendMoney</bold> <MoneyLogotype Class="mini black-grey" /></li>
+                                    <li>Пользователь получит: <bold>@_sendMoneyModule._model.TransMoney</bold> <MoneyLogotype Class="mini black-grey" /></li>
+                                </ul>
+
+                                <div class="align-center button-checkbox-panel" style="margin-bottom: 25px;">
+                                    <Button Type="ButtonType.Submit" Class="primary normal icon" Loading="@transferLoader" @onclick="async () => await StartTransfer()">
+                                        <ChildContent>Перевести<i class="fal fa-forward"></i></ChildContent>
+                                        <LoadingTemplate><div class="btn-loader"></div></LoadingTemplate>
+                                    </Button>
+                                </div>
+                            </Validations>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="loading-template-auth" style="display: flex; padding: 60px;">
+                            <i class="fas fa-user-lock"></i>
+                            <p class="main-text">Нет доступа</p><p class="mini-text">Вам заблокирован доступ к этому действию.</p>
+                        </div>
+                    }
+                }
+                else if (CurrentAction == "requestMoney")
+                {
+                    @if (!isEconomicBlocked || user.Level >= 2)
+                    {
+                        <p class="auth-name">Пополнить счёт</p>
+
+                        @if (RequestMoneyInformation != null && RequestMoneyInformation.isShow)
+                        {
+                            <div style="margin: 0 35px 0 35px; margin-top:10px">
+                                <ValidationBlock block="RequestMoneyInformation" />
+                            </div>
+                        }
+
+                        @if (RequestMoneyError != null && RequestMoneyError.isShow)
+                        {
+                            <div style="margin: 0 35px 0 35px; margin-top:10px">
+                                <ValidationBlock block="RequestMoneyError" />
+                            </div>
+                        }
+
+            <div class="user-form-factor-action-panel">
+                <Validations @ref="_requestMoneyModule._validationContext" Model="@_requestMoneyModule._model" Mode="ValidationMode.Auto" ValidateOnLoad="false">
+                    <Validation @ref="@_requestMoneyModule._fieldValidationStatus["Money"]">
+                        <p class="form-note req">Количество:</p>
+                        <NumericEdit @bind-Value="_requestMoneyModule._model.Money" Placeholder="Введите количество" TValue="int">
+                            <Feedback>
+                                <ValidationError />
+                            </Feedback>
+                        </NumericEdit>
+                    </Validation>
+                    <Validation @ref="@_requestMoneyModule._fieldValidationStatus["Text"]">
+                        <p class="form-note">Информация:</p>
+                        <MarkDownEditor @bind-Text="_requestMoneyModule._model.Text" EditorType="@((string)"requestMoney")" Field="(() => _requestMoneyModule._model.Text )" UniqName="_cl_requestMoney">
+                            <Feedback>
+                                <ValidationError />
+                            </Feedback>
+                        </MarkDownEditor>
+                    </Validation>
+
+                    <Validation @ref="@_requestMoneyModule._fieldValidationStatus["Text"]">
+                        <p class="form-note">Изоображения:</p>
+                        <MultiImageForm @ref="_refMultiImageForm" @bind-fillTicketImages="_requestMoneyModule._model.FillTicketImage" MaxImagesCount="6">
+                            <Feedback>
+                                <ValidationError />
+                            </Feedback>
+                        </MultiImageForm>
+                    </Validation>
+
+
+                    <div class="align-center button-checkbox-panel" style="margin-bottom: 25px;">
+                        <Button Class="primary normal icon" @onclick="async () => await StartRequest()" Loading="@isStartRequestMoney">
+                            <ChildContent>Пополнить<i class="fal fa-forward"></i></ChildContent>
+                            <LoadingTemplate><div class="btn-loader"></div></LoadingTemplate>
+                        </Button>
+                    </div>
+                </Validations>
+            </div>
+                    }
+                    else
+                    {
+                        <div class="loading-template-auth" style="display: flex; padding: 60px;">
+                            <i class="fas fa-user-lock"></i>
+                            <p class="main-text">Нет доступа</p><p class="mini-text">Вам заблокирован доступ к этому действию.</p>
+                        </div>
+                    }
+                }
+                else if (CurrentAction == "loading")
+                {
+                    <div class="loader-wrapper"><div class="btn-loader page"></div></div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="loader-wrapper"><div class="btn-loader page"></div></div>
+    }
+</div>
+
+
+@code {
+    [Parameter]
+    public int UserId { get; set; }
+
+    private Client user { get; set; }
+    private Client viewer { get; set; }
+
+    private string CurrentAction { get; set; }
+    private bool isEconomicBlocked { get; set; }
+
+    /* TRANSFER */
+
+    private ContextValidationModule<SendMoneyUserToUser> _sendMoneyModule { get; set; }
+    private ValidationMessageBlock TransferMoneyInformation { get; set; }
+    private ValidationMessageBlock TransferMoneyError { get; set; }
+
+    private bool transferLoader { get; set; }
+
+    /* REQUEST MONEY */
+
+    private ContextValidationModule<RequestMoneyModel> _requestMoneyModule { get; set; }
+    private MultiImageForm _refMultiImageForm { get; set; }
+
+    private ValidationMessageBlock RequestMoneyInformation { get; set; }
+    private ValidationMessageBlock RequestMoneyError { get; set; }
+    private bool isStartRequestMoney { get; set; }
+
+    /* OTHER */
+
+    private List<string> ActionList = new List<string>()
+{
+        "transferMoney",
+        "requestMoney",
+        "loading"
+    };
+
+    // TODO: Баг с загрузкой фоток в большом количества
+    // TODO: Сделать отдельную страничку с вашими заявками.
+
+    // request money
+
+    private async Task StartRequest()
+    {
+        //var textRequest = await RefDataInformationRequest.GetData(false);
+
+        if (isStartRequestMoney)
+        {
+            RequestMoneyError = new ValidationMessageBlock("Дождитесь окончания загрузки предидущего действия...", "error");
+            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            StateHasChanged();
+            return;
+        }
+
+        if (_refMultiImageForm.isStartImageUpload)
+        {
+            RequestMoneyError = new ValidationMessageBlock("Дождитесь окончания загрузки изоображений.", "error");
+            _requestMoneyModule.SetFieldStatus("FillTicketImage", ValidationStatus.Error);
+            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            StateHasChanged();
+            return;
+        }
+
+        isStartRequestMoney = true;
+        StateHasChanged();
+
+        if (_requestMoneyModule._model.Money <= 0)
+        {
+            RequestMoneyError = new ValidationMessageBlock("Введено неверное количество.", "error");
+            _requestMoneyModule.SetFieldStatus("Money", ValidationStatus.Error);
+            isStartRequestMoney = false;
+            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            StateHasChanged();
+            return;
+        }
+
+        await _ticketServices.CreateTicket(new Ticket()
+        {
+            SystemName = "Заявка на пополнения баланса",
+            Date = DateTimeAddon.NowDateTimeStrings(),
+            SystemInformation = "Заявка на пополнения счёта от пользователя " + viewer.UserName + ", на сумму: " + _requestMoneyModule._model.Money,
+            TicketStatus = "status_waiting",
+            TicketType = "type_fillingBalance",
+            UserCreateId = viewer.Id,
+            JsonObject = JsonConvert.SerializeObject(new FillBalanceTicketModel()
+            {
+                CountMoney = _requestMoneyModule._model.Money,
+                ImagesIds = _requestMoneyModule._model.FillTicketImage.Select(m => m.ImageId).ToList(),
+                TextInformation = _requestMoneyModule._model.Text
+            })
+        });
+
+        // TODO: Изменить картинки, что бы не удалялиь через час
+
+        //await RefDataInformationRequest.ClearMarkDown();
+
+        isStartRequestMoney = false;
+        RequestMoneyError = new ValidationMessageBlock("Заявка успешно подана.", "ok");
+
+        _requestMoneyModule.SetFielAllStatus(ValidationStatus.None);
+
+        _requestMoneyModule._model.FillTicketImage = ComponentUtils.MultiImageFormRecreate();
+        _requestMoneyModule._model.Money = 0;
+        _requestMoneyModule._model.Text = "";
+
+        await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+
+        StateHasChanged();
+    }
+
+    // transfer
+
+    // TODO: Как только появятся настройки экономики ТМЛ добавить сюда нормальный процент а пока 5.3%
+
+    private async Task StartTransfer()
+    {
+        if (transferLoader)
+        {
+            TransferMoneyError = new ValidationMessageBlock("Дождитесь окончания загрузки предидущего действия...", "error");
+            _sendMoneyModule.SetFielAllStatus(ValidationStatus.None);
+            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            StateHasChanged();
+            return;
+        }
+
+        transferLoader = true;
+        StateHasChanged();
+
+        if (_sendMoneyModule._model.Money <= 99 || _sendMoneyModule._model.Money > user.Balance)
+        {
+            TransferMoneyError = new ValidationMessageBlock("Недостаточно средств или введено неверное количество.", "error");
+            _sendMoneyModule.SetFieldStatus("Money", ValidationStatus.Error);
+            transferLoader = false;
+            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            StateHasChanged();
+            return;
+        }
+
+        var userFind = await _userServices.FindUserByNickname(_sendMoneyModule._model.UserName);
+        var userList = await _userServices.GetAllFilterClient(false, false);
+
+        if (userFind == null || userFind.Id == user.Id || userList.Where(m => m.Id == userFind.Id).Count() <= 0)
+        {
+            _sendMoneyModule.SetFieldStatus("UserName", ValidationStatus.Error);
+            TransferMoneyError = new ValidationMessageBlock("Пользователь для перевода не найден или пользователь не валиден.", "error");
+            transferLoader = false;
+            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            StateHasChanged();
+            return;
+        }
+
+        await _economicServices.CompleteTransferPay(user, userFind, _sendMoneyModule._model.SpendMoney, _sendMoneyModule._model.TransMoney);
+
+        TransferMoneyError = new ValidationMessageBlock("Перевод прошёл успешно!", "ok");
+        transferLoader = false;
+
+        await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+
+        _sendMoneyModule.SetFielAllStatus(ValidationStatus.None);
+        StateHasChanged();
+    }
+
+    /*private async Task StartTransfer()
+    {
+        if (transferLoader)
+        {
+            TransferMoneyError = new ValidationMessageBlock("Дождитесь окончания загрузки предидущего действия...", "error");
+            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            StateHasChanged();
+            return;
+        }
+
+
+        transferLoader = true;
+        StateHasChanged();
+
+        if (sendMoneyModel.Money <= 99 || SpendMoney > user.Balance)
+        {
+            addedClassTransfer = "is-invalid";
+            TransferMoneyError = new ValidationMessageBlock("Недостаточно средств или введено неверное количество.", "error");
+            transferLoader = false;
+            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            StateHasChanged();
+            return;
+        }
+
+        var userFind = await _userServices.FindUserByNickname(sendMoneyModel.UserName);
+        var userList = await _userServices.GetAllFilterClient(false, false);
+
+        if (userFind == null || userFind.Id == user.Id || userList.Where(m => m.Id == userFind.Id).Count() <= 0)
+        {
+            _autoCompleteBlock.SetAutoCompleteStatus("is-invalid");
+            TransferMoneyError = new ValidationMessageBlock("Пользователь для перевода не найден или пользователь не валиден.", "error");
+            transferLoader = false;
+            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            StateHasChanged();
+            return;
+        }
+
+        await _economicServices.CompleteTransferPay(user, userFind, SpendMoney, TransMoney);
+
+        TransferMoneyError = new ValidationMessageBlock("Перевод прошёл успешно!", "ok");
+        transferLoader = false;
+
+        await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+
+        _autoCompleteBlock.SetAutoCompleteStatus("");
+        addedClassTransfer = "";
+        StateHasChanged();
+    }
+    */
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await _userServices.FindUserById(UserId);
+        viewer = await _userServices.GetClient();
+        var role = await _roleServices.GetRoleAsync(user.RoleId);
+
+        if (user != null)
+        {
+            if (viewer == null || viewer.Id != user.Id)
+            {
+                await _virtualNavigationServices.ReRedirectClient(VirtualNavigationServices.errorUrl + "404", hardLoad: true);
+                return;
+            }
+
+            var ActionId = _navigationManager.Uri.Split('#')[1];
+
+            var item = ActionList.Where(m => m == ActionId).FirstOrDefault();
+
+            if (item == null)
+            {
+                CurrentAction = ActionList.First();
+                await ActionHub(CurrentAction);
+            }
+            else await ActionHub(ActionId);
+
+            if (role.isBlockedEconomic)
+                isEconomicBlocked = true;
+
+
+            await ChangePageLoadStatus(true);
+            StateHasChanged();
+
+            await _js.InvokeVoidAsync("MaxHeightLoader");
+
+            await _js.InvokeVoidAsync("loadScript", "libs/tippy.js/tippy.min.js");
+
+            await _js.InvokeVoidAsync("CreateTippyElement",
+        new List<TooltipModel>() {
+                new TooltipModel(".-tp-transfer-money", "Перевод денег другому пользователю.", ToolTipStyles.DefaultStyle, width: 350),
+                new TooltipModel(".-tp-request-money", "Подать заявку на пополнение баланса.", ToolTipStyles.DefaultStyle, width: 350)
+                                                                                });
+        }
+        else await _virtualNavigationServices.ReRedirectClient(VirtualNavigationServices.accessDeniedUrl, hardLoad: true);
+    }
+
+    private async Task ActionHub(string action)
+    {
+        CurrentAction = ActionList.Last();
+        StateHasChanged();
+
+        // страничка сменилась на загрузку
+
+        switch (action)
+        {
+            case "transferMoney":
+
+                // Перевод денег
+
+                var tax = await _systemConfiguration.Get("economic_transfer.tax");
+
+                TransferMoneyInformation = new ValidationMessageBlock("Вы находитесь на странице перевода денег. В окне ниже начните вводить никнейм пользователя. Вам выдаст варианты пользователей. Нажмите на один из них. Перевод осуществляется по логину пользователя. Логин у каждого пользователя разный и используется при входе. Вам не обязательно искать пользователя, вы можете ввести его логин сразу, если вы его знаете. Информация по переводам:" +
+    "<ul>" +
+    "<li>Налоговая ставка за перевод: <bold>" + tax + "%</bold></li>" +
+    "<li>Минимальная сумма для перевода: <bold>100</bold></li>" +
+    "</ul>", "info");
+
+                _sendMoneyModule = new ContextValidationModule<SendMoneyUserToUser>(new SendMoneyUserToUser());
+                _sendMoneyModule._model.Tax = Convert.ToDouble(await _systemConfiguration.Get("economic_transfer.tax"));
+
+                break;
+
+            case "requestMoney":
+
+                RequestMoneyInformation = new ValidationMessageBlock("Вы можете пополнить счёт вашего аккаунта. Если вы активно создаете контент в какой либо из стран или группе, за свое творчество и актив вы можете получить воознаграждение:" +
+    "<ul>" +
+    "<li>Страна\\группа\\организация в который вы создаете контент обязана входить в состав ММ как такогого.</li>" +
+    "</ul>", "info");
+
+                _requestMoneyModule = new ContextValidationModule<RequestMoneyModel>(new RequestMoneyModel());
+                _requestMoneyModule._model.FillTicketImage = new List<FillTicketImage>()
+                {
+                    new FillTicketImage() { isUploadBlock = true }, new FillTicketImage(), new FillTicketImage(),
+                    new FillTicketImage(), new FillTicketImage(), new FillTicketImage()
+                };
+
+                break;
+        }
+
+        CurrentAction = action; // Означает окончание загрузки
+        await _js.InvokeVoidAsync("UrlHelper.SetHash", "/profile/" + UserId + "/actions", action); // set new hash
+    }
+}

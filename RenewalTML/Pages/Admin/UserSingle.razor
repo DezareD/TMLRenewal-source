@@ -1,0 +1,766 @@
+﻿@page "/apanel/userSingle/{userId:int}"
+
+@inherits RenewalTMLComponentBase
+
+@using Microsoft.AspNetCore.Hosting;
+
+@inject IAdminActionServices _adminActionServices
+@inject IUserAdminServices _adminUserServices
+@inject IVirtualFileServices _fileManager
+@inject IWebHostEnvironment _webhostManager
+
+@if (_isComplete)
+{
+    <div style="display: flex; gap: 15px;">
+        <div style="display: flex; flex: 1; gap: 15px; flex-direction:column;">
+            <div class="block p-normal">
+                <div>
+                    <div class="admin-useredit-bacground"></div>
+                    <div class="admin-abs-edit-icon"><i class="fas fa-edit"></i></div>
+                </div>
+                <div style="position: relative;">
+                    <ClientAvatar @ref="ClientAvatarRef" AvatarSize="AvatarSize._100x" Client="User"></ClientAvatar>
+                    @if (isHavePermissionModerateUser)
+                    {
+                        <div class="admin-abs-edit-icon left-top" @onclick="() => ShowEditImageModel()"><i class="fas fa-edit"></i></div>
+                    }
+                </div>
+                <div>
+                    <div class="admin-useredit-item" style="display: flex; gap: 10px;">
+                        <p style="color: #333;">@User.ScreenName</p>
+                        @if (isHavePermissionModerateUser)
+                        {
+                            <div class="admin-right-edit-icon" @onclick="() => ShowEditScreenNameModel()"><i class="fas fa-edit"></i></div>
+                        }
+                    </div>
+                    <div class="admin-useredit-item" style="display: flex; gap: 10px;">
+                        <p style="font-size: 11px;">@@@User.UserName</p>
+                        @if (isHavePermissionAdministrateUser)
+                        {
+                            <div class="admin-right-edit-icon mini" @onclick="() => ShowEditLoginModel()"><i class="fas fa-edit"></i></div>
+                        }
+                    </div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+                    <Fields Class="modal-form-wrapper">
+                        <Button Class="primary normal icon">
+                            <ChildContent>Действия аккаунта<i class="fas fa-caret-down"></i></ChildContent>
+                        </Button>
+                    </Fields>
+                    @if (isHavePermissionAdministrateUser)
+                    {
+                        <Fields Class="modal-form-wrapper">
+                            <Button Class="secondary normal icon" @onclick="() => ShowEditPasswordModel()">
+                                <ChildContent>Установить новый пароль<i class="fal fa-lock"></i></ChildContent>
+                            </Button>
+                        </Fields>
+                    }
+                    else
+                    {
+                        <Fields Class="modal-form-wrapper">
+                            <Button Class="secondary normal icon" Style="opacity: .5; cursor: default;">
+                                <ChildContent>Установить новый пароль<i class="fal fa-lock"></i></ChildContent>
+                            </Button>
+                        </Fields>
+                    }
+
+                    <ToLink Url="@("/profile/" + User.Id)" IsActive="true" Class="modal-form-wrapper">
+                        <Button Class="secondary normal icon">
+                            <ChildContent>Перейти в профиль<i class="fas fa-user-circle"></i></ChildContent>
+                        </Button>
+                    </ToLink>
+
+                    <Fields Class="modal-form-wrapper">
+                        <Button Class="@((isBanned)? "destruct-outline normal icon only-animated" : "destruct normal icon only-animated")" @onclick="async () => await ToggleBanned()" Loading="@isStartToggleBanned" Style="@(isHavePermissionAdministrateUser == true? "":"opacity: .5; cursor: default;")">
+                            <ChildContent>@((isBanned)? "Разблокировать" : "Заблокировать")<i class="fas fa-ban"></i></ChildContent>
+                            <LoadingTemplate><div class="btn-loader"></div></LoadingTemplate>
+                        </Button>
+                    </Fields>
+
+                </div>
+            </div>
+        </div>
+        <div style="flex: 1;">
+            @if (SettingsInformationBlock != null && SettingsInformationBlock.isShow)
+            {
+                <div style="margin: 0 20px 0 20px;">
+                    <ValidationBlock block="SettingsInformationBlock" />
+                </div>
+            }
+        </div>
+        <div style="flex: 1;" class="block p-normal">
+            <p class="page-title-user" style="margin-bottom: 15px">Действия <span class="page-title-postfix">(@allCountActions Шт.)</span></p>
+            <AdminActionBlock @ref="adminActionBlockRef" AllCount="allCountActions" AdminActionList="adminActions"></AdminActionBlock>
+        </div>
+    </div>
+
+    <Modal @ref="modalRefEditPassword">
+        <ModalContent Centered="true">
+            <ModalHeader>
+                <ModalTitle>Смена пароля</ModalTitle>
+                <i class="modal_x fal fa-times" @onclick="HideEditPasswordModel"></i>
+            </ModalHeader>
+            <ModalBody>
+                @if (editPasswordModel != null)
+                {
+                    @if (EditPasswordValidationBlock != null && EditPasswordValidationBlock.isShow)
+                    {
+                        <div>
+                            <ValidationBlock block="EditPasswordValidationBlock" />
+                        </div>
+                    }
+                    <EditForm Model="@editPasswordModel">
+                        <Validations @ref="editPasswordValidation" Mode="ValidationMode.Auto" ValidateOnLoad="false" EditContext="@_edcEditPassword">
+                            <Fields Class="modal-form-wrapper">
+                                <Field>
+                                    <Validation>
+                                        <TextEdit @bind-Text="@editPasswordModel.NewPassword" Role="TextRole.Text" Placeholder="Пароль">
+                                            <Feedback>
+                                                <ValidationError />
+                                            </Feedback>
+                                        </TextEdit>
+                                        <ValidationMessage For="() => editPasswordModel.NewPassword" />
+                                    </Validation>
+                                </Field>
+                            </Fields>
+                        </Validations>
+                    </EditForm>
+                }
+            </ModalBody>
+            <ModalFooter>
+                <div class="footer-buttons" style="display: flex; justify-content: center;">
+                    <Button Class="primary normal icon" Clicked="@EditPasswordModelExecuted" Loading="@isEditPasswordLoading">
+                        <ChildContent>Обновить пароль<i class="fal fa-lock"></i></ChildContent>
+                        <LoadingTemplate><div class="btn-loader"></div></LoadingTemplate>
+                    </Button>
+                    <Button Class="primary outline icon" Clicked="@HideEditPasswordModel">
+                        <ChildContent>Отменить</ChildContent>
+                    </Button>
+                </div>
+            </ModalFooter>
+        </ModalContent>
+    </Modal>
+    <Modal @ref="modalRefEditScreenName">
+        <ModalContent Centered="true">
+            <ModalHeader>
+                <ModalTitle>Смена никнейма</ModalTitle>
+                <i class="modal_x fal fa-times" @onclick="HideEditScreenNameModel"></i>
+            </ModalHeader>
+            <ModalBody>
+                @if (editScreenNameModel != null)
+                {
+                    @if (EditScreenNameValidationBlock != null && EditScreenNameValidationBlock.isShow)
+                    {
+                        <div>
+                            <ValidationBlock block="EditScreenNameValidationBlock" />
+                        </div>
+                    }
+                    <EditForm Model="@editScreenNameModel">
+                        <Validations @ref="editScreenNameValidation" Mode="ValidationMode.Auto" ValidateOnLoad="false" EditContext="@_edcEditScreenName">
+                            <Fields Class="modal-form-wrapper">
+                                <Field>
+                                    <Validation>
+                                        <TextEdit @bind-Text="@editScreenNameModel.NewScreenName" Role="TextRole.Text" Placeholder="Имя пользователя">
+                                            <Feedback>
+                                                <ValidationError />
+                                            </Feedback>
+                                        </TextEdit>
+                                        <p class="note-form form-row">Имя пользователя не является уникальным.</p>
+                                        <ValidationMessage For="() => editScreenNameModel.NewScreenName" />
+                                    </Validation>
+                                </Field>
+                            </Fields>
+                        </Validations>
+                    </EditForm>
+                }
+            </ModalBody>
+            <ModalFooter>
+                <div class="footer-buttons" style="display: flex; justify-content: center;">
+                    <Button Class="primary normal icon" Clicked="@EditScreenNameModelExecuted" Loading="@isEditScreenNameLoading">
+                        <ChildContent>Обновить никнейм<i class="fal fa-address-book"></i></ChildContent>
+                        <LoadingTemplate><div class="btn-loader"></div></LoadingTemplate>
+                    </Button>
+                    <Button Class="primary outline icon" Clicked="@HideEditScreenNameModel">
+                        <ChildContent>Отменить</ChildContent>
+                    </Button>
+                </div>
+            </ModalFooter>
+        </ModalContent>
+    </Modal>
+
+    <Modal @ref="modalRefEditLogin">
+        <ModalContent Centered="true">
+            <ModalHeader>
+                <ModalTitle>Смена никнейма</ModalTitle>
+                <i class="modal_x fal fa-times" @onclick="HideEditLoginModel"></i>
+            </ModalHeader>
+            <ModalBody>
+                @if (editLoginModel != null)
+                {
+                    @if (EditLoginValidationBlock != null && EditLoginValidationBlock.isShow)
+                    {
+                        <div>
+                            <ValidationBlock block="EditLoginValidationBlock" />
+                        </div>
+                    }
+                    <EditForm Model="@editLoginModel">
+                        <Validations @ref="editLoginValidation" Mode="ValidationMode.Auto" ValidateOnLoad="false" EditContext="@_edcEditLogin">
+                            <Fields Class="modal-form-wrapper">
+                                <Field>
+                                    <Validation>
+                                        <TextEdit @bind-Text="@editLoginModel.NewLogin" Role="TextRole.Text" Placeholder="Логин пользователя">
+                                            <Feedback>
+                                                <ValidationError />
+                                            </Feedback>
+                                        </TextEdit>
+                                        <p class="note-form form-row">Логин пользователя обязательно должен быть уникальным.</p>
+                                        <ValidationMessage For="() => editLoginModel.NewLogin" />
+                                    </Validation>
+                                </Field>
+                            </Fields>
+                        </Validations>
+                    </EditForm>
+                }
+            </ModalBody>
+            <ModalFooter>
+                <div class="footer-buttons" style="display: flex; justify-content: center;">
+                    <Button Class="primary normal icon" Clicked="@EditLoginModelExecuted" Loading="@isEditLoginLoading">
+                        <ChildContent>Обновить никнейм<i class="fal fa-address-book"></i></ChildContent>
+                        <LoadingTemplate><div class="btn-loader"></div></LoadingTemplate>
+                    </Button>
+                    <Button Class="primary outline icon" Clicked="@HideEditLoginModel">
+                        <ChildContent>Отменить</ChildContent>
+                    </Button>
+                </div>
+            </ModalFooter>
+        </ModalContent>
+    </Modal>
+
+    <Modal @ref="modalRefEditImage">
+        <ModalContent Centered="true" Size="ModalSize.Large">
+            <ModalHeader>
+                <ModalTitle>Смена аватара</ModalTitle>
+                <i class="modal_x fal fa-times" @onclick="HideEditImageModel"></i>
+            </ModalHeader>
+            <ModalBody>
+                <div style="display: flex; gap: 20px;">
+                    <div class="circle-avatar-outer" style="flex:1;">
+                        <img width="250" height="250" style="opacity: 0;" class="-js-get-cropped" src="@(mainUserAvatarImage != null ? mainUserAvatarImage : "")" />
+                    </div>
+                    <div style="flex:1;">
+                        @if (EditImageValidationBlock != null && EditImageValidationBlock.isShow)
+                        {
+                            <div style="margin-bottom:15px">
+                                <ValidationBlock block="EditImageValidationBlock" />
+                            </div>
+                        }
+                        <p class="input-upper-label">Загрузить фотографию</p>
+                        <FileEdit Changed="@OnChangedFile" Progressed="@OnProgressed" AutoReset="false" Placeholder="Выбрать файл..." Filter="image/jpeg, image/png"></FileEdit>
+                        @if (isProgressBarImageLoader)
+                        {
+                            <Progress Color="@(progressBarImageLoader >= 100 ? Color.Success : Color.Primary)" Value="@progressBarImageLoader" />
+                        }
+                        <div class="input-uili-info">
+                            <p>Загрузите новую фотографию в поле сверху, либо обрежте вашу старую фотографию по новому. Правила загрузки изоображения для автара:</p>
+                            <ul>
+                                <li>Аватар должен быть почти квадратный, старайтесь загружать как можно более квадратные изоображения. Но в любом случае вам придется обрезать загруженное изоображение. Изоображения будут показываться в виде ромба. Примерное соотношение сторон: ~ 1.113</li>
+                                <li>Максимальный размер изоображения: <strong>2МБ</strong></li>
+                                <li>После обрезки или(и) загрузки нового изоображений нажмите на кнопку 'обновить аватар' иначе данные не сохранятся.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </ModalBody>
+            <ModalFooter>
+                <div class="footer-buttons" style="display: flex; justify-content: center;">
+                    <Button Class="primary normal icon" Clicked="@EditImageExecuted" Loading="@isEditImagePasswordLoading">
+                        <ChildContent>Обновить аватар<i class="fas fa-user-circle"></i></ChildContent>
+                        <LoadingTemplate><div class="btn-loader"></div></LoadingTemplate>
+                    </Button>
+                    <Button Class="primary outline icon" Clicked="@HideEditImageModel">
+                        <ChildContent>Отменить</ChildContent>
+                    </Button>
+                </div>
+            </ModalFooter>
+        </ModalContent>
+    </Modal>
+}
+else
+{
+    <div class="loader-wrapper"><div class="btn-loader page"></div></div>
+}
+
+@code {
+    [Parameter]
+    public int UserId { get; set; }
+
+    private bool isHavePermissionAdministrateUser { get; set; }
+    private bool isHavePermissionModerateUser { get; set; }
+
+    private Client Administrator { get; set; }
+    private Client User { get; set; }
+
+    private List<AdminAction> adminActions { get; set; }
+    private ValidationMessageBlock SettingsInformationBlock { get; set; }
+
+    /* images */
+
+    private Modal modalRefEditImage { get; set; }
+
+    private string mainUserAvatarImage { get; set; }
+
+    private bool isImageUploaded { get; set; }
+    private IFileEntry imageUploaded { get; set; }
+
+    private int progressBarImageLoader { get; set; }
+    private bool isProgressBarImageLoader { get; set; }
+    private bool isEditImagePasswordLoading { get; set; }
+
+    private ValidationMessageBlock EditImageValidationBlock { get; set; }
+    private ClientAvatar ClientAvatarRef { get; set; }
+
+    /* screen name */
+
+    private Modal modalRefEditScreenName { get; set; }
+
+    private EditAdminScreenName editScreenNameModel { get; set; }
+    private EditContext _edcEditScreenName { get; set; }
+    private Validations editScreenNameValidation { get; set; }
+    private bool isEditScreenNameLoading { get; set; }
+    private ValidationMessageBlock EditScreenNameValidationBlock { get; set; }
+
+    /* login */
+
+    private Modal modalRefEditLogin { get; set; }
+
+    private EditAdminLogin editLoginModel { get; set; }
+    private EditContext _edcEditLogin { get; set; }
+    private Validations editLoginValidation { get; set; }
+    private bool isEditLoginLoading { get; set; }
+    private ValidationMessageBlock EditLoginValidationBlock { get; set; }
+
+    /* password */
+
+    private Modal modalRefEditPassword { get; set; }
+
+    private EditAdminPassword editPasswordModel { get; set; }
+    private EditContext _edcEditPassword { get; set; }
+    private Validations editPasswordValidation { get; set; }
+    private bool isEditPasswordLoading { get; set; }
+    private ValidationMessageBlock EditPasswordValidationBlock { get; set; }
+
+    /* banned */
+
+    private bool isStartToggleBanned { get; set; }
+
+    private AdminActionBlock adminActionBlockRef { get; set; }
+
+    void OnProgressed(FileProgressedEventArgs e)
+    {
+        int percent = (Convert.ToInt32(e.Percentage - 10) < 0) ? 0 : Convert.ToInt32(e.Percentage - 10);
+        progressBarImageLoader = percent;
+        //StateHasChanged();
+    }
+
+    private async Task EditImageExecuted()
+    {
+        isEditImagePasswordLoading = true;
+        isProgressBarImageLoader = false;
+        progressBarImageLoader = 0;
+
+        StateHasChanged();
+
+        var fileStatic = new VirtualFileStatic(_webhostManager, _fileManager);
+
+        var jsonStringify = await _js.InvokeAsync<string>("CropperConnector.GetDataCropper", ".-js-get-cropped"); // получаем данные с кропера
+        var editFileAvatar = JsonConvert.DeserializeObject<CroppedImageInfo>(jsonStringify); // преобразуем данные в класс.
+
+        if (isImageUploaded)
+        {
+            var megafile = await fileStatic.GenerateWebpFile(imageUploaded, Convert.ToDouble(imageUploaded.Size) / (1024.0 * 1024.0));
+            await fileStatic.RecroppedImage(User.UserAvatar_cropp, megafile.MainImageId, editFileAvatar);
+
+            User.UserAvatar_main = megafile.MainImageId;
+            await _userServices.UpdateUser(User);
+        }
+        else
+        {
+            await fileStatic.RecroppedImage(User.UserAvatar_cropp, User.UserAvatar_main, editFileAvatar);
+        }
+
+        await _adminActionServices.CreateAdminTransaction(new AdminAction()
+        {
+            AdminId = Administrator.Id,
+            Date = DateTimeAddon.NowDateTimeStrings(),
+            HtmlText = "Администратор обнавил аватар.",
+            Icon = "fa-user-circle",
+            Priority = 1,
+            Type = "{to:user:" + User.Id + "}"
+        });
+
+        isEditImagePasswordLoading = false;
+
+        await RestrictedPage();
+
+        HideEditImageModel();
+
+        await ClientAvatarRef.ReGenerateImage();
+
+        SettingsInformationBlock = new ValidationMessageBlock("Аватар успешно изменён.", "ok");
+        //userImageSettings = (await _fileManager.GetPhysicCroppedFile(user.UserAvatar_cropp)) + "?_v=" + ClientAuthServices.GenerateRandomString(10, false).ToUpperInvariant();
+    }
+
+    private async Task ToggleBanned()
+    {
+        if (isStartToggleBanned == true)
+            return;
+
+        isStartToggleBanned = true;
+        StateHasChanged();
+
+        try
+        {
+            if (isHavePermissionAdministrateUser)
+            {
+                await _adminUserServices.ToggleUserBanned(User);
+
+                await _adminActionServices.CreateAdminTransaction(new AdminAction()
+                {
+                    AdminId = Administrator.Id,
+                    Date = DateTimeAddon.NowDateTimeStrings(),
+                    HtmlText = "Пользователь заблокирован \\ разблокирован.",
+                    Icon = "fa-user-alt-slash",
+                    Priority = 2,
+                    Type = "{to:user:" + User.Id + "}"
+                });
+
+                await RestrictedPage();
+
+                SettingsInformationBlock = new ValidationMessageBlock("Пользователь успешно заблокирован \\ разблокирован!", "ok");
+            }
+        }
+        catch (Exception)
+        {
+            SettingsInformationBlock = new ValidationMessageBlock("Ошибка блокировки\\разблокировки пользователя.", "error");
+        }
+
+        isStartToggleBanned = false;
+    }
+
+    private async Task OnChangedFile(FileChangedEventArgs e)
+    {
+        var file = e.Files.FirstOrDefault();
+
+        if (file == null)
+        {
+            EditImageValidationBlock = new ValidationMessageBlock("Что-то пошло не так при загрузке файлов.", "error");
+            return;
+        }
+        if (!VirtualFileManager.imageMimeTypes.Contains(file.Type))
+        {
+            EditImageValidationBlock = new ValidationMessageBlock("Загружаемый файл не является изоображением.", "error");
+            return;
+        }
+
+        if ((file.Size / (1024 * 1024)) > 2) // 2 mb limit
+        {
+            EditImageValidationBlock = new ValidationMessageBlock("Загружаемый файл слишком большой.", "error");
+            return;
+        }
+
+        isProgressBarImageLoader = true;
+        progressBarImageLoader = 0;
+        StateHasChanged();
+
+        imageUploaded = file;
+        isImageUploaded = true;
+
+        var fileStatic = new VirtualFileStatic(_webhostManager, _fileManager);
+
+
+        // TODO: DAY TO DELETE THIS IMAGE: 1
+        var megafile = await fileStatic.GenerateWebpFile(imageUploaded, Convert.ToDouble(imageUploaded.Size) / (1024.0 * 1024.0),
+            hourseToDelete: 1); // delete 1 hourse later
+        mainUserAvatarImage = await _fileManager.GetPhysicFileUrl(megafile.MainImageId);
+
+        progressBarImageLoader = 100;
+
+        StateHasChanged();
+
+        await _js.InvokeVoidAsync("CropperConnector.InjectCropperToImage", ".-js-get-cropped"); // reinject
+    }
+
+    private void HideEditImageModel()
+    {
+        imageUploaded = null;
+        isImageUploaded = false;
+        mainUserAvatarImage = null;
+        isProgressBarImageLoader = false;
+        progressBarImageLoader = 0;
+
+        EditImageValidationBlock = null;
+
+        modalRefEditImage.Hide();
+    }
+
+    private async Task ShowEditImageModel()
+    {
+        if (isHavePermissionModerateUser)
+        {
+            var croppedFile = await _fileManager.GetCroppedImageFile(User.UserAvatar_cropp);
+            mainUserAvatarImage = await _fileManager.GetPhysicFileUrl(User.UserAvatar_main);
+            StateHasChanged();
+            await _js.InvokeVoidAsync("CropperConnector.InjectCropperToImage", ".-js-get-cropped", croppedFile.x, croppedFile.y, croppedFile.width, croppedFile.height);
+            isProgressBarImageLoader = true;
+
+            modalRefEditImage.Show();
+        }
+    }
+
+    /* screen name */
+
+    private void HideEditScreenNameModel()
+    {
+        editScreenNameModel = new EditAdminScreenName() { };
+        EditScreenNameValidationBlock = null;
+        modalRefEditScreenName.Hide();
+    }
+
+    private async Task EditScreenNameModelExecuted()
+    {
+        if (isEditScreenNameLoading == true)
+            return;
+
+        isEditScreenNameLoading = true;
+        StateHasChanged();
+
+        if (editScreenNameValidation.ValidateAll())
+        {
+            try
+            {
+                await _adminUserServices.SetUserScreenName(User, editScreenNameModel.NewScreenName);
+
+                SettingsInformationBlock = new ValidationMessageBlock("Никнейм успешно изменён.", "ok");
+
+                await _adminActionServices.CreateAdminTransaction(new AdminAction()
+                {
+                    AdminId = Administrator.Id,
+                    Date = DateTimeAddon.NowDateTimeStrings(),
+                    HtmlText = "Администратор изменил никнейм на: " + editScreenNameModel.NewScreenName + ".",
+                    Icon = "fa-user-tag",
+                    Priority = 1,
+                    Type = "{to:user:" + User.Id + "}"
+                });
+
+                await RestrictedPage();
+
+                HideEditScreenNameModel();
+            }
+            catch (Exception)
+            {
+                EditScreenNameValidationBlock = new ValidationMessageBlock("Ошибка смены никнейма.", "error");
+            }
+        }
+
+        isEditScreenNameLoading = false;
+    }
+
+    private void ShowEditScreenNameModel()
+    {
+        if (isHavePermissionModerateUser)
+        {
+            editScreenNameModel = new EditAdminScreenName() { };
+            editScreenNameModel.NewScreenName = User.ScreenName;
+            modalRefEditScreenName.Show();
+        }
+    }
+
+    /* login */
+
+    private void HideEditLoginModel()
+    {
+        editLoginModel = new EditAdminLogin() { };
+        EditLoginValidationBlock = null;
+        modalRefEditLogin.Hide();
+    }
+
+    private async Task EditLoginModelExecuted()
+    {
+        if (isEditLoginLoading == true)
+            return;
+
+        isEditLoginLoading = true;
+        StateHasChanged();
+
+        if (editLoginValidation.ValidateAll())
+        {
+            try
+            {
+                var user = await _userServices.FindUserByNickname(editLoginModel.NewLogin);
+
+                if (user == null)
+                {
+                    await _adminUserServices.SetUserLogin(User, editLoginModel.NewLogin);
+
+                    SettingsInformationBlock = new ValidationMessageBlock("Логин успешно изменён.", "ok");
+
+                    await _adminActionServices.CreateAdminTransaction(new AdminAction()
+                    {
+                        AdminId = Administrator.Id,
+                        Date = DateTimeAddon.NowDateTimeStrings(),
+                        HtmlText = "Администратор изменил логин на: " + editLoginModel.NewLogin + ".",
+                        Icon = "fa-user-tag",
+                        Priority = 2,
+                        Type = "{to:user:" + User.Id + "}"
+                    });
+
+                    await RestrictedPage();
+
+                    HideEditLoginModel();
+                }
+                else EditLoginValidationBlock = new ValidationMessageBlock("Ошибка смены логина. Такой аккаунт уже существует.", "error");
+            }
+            catch (Exception)
+            {
+                EditLoginValidationBlock = new ValidationMessageBlock("Ошибка смены логина.", "error");
+            }
+        }
+
+        isEditLoginLoading = false;
+    }
+
+    private void ShowEditLoginModel()
+    {
+        if (isHavePermissionAdministrateUser)
+        {
+            editLoginModel = new EditAdminLogin() { };
+            editLoginModel.NewLogin = User.UserName;
+            modalRefEditLogin.Show();
+        }
+    }
+
+    /* password */
+
+    private void HideEditPasswordModel()
+    {
+        editPasswordModel = new EditAdminPassword() { };
+        EditPasswordValidationBlock = null;
+        modalRefEditPassword.Hide();
+    }
+
+    private async Task EditPasswordModelExecuted()
+    {
+        if (isEditPasswordLoading == true)
+            return;
+
+        isEditPasswordLoading = true;
+        StateHasChanged();
+
+        if (editPasswordValidation.ValidateAll())
+        {
+            try
+            {
+                await _adminUserServices.SetUserPassword(User, editPasswordModel.NewPassword);
+
+                SettingsInformationBlock = new ValidationMessageBlock("Пароль успешно изменён.", "ok");
+
+                await _adminActionServices.CreateAdminTransaction(new AdminAction()
+                {
+                    AdminId = Administrator.Id,
+                    Date = DateTimeAddon.NowDateTimeStrings(),
+                    HtmlText = "Администратор изменил пароль для пользователя.",
+                    Icon = "fa-key",
+                    Priority = 2,
+                    Type = "{to:user:" + User.Id + "}"
+                });
+
+                await RestrictedPage();
+
+                HideEditPasswordModel();
+            }
+            catch (Exception)
+            {
+                EditPasswordValidationBlock = new ValidationMessageBlock("Ошибка смены пароля.", "error");
+            }
+        }
+
+        isEditPasswordLoading = false;
+    }
+
+    private void ShowEditPasswordModel()
+    {
+        if (isHavePermissionAdministrateUser)
+        {
+            editPasswordModel = new EditAdminPassword() { };
+
+            modalRefEditPassword.Show();
+        }
+    }
+
+    private bool isBanned { get; set; }
+    private int allCountActions { get; set; }
+
+    private async Task RestrictedPage()
+    {
+        User = await _userServices.FindUserById(UserId);
+
+        var userRole = await _roleServices.GetRoleAsync(User.RoleId);
+
+        if (userRole.RequereName == RoleManager.defaultRoleName_banned)
+            isBanned = true;
+        else isBanned = false;
+
+        adminActions = await _adminActionServices.GetAdminActionForUser(User);
+        allCountActions = await _adminActionServices.GetAdminActionForUserCount(User);
+
+        StateHasChanged();
+        await adminActionBlockRef.SHC();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Administrator = await _userServices.GetClient();
+        var role = await _roleServices.GetRoleAsync(Administrator.RoleId);
+        User = await _userServices.FindUserById(UserId);
+
+        var userRole = await _roleServices.GetRoleAsync(User.RoleId);
+
+        if (Administrator == null || User == null || Administrator.Id == User.Id)
+        {
+            if (Administrator.Id == User.Id)
+                await _virtualNavigationServices.ReRedirectClient(VirtualNavigationServices.accessDeniedUrl, hardLoad: true);
+            else await _virtualNavigationServices.ReRedirectClient(VirtualNavigationServices.errorUrl + "404", hardLoad: true);
+            return;
+        }
+
+        if (role.isHaveAccesToAdminPanel && role.isHaveToViewUserList && (role.isHaveToModerateUserAccount || role.isHaveToAdministrateUserAccount))
+        {
+            if (role.isHaveToAdministrateUserAccount)
+                isHavePermissionAdministrateUser = true;
+
+            if (role.isHaveToModerateUserAccount)
+                isHavePermissionModerateUser = true;
+
+            if (userRole.RequereName == RoleManager.defaultRoleName_banned)
+                isBanned = true;
+
+            await _js.InvokeVoidAsync("loadScript", "libs/cropper.js/cropper.min.js");
+            await _js.InvokeVoidAsync("loadScript", "libs/cropper.js/jquery-cropper.min.js");
+
+            adminActions = await _adminActionServices.GetAdminActionForUser(User);
+            allCountActions = await _adminActionServices.GetAdminActionForUserCount(User);
+
+            editScreenNameModel = new EditAdminScreenName();
+            _edcEditScreenName = new EditContext(editScreenNameModel);
+
+            editLoginModel = new EditAdminLogin();
+            _edcEditLogin = new EditContext(editLoginModel);
+
+            editPasswordModel = new EditAdminPassword();
+            _edcEditPassword = new EditContext(editPasswordModel);
+
+            await ChangePageLoadStatus(true);
+        }
+        else await _virtualNavigationServices.ReRedirectClient(VirtualNavigationServices.accessDeniedUrl, hardLoad: true);
+    }
+} 

@@ -1,0 +1,42 @@
+﻿@page "/"
+
+@inherits RenewalTMLComponentBase
+
+@if (_isComplete)
+{
+    <!--<div>
+        <MarkDownEditor EditorType="@((string)"mini")" UniqName="test"></MarkDownEditor>
+    </div>-->
+
+    <div style="display: flex; gap: 15px; flex-direction: column;">
+
+        <div style="display: flex; flex: 1; gap: 15px;">
+            <DoWorkBlock InformationText="Блок главной страницы." Class="" Style=" flex:1;"></DoWorkBlock>
+            <DoWorkBlock InformationText="Блок главной страницы." Class="" Style=" flex:1;"></DoWorkBlock>
+            <DoWorkBlock InformationText="Блок главной страницы." Class="" Style=" flex:1;"></DoWorkBlock>
+        </div>
+        <div style="display: flex; flex: 1; gap: 15px;">
+            <DoWorkBlock InformationText="Блок главной страницы." Class="" Style=" flex:2;"></DoWorkBlock>
+            <DoWorkBlock InformationText="Блок главной страницы." Class="" Style=" flex:1;"></DoWorkBlock>
+            <DoWorkBlock InformationText="Блок главной страницы." Class="" Style=" flex:1;"></DoWorkBlock>
+        </div>
+        <div style="display:flex; flex: 1; gap: 15px;">
+            <DoWorkBlock InformationText="Блок главной страницы." Class="" Style=" flex:3;"></DoWorkBlock>
+            <DoWorkBlock InformationText="Блок главной страницы." Class="" Style=" flex:1;"></DoWorkBlock>
+        </div>
+    </div>
+}
+else
+{
+    <div class="loader-wrapper"><div class="btn-loader page"></div></div>
+}
+
+@code  {
+    private Data.Model.Client user { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await _userServices.GetClient();
+        await ChangePageLoadStatus(true);
+    }
+}

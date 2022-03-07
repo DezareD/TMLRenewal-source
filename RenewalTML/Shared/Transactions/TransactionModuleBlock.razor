@@ -1,0 +1,197 @@
+﻿@inject IClientAuthServices _userServices
+@inject IRolePermissionServices _permissionServices
+@inject ITransactionServices _transactionServices
+@inject IRawTextHtmlizer _rawHtmlizer
+
+@if (TransactionList != null)
+{
+    <div class="outoftable" style="@Style">
+        <Table>
+            <TableHeader>
+                <TableRow Class="top-table">
+                    <TableHeaderCell ColumnSpan="3">
+                        <div class="th-item" style="float: left;">
+                            <span>Транзакции <span style="color: #b7b7b7; margin-left: 3px;">@TransactionList.AllTransactionCount</span></span>
+                        </div>
+                        <div class="th-item" style="float: left; border-right: 0;">
+                            @{
+                                var summ = 0;
+
+                                foreach (var i in TransactionList.TransactionList)
+                                {
+                                    if (i.isEarn) summ += i.Value;
+                                    else summ -= i.Value;
+                                }
+                            }
+
+                            <p class="summ_transaction @(summ > 0? "economy" : "declaim") "> @(summ == 0? "" : (summ > 0? "+" : "-")) @CurrencyAddon.Format(Math.Abs(summ)) <span style="color:#333;">Кеклар</span></p>
+                        </div>
+                        @if (user != null && ClientRole != null && ClientRole.isHaveToModerateTransactions)
+                        {
+                            <Dropdown Direction="Direction.Down" RightAligned="true">
+                                <DropdownToggle Class="clear-btn th-item transaction-menu">
+                                    <i class="fal fa-bars"></i>
+                                </DropdownToggle>
+                                <DropdownMenu Style="margin: 8px 0 0;" Class="mini">
+                                    <DropdownItem><span @onclick="OpenAllTransactionModal"><i class="fas fa-th-list"></i>Все транзакции</span></DropdownItem>
+                                </DropdownMenu>
+                            </Dropdown>
+                        }
+                    </TableHeaderCell>
+                </TableRow>
+                <TableRow>
+                    <TableHeaderCell>Дата</TableHeaderCell>
+                    <TableHeaderCell>Информация</TableHeaderCell>
+                    <TableHeaderCell>Количество</TableHeaderCell>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                @foreach (var item in TransactionList.TransactionList)
+                {
+                    <TableRow>
+                        <TableRowCell>@item.ReadyDate</TableRowCell>
+                        <TableRowCell Class="transaction-info-cell">@((MarkupString)item.HTMLInfo)</TableRowCell>
+                        @if (item.isEarn)
+                        {
+                            <TableRowCell><p><span class="economy">+ @item.ValueFormat</span> Кеклар</p></TableRowCell>
+                        }
+                        else
+                        {
+                            <TableRowCell><p><span class="declaim">- @item.ValueFormat</span> Кеклар</p></TableRowCell>
+                        }
+                    </TableRow>
+                }
+
+            </TableBody>
+        </Table>
+    </div>
+
+    <Modal @ref="modalRefAllTransactionList">
+        <ModalContent Centered="true" Size="ModalSize.Large">
+            <ModalHeader>
+                <ModalTitle>Все транзакции</ModalTitle>
+                <i class="modal_x fal fa-times" @onclick="HideAllTransactionListModal"></i>
+            </ModalHeader>
+            <ModalBody>
+                @if (_ModalTransactionList != null)
+                {
+                    <div class="outoftable" style="@Style">
+                        <Table>
+                            <TableHeader>
+                                <TableRow Class="top-table">
+                                    <TableHeaderCell ColumnSpan="3">
+                                        <div class="th-item" style="float: left;">
+                                            <span>Транзакции <span style="color: #b7b7b7; margin-left: 3px;">@TransactionList.AllTransactionCount</span></span>
+                                        </div>
+                                        <div class="th-item" style="float: left; border-right: 0; display: flex; gap: 10px;">
+                                            @{
+                                                var summ = 0;
+
+                                                foreach (var i in _ModalTransactionList.TransactionList)
+                                                {
+                                                    if (i.isEarn) summ += i.Value;
+                                                    else summ -= i.Value;
+                                                }
+                                            }
+
+                                            <span class="summ_transaction">Сумма за блок: </span><p class="summ_transaction @(summ > 0? "economy" : "declaim") "> @(summ == 0? "" : (summ > 0? "+" : "-")) @CurrencyAddon.Format(Math.Abs(summ)) <span style="color:#333;">Кеклар</span></p>
+                                        </div>
+                                    </TableHeaderCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableHeaderCell>#</TableHeaderCell>
+                                    <TableHeaderCell>Дата</TableHeaderCell>
+                                    <TableHeaderCell>Информация</TableHeaderCell>
+                                    <TableHeaderCell>Количество</TableHeaderCell>
+                                    <TableHeaderCell>Техническая информация</TableHeaderCell>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                @foreach (var item in _ModalTransactionList.TransactionList)
+                                {
+                                <TableRow>
+                                    <TableRowCell>@item.Id</TableRowCell>
+                                    <TableRowCell>@item.ReadyDate</TableRowCell>
+                                    <TableRowCell Class="transaction-info-cell">@((MarkupString)item.HTMLInfo)</TableRowCell>
+                                    @if (item.isEarn)
+                                    {
+                                        <TableRowCell><p><span class="economy">+ @item.ValueFormat</span> Кеклар</p></TableRowCell>
+                                    }
+                                    else
+                                    {
+                                        <TableRowCell><p><span class="declaim">- @item.ValueFormat</span> Кеклар</p></TableRowCell>
+                                    }
+                                    <TableRowCell>@item.LogInformation</TableRowCell>
+                                </TableRow>
+                                }
+
+
+                            </TableBody>
+                        </Table>
+                    </div>
+                }
+                else
+                {
+                    <div class="loader-wrapper"><div style="padding:30px;" class="btn-loader page"></div></div>
+                }
+            </ModalBody>
+            <ModalFooter>
+                    <PagingBlock @ref="_refModalAllTransactionList" ItemOnPage="16" ElementCount="TransactionList.AllTransactionCount" CurrentPageChanged="OnPageChanged"></PagingBlock>
+            </ModalFooter>
+        </ModalContent>
+    </Modal>
+}
+else
+{
+    <div class="loader-wrapper"><div style="padding:30px;" class="btn-loader page"></div></div>
+}
+
+@code {
+    [Parameter]
+    public TransactionModule TransactionList { get; set; }
+
+    [Parameter]
+    public string Style { get; set; }
+
+    [Parameter]
+    public Client UserTransaction { get; set; }
+
+    private TransactionModule _ModalTransactionList { get; set; }
+    private Modal modalRefAllTransactionList { get; set; }
+    private PagingBlock _refModalAllTransactionList { get; set; }
+
+    private Role ClientRole { get; set; }
+    private Client user { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        user = await _userServices.GetClient();
+
+        if (user != null)
+            ClientRole = await _permissionServices.GetClientRole(user);
+    }
+
+    private async Task OnPageChanged()
+    {
+        _refModalAllTransactionList.ToggleStatus();
+        _ModalTransactionList = null;
+        StateHasChanged();
+
+        _ModalTransactionList = await _transactionServices.GetEntityTransaction(UserTransaction, _rawHtmlizer, 16, 16 * (_refModalAllTransactionList._currentPage - 1));
+        StateHasChanged();
+        _refModalAllTransactionList.ToggleStatus();
+    }
+
+    private void HideAllTransactionListModal()
+    {
+        modalRefAllTransactionList.Hide();
+        _ModalTransactionList = null;
+    }
+
+    private async Task OpenAllTransactionModal()
+    {
+        modalRefAllTransactionList.Show();
+        StateHasChanged();
+        _ModalTransactionList = await _transactionServices.GetEntityTransaction(UserTransaction, _rawHtmlizer, 16);
+    }
+} 

@@ -1,0 +1,88 @@
+﻿@page "/profile/{userId:int}/tickets"
+
+@inherits RenewalTMLComponentBase
+
+@inject ITicketServices _ticketServices
+@inject IClientAuthServices _userServices
+
+@if (_isComplete)
+{
+<div class="block block-page-information" style="background: url(/imgs/application/page_banner.png)">
+    <p class="title">Ваши заявки</p>
+    <p class="info">Тут вы можете просмотреть список всех ваших заявок и их статусы</p>
+ </div>
+}
+<div class="block p-normal -js-page-maxheight-relaod" style="@(_isComplete? "max-height:900px;":"max-height:90px;")">
+    @if (_isComplete)
+    {
+    <div class="outoftable">
+        <Table>
+            <TableHeader>
+                <TableRow>
+                    <TableHeaderCell>#</TableHeaderCell>
+                    <TableHeaderCell>Дата создания</TableHeaderCell>
+                    <TableHeaderCell>Название</TableHeaderCell>
+                    <TableHeaderCell>Системная информация</TableHeaderCell>
+                    <TableHeaderCell>Дополнительная админ информация</TableHeaderCell>
+                    <TableHeaderCell>Просмотревший администратор</TableHeaderCell>
+                    <TableHeaderCell>Дата просмотра</TableHeaderCell>
+                    <TableHeaderCell>Вердикт</TableHeaderCell>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                @foreach (var item in _tickets)
+                {
+                    <TableRow>
+                        <TableRowCell>@item.Id</TableRowCell>
+                        <TableRowCell>@DateTimeAddon.StringToDateTimeFormat(item.Date)</TableRowCell>
+                        <TableRowCell>@item.SystemName</TableRowCell>
+                        <TableRowCell>@item.SystemInformation</TableRowCell>
+                        <TableRowCell>@item.AdminInformation</TableRowCell>
+                        <TableRowCell><ClientFormatter ClientId="@item.AdminViewdId"/></TableRowCell>
+                        <TableRowCell>@DateTimeAddon.StringToDateTimeFormat(item.DataView)</TableRowCell>
+                        <TableRowCell><span class="status @item.TicketStatus">@item.TicketStatus</span></TableRowCell>
+                    </TableRow>
+                }
+            </TableBody>
+        </Table>
+    </div>
+    }
+    else
+    {
+        <div class="loader-wrapper"><div class="btn-loader page"></div></div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int UserId { get; set; }
+
+    private Client user { get; set; }
+    private List<Ticket> _tickets { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await _userServices.GetClient();
+
+        if (user != null)
+        {
+            if (user.Id != UserId)
+            {
+                await _virtualNavigationServices.ReRedirectClient(VirtualNavigationServices.accessDeniedUrl, hardLoad: true);
+                return;
+            }
+
+            user.TicketsNonViewCount = 0;
+            await _userServices.UpdateUser(user);
+
+            _tickets = await _ticketServices.GetLastUserTicket(user);
+
+            await ChangePageLoadStatus(true);
+
+            StateHasChanged();
+
+            await _js.InvokeVoidAsync("MaxHeightLoader");
+        }
+        else await _virtualNavigationServices.ReRedirectClient(VirtualNavigationServices.errorUrl + "404", hardLoad: true);
+    }
+}

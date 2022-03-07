@@ -1,0 +1,11 @@
+﻿<Validation @bind-Status="StatusValidator">
+    @ChildContent
+</Validation>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public ValidationStatus StatusValidator { get; set; }
+}

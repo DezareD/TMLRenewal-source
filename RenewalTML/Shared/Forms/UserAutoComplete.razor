@@ -1,0 +1,92 @@
+﻿@inherits BaseTextInput<string>
+
+@inject NavigationManager UriHelper
+@inject IJSRuntime _js
+@inject IClientAuthServices _clientServices
+@inject IVirtualFileServices _fileServices
+
+<div class="input-group">
+    <div style="@(isLoaded == false? "display:none;" : "")" class="input-group-prepend">
+        <span class="input-group-text">@@</span>
+    </div>
+    <input style="width:100%; @(isLoaded == false? "display:none;" : "")" id="userAutoComplete-@InputCode" class="input-left-none form-control @ClassNames"
+           @oninput="OnChange" value="@Text">
+    @Feedback
+</div>
+
+@ChildContent
+
+@if (!isLoaded)
+{
+    <div class="loader-wrapper"><div class="btn-loader page"></div></div>
+}
+
+@code {
+    [Parameter] public string Text { get; set; }
+
+    [Parameter] public EventCallback<string> TextChanged { get; set; }
+
+    [Parameter] public Expression<Func<string>> Field { get; set; }
+
+    protected override string InternalValue { get => Text; set => Text = value; }
+
+    private string InputCode { get; set; }
+    private bool isLoaded { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        InputCode = ClientAuthServices.GenerateRandomString(10, false).ToUpperInvariant();
+
+        var userList = await _clientServices.GetAllFilterClient(false, false);
+
+        var jsonList = new List<AutoCompleteDataInterop>();
+
+        foreach (var k in userList)
+        {
+            var image = await _fileServices.GetPhysicCroppedFile(k.UserAvatar_cropp64x64);
+            jsonList.Add(new AutoCompleteDataInterop() { ScreenName = k.ScreenName, Login = k.UserName, ImageUrl = image });
+        }
+
+        await _js.InvokeVoidAsync("loadScript", "libs/autocomplete/autocomplete.min.js");
+        await _js.InvokeVoidAsync("AutoComplete.GenerateAutoComplete_userlist", "#userAutoComplete-" + InputCode, jsonList, Placeholder);
+
+        isLoaded = true;
+    }
+
+    private async Task OnChange(ChangeEventArgs e)
+    {
+        var context = new ValidationContext((string)e.Value, null, null);
+        var results = new List<ValidationResult>();
+
+        var attrs = ComponentUtils.GetExpressionCustomAttributes(Field);
+
+        Validator.TryValidateValue((string)e.Value, context, results, attrs);
+
+        if (results.Any()) ParentValidation.NotifyValidationStatusChanged(ValidationStatus.Error, results.Select(m => m.ErrorMessage).ToList());
+        else ParentValidation.NotifyValidationStatusChanged(ValidationStatus.Success);
+
+        await TextChanged.InvokeAsync((string)e.Value);
+    }
+
+    /* INHERITS */
+
+    protected override void BuildClasses(ClassBuilder builder)
+    {
+        builder.Append("is-invalid", ParentValidation?.Status == ValidationStatus.Error);
+        builder.Append("is-valid", ParentValidation?.Status == ValidationStatus.Success);
+
+        base.BuildClasses(builder);
+    }
+
+    protected override Task OnInternalValueChanged(string value) => TextChanged.InvokeAsync(value);
+    protected override Task<ParseValue<string>> ParseValueFromStringAsync(string value) => Task.FromResult(new ParseValue<string>(true, value, null));
+
+    public async override Task SetParametersAsync(ParameterView parameters)
+    {
+        parameters.SetParameterProperties(this);
+        await base.SetParametersAsync(ParameterView.Empty);
+
+        if (ParentValidation != null)
+            await InitializeValidation();
+    }
+}

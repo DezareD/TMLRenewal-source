@@ -1,0 +1,124 @@
+﻿@inject NavigationManager UriHelper
+<!--
+    0: Нет ничего
+    1: Одна кнопка, которая и горит
+    2-4: Выбор одной из страничек
+    4-x:
+    1 2 3 4 5 .. 100
+    1 .. 13 14 15 16 17 18 .. 100
+    1 .. 96 97 98 99 100
+
+    1 .. 4 5 6 7 8 .. 100
+    Если выбрана 1 страница кнопка налево блокируется, так же как и при последней кнопка направо.
+    При нажатии на три точки откроется меню, где вы можете ввести страничку и перейти на нее.
+    -->
+
+@if (PageCount >= 0)
+{
+    @if (PageCount >= 1 && PageCount <= 6)
+    {
+        <div class="pagination @(isDisable? "disable" : "")">
+            @for (int i = 1; i <= PageCount; i++)
+            {
+                var temp = i;
+                <div class="page-item @(_currentPage == i? "active" : "")" @onclick="async () => await ChangePage(temp)">@i</div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="pagination @(isDisable? "disable" : "")">
+            @if (_currentPage <= 4)
+            {
+                @for (int i = 1; i <= 5; i++)
+                {
+                    var temp = i;
+                    <div class="page-item @(_currentPage == i? "active" : "")" @onclick="async () => await ChangePage(temp)">@i</div>
+                }
+
+                <div class="page-item">..</div>
+
+                <div class="page-item @(_currentPage == PageCount? "active" : "")" @onclick="async () => await ChangePage(PageCount)">@PageCount</div>
+            }
+            else if (_currentPage > 3 && _currentPage < PageCount - 3)
+            {
+                <div class="page-item @(_currentPage == 1? "active" : "")" @onclick="async () => await ChangePage(1)">1</div>
+
+                <div class="page-item">..</div>
+
+                @for (int i = _currentPage - 2; i <= _currentPage + 2; i++)
+                {
+                    var temp = i;
+                    <div class="page-item @(_currentPage == i? "active" : "")" @onclick="async () => await ChangePage(temp)">@i</div>
+                }
+
+                <div class="page-item">..</div>
+
+                <div class="page-item @(_currentPage == PageCount? "active" : "")" @onclick="async () => await ChangePage(PageCount)">@PageCount</div>
+            }
+            else
+            {
+                <div class="page-item @(_currentPage == 1? "active" : "")" @onclick="async () => await ChangePage(1)">1</div>
+
+                <div class="page-item">..</div>
+
+                @for (int i = PageCount - 3; i <= PageCount; i++)
+                {
+                    var temp = i;
+                    <div class="page-item @(_currentPage == i? "active" : "")" @onclick="async () => await ChangePage(temp)">@i</div>
+                }
+            }
+        </div>
+    }
+}
+
+@code {
+    // example: prefix (url/aboba/user/) + page + postfix (/admin/panel)
+
+    [Parameter]
+    public int ElementCount { get; set; }
+
+    [Parameter]
+    public int ItemOnPage { get; set; }
+
+    [Parameter]
+    public EventCallback<string> CurrentPageChanged { get; set; }
+
+    public int _currentPage { get; set; }
+    private int PageCount { get; set; }
+    private bool isDisable { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        UpdatePageCount();
+    }
+
+    public async Task ChangePage(int newPage)
+    {
+        if (!isDisable)
+        {
+            _currentPage = newPage;
+            await CurrentPageChanged.InvokeAsync();
+            StateHasChanged();
+        }
+    }
+
+    public void UpdatePageCount()
+    {
+        if (ElementCount == 0)
+            PageCount = 0;
+        if (ElementCount <= ItemOnPage)
+            PageCount = 1;
+
+        _currentPage = 1;
+
+        var ostCount = ElementCount % ItemOnPage;
+        PageCount = (int)(ElementCount / ItemOnPage) + (ostCount >= 1 ? 1 : 0);
+    }
+
+    public void ToggleStatus()
+    {
+        isDisable = !isDisable;
+        StateHasChanged();
+    }
+}

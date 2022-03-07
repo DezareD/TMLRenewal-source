@@ -1,0 +1,78 @@
+﻿@page "/profile/{userId:int}/awards"
+
+@inject IAwardServices _awardServices
+
+@inherits RenewalTMLComponentBase
+
+@if (_isComplete)
+{
+<div class="block block-page-information" style="background: url(/imgs/application/page_banner.png)">
+        <p class="title">Список достижений</p>
+        <p class="info">Выполняйте задания в виде достижений и получайте награды. Чем труднее получение достижения - тем лучше награду вы получите.</p>
+        <p class="info" style="margin-top: 10px;"><i class="fas fa-award" style="margin-right: 10px;"></i>Получено достижений: @countGetAwards / @countAllAwards</p>
+    </div>
+}
+<div class="block p-normal -js-page-maxheight-relaod" style="@(_isComplete? "max-height:900px; display: flex; ":"max-height:90px;")">
+    @if (_isComplete)
+    {
+        <div class="user-awards-panel">
+            @foreach (var award in UserAwards)
+            {
+                <div class="award-item @((award.Progress/award.ProgressFinal)*100 >= 100? "complete" : "")">
+                    <div class="award-logo">@((MarkupString)award.HTMLIcon)</div>
+                    <div>
+                        <p class="award-name">@award.Name</p>
+                        <p class="award-info">@((MarkupString)award.HTMLText)</p>
+                    </div>
+                    <div class="award-progress">
+                        <Progress Style="flex: 1;" Color="@(((award.Progress/award.ProgressFinal)*100) >= 100? Color.Success : Color.Primary)" Value="((award.Progress/award.ProgressFinal)*100)" />
+                        <p class="award-progress-info">@CurrencyAddon.Format(award.ProgressFinal) / @CurrencyAddon.Format(award.Progress)</p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="loader-wrapper"><div class="btn-loader page"></div></div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int UserId { get; set; }
+
+    private Client user { get; set; }
+    private List<AwardView> UserAwards { get; set; }
+
+    private int countAllAwards { get; set; }
+    private int countGetAwards { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await _userServices.GetClient();
+
+        if (user != null)
+        {
+
+            if (user.Id != UserId)
+            {
+                await _virtualNavigationServices.ReRedirectClient(VirtualNavigationServices.errorUrl + "404", hardLoad: true);
+                return;
+            }
+
+            UserAwards = await _awardServices.GetUserListAwards(user);
+
+            countAllAwards = UserAwards.Count();
+            countGetAwards = UserAwards.Where(m => m.isGet == true).Count();
+
+
+            await ChangePageLoadStatus(true);
+
+            StateHasChanged();
+
+            await _js.InvokeVoidAsync("MaxHeightLoader");
+        }
+        else await _virtualNavigationServices.ReRedirectClient(VirtualNavigationServices.accessDeniedUrl, hardLoad: true);
+    }
+}

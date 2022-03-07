@@ -1,0 +1,254 @@
+@import "mixins/_adaptive_bp.scss";
+@import "mixins/_colors.scss";
+
+.admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .header-name {
+        font-size: 18.5px;
+        color: #333;
+    }
+}
+
+.admin-page {
+    margin-top: 25px
+}
+
+.admin-badges-panel {
+    gap: 5px;
+
+    .a-badge {
+        i {
+            color: white;
+            cursor: pointer;
+            padding: 5px;
+            font-size: 12px;
+            border-radius: .25rem;
+            transition: .2s;
+        }
+
+        &.disable {
+            opacity: .5;
+
+            i {
+                cursor: default!important;
+            }
+        }
+    }
+
+    .a-edit:not(.disable) i {
+        &:hover {
+            background: #717abf;
+        }
+    }
+
+    .a-edit i {
+        background: #7a8afd;
+    }
+
+    .a-delete:not(.disable) i {
+        &:hover {
+            background: #c54848;
+        }
+    }
+
+    .a-delete i {
+        background: #ec4e4e;
+    }
+}
+
+.modal-form-wrapper {
+    padding: 0px 20px 0px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .form-group {
+        margin-top: 7.5px;
+        margin-bottom: 7.5px;
+    }
+}
+
+.modal-fields-separator-text {
+    color: #333;
+    font-size: 17.5px;
+}
+
+.main-bar {
+    transition: .2s;
+
+    &.admin {
+        background: #24292e!important;
+        border-bottom: 1px solid #24292e!important;
+    }
+}
+
+.bar-site-naming {
+    transition: .2s;
+
+    &.admin {
+        color: white;
+    }
+}
+
+.bar-icon-item {
+    transition: .2s;
+
+    &.admin {
+        color: white !important;
+    }
+}
+
+.admin-items-list-outer {
+    display: grid;
+    align-items: center;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.admin-user-item-outer {
+    width: 38px;
+    height: 38px;
+    position:relative;
+}
+
+.admin-menu-page {
+    display: flex;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.activate-button-menu-item button {
+    opacity: .5;
+    transition: .2s;
+}
+
+.admin-info-badge {
+    background: #f2f5f8;
+    padding: 3px 4px;
+    border-radius: 0.5rem;
+}
+
+.admin-action-outer-icon {
+    width: 40px;
+    height: 40px;
+    position: relative;
+}
+
+.admin-action-icon {
+    background: #e1e1e1;
+    color: #333;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    width: 100%;
+    height: 100%;
+    outline: 5px solid white;
+}
+
+.admin-action-mini-icon {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 15px;
+    height: 15px;
+    color: white;
+    border-radius: 50%;
+    font-size: 9.5px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+.admin-action-mini-icon.normal {
+    background: #cbc6c6;
+}
+
+.admin-action-mini-icon.rare {
+    background: #a0c391;
+}
+
+.admin-action-mini-icon.block {
+    background: #b9b261;
+}
+
+.admin-action-mini-icon.extern {
+    background: #b96161;
+}
+
+.admin-abs-edit-icon {
+    position: absolute;
+    font-size: 12px;
+    opacity: .5;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.admin-abs-edit-icon:hover {
+    opacity:1;
+}
+
+.admin-abs-edit-icon.left-top {
+    top: 0;
+    left: 0;
+}
+
+.admin-right-edit-icon {
+    color: #333;
+    font-size: 12px;
+    background: #e1e1e1;
+    padding: 5px;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .2s;
+}
+
+.admin-right-edit-icon.mini {
+    font-size: 9px!important;
+    padding: 3.5px!important;
+}
+
+.admin-right-edit-icon:hover {
+    opacity: .5;
+}
+
+.admin-action-line {
+    position: absolute;
+    width: 3px;
+    border-radius: 0.25rem;
+    height: 100%;
+    background: #edeaea;
+    top: 0;
+    left: 0;
+    margin-left: 18px;
+}
+
+.admin-action-line.stop {
+    height: 97%!important;
+}
+
+.admin-action-line.first {
+    height: 50% !important;
+}
+
+.admin-info-badge-menu {
+    margin-left: 10px;
+    background: #e96a6a;
+    color: white;
+    height: 18px;
+    width: 18px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 11px;
+    border-radius: 50%;
+}

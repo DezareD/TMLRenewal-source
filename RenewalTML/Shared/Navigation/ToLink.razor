@@ -1,0 +1,42 @@
+﻿@inject NavigationManager UriHelper
+@inject IJSRuntime JS
+@inject IVirtualNavigationServices virtualNavigationServices
+@inject IClientAuthServices authServices
+
+<a href="@Url" @onclick:preventDefault class="js-offnavigate @Class" @onclick=@Navigate>@ChildContent</a>
+
+@code {
+
+    [Parameter]
+    public string Url { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public bool IsActive { get; set; }
+
+    [CascadingParameter(Name = "_applicationContainer")]
+    public App _applicationContainer { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        virtualNavigationServices.PageAddedServices(_applicationContainer, authServices);
+    }
+
+    private async Task Navigate()
+    {
+        var thisUrl = UriHelper.ToBaseRelativePath(UriHelper.Uri);
+
+        if (thisUrl == Url) 
+            return;
+
+        if (Url != null && IsActive)
+        {
+            await virtualNavigationServices.ReRedirectClient(Url);
+        }
+    }
+}

@@ -1,0 +1,229 @@
+﻿@inherits BaseInputComponent<List<FillTicketImage>>
+
+@using Microsoft.AspNetCore.Hosting;
+
+@inject IWebHostEnvironment _webhostManager
+@inject IVirtualFileServices _fileManager
+
+@if (_isComplete && fillTicketImages != null)
+{
+    @if (!ReadOnly)
+    {
+        <div class="action-fillbalance-image-outer @ClassNames @_focusClass">
+            @foreach (var img in fillTicketImages)
+            {
+                <div class="action-fillbalance-image-block @(img.isLoading ? "sloader" : "") @(img.isUploadBlock ? "active_upload" : (img.isFilled ? "filled_image" : ""))">
+                    @if (img.isUploadBlock)
+                    {
+                        <Validation Validator="@((e) => e.Status = ValidationStatus.None )">
+                            <FileEdit @onfocus="FocusedPanel" Disabled="isStartImageUpload" Multiple="true" Class="offdesign" Changed="@OnChangedFile" Filter="image/jpeg, image/png">
+                                <i class="fal fa-plus"></i>
+                            </FileEdit>
+                        </Validation>
+                    }
+                    else if (img.isFilled)
+                    {
+                        <i @onclick="async () => await DeatachImage(img.ImageId)" class="fal fa-minus-circle"></i>
+                        <img src="@img.ImageUrl" />
+                    }
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="action-fillbalance-image-outer @ClassNames">
+            @foreach (var img in fillTicketImages)
+            {
+                <div class="action-fillbalance-image-block">
+                    <img src="@img.ImageUrl" />
+                </div>
+            }
+        </div>
+    }
+
+    @Feedback
+    @ChildContent
+}
+else
+{
+    <div class="loader-wrapper"><div class="btn-loader page"></div></div>
+}
+
+@code {
+    [Parameter] public List<FillTicketImage> fillTicketImages { get; set; }
+
+    [Parameter] public EventCallback<List<FillTicketImage>> fillTicketImagesChanged { get; set; }
+
+    [Parameter] public int MaxImagesCount { get; set; }
+
+    private static System.Timers.Timer _focusTimer { get; set; }
+
+    public bool isStartImageUpload { get; set; }
+    private bool _isComplete { get; set; }
+
+    private string _focusClass { get; set; }
+
+    protected override List<FillTicketImage> InternalValue { get => fillTicketImages; set => fillTicketImages = value; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isComplete = true;
+    }
+
+    private void FocusedPanel(FocusEventArgs e)
+    {
+        var s = e.Type;
+    }
+
+    private void StartFocusTimer()
+    {
+        _focusTimer = new System.Timers.Timer(1500);
+        _focusTimer.Elapsed += ((source, e) =>
+        {
+            InvokeAsync(() =>
+            {
+                _focusClass = "unfocused";
+                StateHasChanged();
+            });
+        });
+        _focusTimer.Enabled = true;
+        _focusTimer.AutoReset = false;
+    }
+
+    private async Task OnChangedFile(FileChangedEventArgs e)
+    {
+        _focusClass = "focused";
+        StateHasChanged();
+
+        var emptyList = fillTicketImages.Where(m => !m.isFilled).ToList();
+        var fileStatic = new VirtualFileStatic(_webhostManager, _fileManager);
+        var emptyImages = emptyList.Count();
+
+        foreach (var k in emptyList.Take(e.Files.Count()).ToList())
+            k.isLoading = true;
+
+        if (isStartImageUpload)
+            return;
+
+        isStartImageUpload = true;
+
+        ParentValidation.NotifyValidationStatusChanged(ValidationStatus.None);
+
+        StateHasChanged();
+
+        foreach (var file in e.Files.Take(emptyImages))
+        {
+            var currentImageBlock = fillTicketImages.Where(m => !m.isFilled).First();
+
+            if (file == null)
+            {
+                await OnEndedUpload();
+                ParentValidation.NotifyValidationStatusChanged(ValidationStatus.Error, new List<string>() { "Ошибка загрузки одного из файлов." });
+                StateHasChanged();
+                return;
+            }
+
+            if (!VirtualFileManager.imageMimeTypes.Contains(file.Type))
+            {
+                await OnEndedUpload();
+                ParentValidation.NotifyValidationStatusChanged(ValidationStatus.Error, new List<string>() { "Один из загружаемых файлов не является изоображением." });
+                StateHasChanged();
+                return;
+            }
+
+            if ((file.Size / (1024 * 1024)) > 2) // 2 mb limit
+            {
+                await OnEndedUpload();
+                ParentValidation.NotifyValidationStatusChanged(ValidationStatus.Error, new List<string>() { "Один из загружаемых файлов слишком большой." });
+                StateHasChanged();
+                return;
+            }
+
+            // TODO: СНАЧАЛА ЗАГРУЗИТЬ ТОЛЬКО НА ЧАС, ПОТОМ ИСПРАВИТЬ НА БОЛЬШОЙ СРОК
+            var megafile = await fileStatic.GenerateWebpFile(file, Convert.ToDouble(file.Size) / (1024.0 * 1024.0),
+                hourseToDelete: 1); // delete 1 hourse later
+
+            currentImageBlock.isFilled = true;
+            currentImageBlock.ImageUrl = await _fileManager.GetPhysicFileUrl(megafile.MainImageId);
+            currentImageBlock.ImageId = megafile.MainImageId;
+            currentImageBlock.isLoading = false;
+        }
+
+        await OnEndedUpload();
+    }
+
+    private async Task OnEndedUpload()
+    {
+        var beforeLoadHasNeedUploadBlock = fillTicketImages.Where(m => !m.isFilled).FirstOrDefault();
+
+        foreach (var k in fillTicketImages.ToList())
+            k.isUploadBlock = false;
+
+        if (beforeLoadHasNeedUploadBlock != null)
+        {
+            beforeLoadHasNeedUploadBlock.isUploadBlock = true;
+            beforeLoadHasNeedUploadBlock.isFilled = false;
+            beforeLoadHasNeedUploadBlock.isLoading = false;
+        }
+
+        isStartImageUpload = false;
+
+        ParentValidation.NotifyValidationStatusChanged(ValidationStatus.Success);
+
+        StartFocusTimer();
+        StateHasChanged();
+    }
+
+    private async Task DeatachImage(int id)
+    {
+        if (!isStartImageUpload)
+        {
+            var fileStatic = new VirtualFileStatic(_webhostManager, _fileManager);
+            var imgDeleteBlock = fillTicketImages.Where(m => m.ImageId == id).First();
+
+            imgDeleteBlock.ImageId = 0;
+            imgDeleteBlock.ImageUrl = null;
+            imgDeleteBlock.isFilled = false;
+            imgDeleteBlock.isLoading = false;
+
+            await fileStatic.DeleteFile(id);
+
+            // reset upload block
+            foreach (var k in fillTicketImages)
+                k.isUploadBlock = false;
+
+            var beforeLoadHasNeedUploadBlock = fillTicketImages.Where(m => !m.isFilled).FirstOrDefault();
+            if (beforeLoadHasNeedUploadBlock != null)
+            {
+                beforeLoadHasNeedUploadBlock.isUploadBlock = true;
+                beforeLoadHasNeedUploadBlock.isFilled = false;
+                beforeLoadHasNeedUploadBlock.isLoading = false;
+                StateHasChanged();
+            }
+        }
+    }
+
+    /* inherit's */
+
+    protected override Task OnInternalValueChanged(List<FillTicketImage> value) => fillTicketImagesChanged.InvokeAsync(value);
+    protected override Task<ParseValue<List<FillTicketImage>>> ParseValueFromStringAsync(string value) => Task.FromResult(new ParseValue<List<FillTicketImage>>());
+
+    protected override void BuildClasses(ClassBuilder builder)
+    {
+        builder.Append("multiimagestatus-invalid", ParentValidation?.Status == ValidationStatus.Error);
+        builder.Append("multiimagestatus-valid", ParentValidation?.Status == ValidationStatus.Success);
+        builder.Append("multiimagestatus-none", ParentValidation?.Status == ValidationStatus.None);
+
+        base.BuildClasses(builder);
+    }
+
+    public async override Task SetParametersAsync(ParameterView parameters)
+    {
+        parameters.SetParameterProperties(this);
+        await base.SetParametersAsync(ParameterView.Empty);
+
+        if (ParentValidation != null)
+            await InitializeValidation();
+    }
+}

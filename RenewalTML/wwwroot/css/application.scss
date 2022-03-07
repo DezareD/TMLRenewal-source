@@ -1,0 +1,107 @@
+﻿@import "mixins/_colors.scss";
+@import "mixins/_fonts.scss";
+
+/* CONST's */
+
+$main-background-color: #f1f2f6;
+
+/* MAIN.APPLICATION */
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+input {
+    outline: none;
+}
+
+html {
+    background: $main-background-color;
+    margin: 0;
+    padding: 0;
+    word-wrap: break-word;
+    display: block;
+    font-family: 'SF UI Display';
+    font-weight: 500;
+    color: $-text-demifocus-color;
+    min-width: 630px;
+}
+
+html {
+    direction: ltr;
+    unicode-bidi: isolate;
+}
+
+body {
+    margin: 0;
+    text-rendering: optimizeLegibility;
+}
+
+a {
+    text-decoration: none;
+    color: $-text-focus-color;
+    user-select: none;
+    cursor: pointer;
+}
+
+.align-center {
+    text-align: center;
+}
+
+*, ::after, ::before {
+    box-sizing: border-box;
+}
+
+.components-reconnect-failed, .components-reconnect-rejected, .components-reconnect-hide {
+    display: none!important;
+}
+
+.components-reconnect-show {
+    display: flex!important;
+}
+
+#blazor-error-ui {
+    display: none;
+}
+
+#components-reconnect-modal, #blazor-error-ui {
+    width: 100%;
+    position: fixed;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, .4);
+    z-index: 999999;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+
+    div {
+        max-width: 400px;
+        background: white;
+        border: 1px solid #d8d8d8;
+        padding: 20px;
+        border-radius: .25rem;
+        margin: 0 auto;
+        margin-top: 30px;
+        position: relative;
+
+        .dismiss {
+            position: absolute;
+            right: 0;
+            margin-right: 15px;
+        }
+
+        .reload {
+            display: block;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+    }
+}
+
+.preletive {
+    position: relative!important;
+}

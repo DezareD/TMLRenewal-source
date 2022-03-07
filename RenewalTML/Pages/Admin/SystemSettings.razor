@@ -1,0 +1,278 @@
+﻿@page "/apanel/systemSettings"
+
+@inject ISystemConfigurationServices _systemConfigurationServices
+@inject IAdminActionServices _adminActionServices 
+
+@using System.Threading
+
+@inherits RenewalTMLComponentBase
+
+<div class="block p-normal">
+    <div class="admin-header">
+        <p class="header-name">Настройки подсистем</p>
+        <div>
+            @if (isSearched)
+            {
+                <div class="btn-loader inputloader" style="display: inline-block; margin-right: 10px;"></div>
+            }
+
+            <div style="position: relative; display: inline-block;">
+                <Validation AsyncValidator="@OnUpdateSearch">
+                    <Field Style="position: relative;">
+                        <TextEdit Placeholder="Поиск..."
+                                  DelayTextOnKeyPress="true"
+                                  DelayTextOnKeyPressInterval="850"
+                                  Text="@SearchInput"
+                                  Class="search-input">
+                        </TextEdit>
+                    </Field>
+                </Validation>
+                <i class="far fa-search search-icon"></i>
+            </div>
+        </div>
+    </div>
+    <div class="admin-menu-page">
+        @if (UserRole != null)
+        {
+            @if (UserRole.isHaveAccesToEditSettings_System)
+            {
+                <Fields Class="@(CurrentSettingsType == "type_system" ? "modal-form-wrapper activate-button-menu-item" : "modal-form-wrapper")">
+                    <Button Class="secondary medium icon" @onclick="async () => await ChangeSettingsType(TypesMassive[0])">
+                        <ChildContent>Системные<i class="fal fa-lock"></i></ChildContent>
+                    </Button>
+                </Fields>
+            }
+
+            @if (UserRole.isHaveAccesToEditSettings_Economic)
+            {
+                <Fields Class="@(CurrentSettingsType == "type_economic" ? "modal-form-wrapper activate-button-menu-item" : "modal-form-wrapper")">
+                    <Button Class="secondary medium icon" @onclick="async () => await ChangeSettingsType(TypesMassive[1])">
+                        <ChildContent>Экономика<i class="fal fa-lock"></i></ChildContent>
+                    </Button>
+                </Fields>
+            }
+        }
+        </div>
+    <div class="admin-page">
+        @if (PaginationSystemCofiguration != null)
+        {
+            if (PaginationSystemCofiguration.Count() > 0)
+            {
+        <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px;">
+            <div style="display: flex; gap: 15px;">
+                <div style="flex: 1; font-size: 15px; color: #333;">Уникальный Id</div>
+                <div style="flex: 2; font-size: 15px; color: #333;">Информация</div>
+                <div style="flex: 1; font-size: 15px; color: #333;">Значение</div>
+            </div>
+            @foreach (var settings in PaginationSystemCofiguration)
+            {
+                <div style="display: flex; gap: 15px;">
+                    <div style="flex: 1; font-size: 13px; color: #333;"><span class="admin-info-badge">@settings.configuration.UniqId</span></div>
+                    <div style="flex: 2; font-size: 13px; color: #333;">@settings.configuration.Information</div>
+                    <div style="flex: 1;">
+                        <Field Style="position: relative;">
+                            <div style="margin-right: 30px;">
+                                @if (settings.configuration.RequeredType == "string")
+                                {
+                                    <MemoEdit Text="@settings.configuration.Value"
+                                              TextChanged="(m) => OnEditSettingsValue(m, settings.configuration.Id)"
+                                              DelayTextOnKeyPress="true"
+                                              DelayTextOnKeyPressInterval="850"
+                                              Class="">
+                                    </MemoEdit>
+                                }
+                                else if (settings.configuration.RequeredType == "int")
+                                {
+                                    <NumericEdit Value="@Convert.ToInt32(settings.configuration.Value)"
+                                                 ValueChanged="(m) => OnEditSettingsValue(Convert.ToString(m), settings.configuration.Id)"
+                                                 DelayTextOnKeyPress="true"
+                                                 DelayTextOnKeyPressInterval="850"
+                                                 TValue="int"
+                                                 Class="">
+                                    </NumericEdit>
+                                }
+                                else if (settings.configuration.RequeredType == "double")
+                                {
+                                    <NumericEdit Value="@Convert.ToDouble(settings.configuration.Value)"
+                                                 ValueChanged="(m) => OnEditSettingsValue(Convert.ToString(m), settings.configuration.Id)"
+                                                 DelayTextOnKeyPress="true"
+                                                 DelayTextOnKeyPressInterval="850"
+                                                 TValue="double"
+                                                 Class="">
+                                    </NumericEdit>
+                                }
+                                else if (settings.configuration.RequeredType == "bool")
+                                {
+                                    <Check Checked="@Convert.ToBoolean(settings.configuration.Value)" CheckedChanged="(m) => OnEditSettingsValue(Convert.ToString(m), settings.configuration.Id)" TValue="bool"></Check>
+                                }
+                            </div>
+                            <InputLoader isShowAcceptOrErrorStatus="true" state="settings.loaderState" />
+                        </Field>
+                    </div>
+                </div>
+            }
+        </div>
+
+                <PagingBlock @ref="PagingBlock" ItemOnPage="SettingsPageSize" ElementCount="AllSystemConfiguration.Count()" CurrentPageChanged="OnPageChanged"></PagingBlock>
+            }
+            else
+            {
+                <p>Not Found</p>
+            }
+        }
+        else
+        {
+            <div class="loader-wrapper"><div class="btn-loader page"></div></div>
+        }
+    </div>
+</div>
+
+@code {
+
+    private string[] TypesMassive = new string[]
+    {
+        "type_system",
+        "type_economic"
+    };
+
+    private string CurrentSettingsType { get; set; }        // Какие настройки сейчас включены
+    private List<SystemSettingModel> AllSystemConfiguration { get; set; }
+    private List<SystemSettingModel> PaginationSystemCofiguration { get; set; }
+
+    private PagingBlock PagingBlock { get; set; }
+    private const int SettingsPageSize = 16;
+    private string SearchInput { get; set; }
+
+    private bool isSearched { get; set; }
+    private bool searchedStart { get; set; }
+
+    private Role UserRole { get; set; }
+    private Client User { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        User = await _userServices.GetClient();
+        UserRole = await _roleServices.GetRoleAsync(User.RoleId);
+
+        CurrentSettingsType = "type_system";
+
+        if (UserRole.isHaveAccesToAdminPanel && UserRole.isHaveAccesToViewSystemSettings &&
+            (UserRole.isHaveAccesToEditSettings_Economic || UserRole.isHaveAccesToEditSettings_System))
+        {
+            await _js.InvokeVoidAsync("loadScript", "libs/tippy.js/tippy.min.js");
+
+            await _js.InvokeVoidAsync("CreateTippyElement",
+            new List<TooltipModel>() {
+                new TooltipModel(".-tp-autosave-info", "Данное поле автосохраняемое, просто вводите текст, а этот индикатор покажет статус изменения.", ToolTipStyles.DefaultStyle, width: 350)
+                    });
+
+            AllSystemConfiguration = (await _systemConfigurationServices.GetAllAsync()).Where(m => m.Type == CurrentSettingsType).Select(m => new SystemSettingModel() { configuration = m, loaderState = InputLoaderState.Waiting }).ToList();
+            PaginationSystemCofiguration = AllSystemConfiguration.Take(SettingsPageSize).ToList();
+
+            await ChangePageLoadStatus(true);
+        }
+        else await _virtualNavigationServices.ReRedirectClient(VirtualNavigationServices.accessDeniedUrl, hardLoad: true);
+    }
+
+    private async Task ChangeSettingsType(string newtype)
+    {
+        if (CurrentSettingsType == newtype)
+            return;
+
+        if (!String.IsNullOrEmpty(SearchInput))
+        {
+            isSearched = true;
+            StateHasChanged();
+        }
+
+        var search = SearchInput;
+
+        PagingBlock._currentPage = 1;
+
+        CurrentSettingsType = newtype;
+
+        AllSystemConfiguration = (await _systemConfigurationServices.GetAllAsync()).Where(m => m.Type == CurrentSettingsType).Select(m => new SystemSettingModel() { configuration = m, loaderState = InputLoaderState.Waiting }).ToList();
+
+        if (search != "")
+            AllSystemConfiguration = AllSystemConfiguration.Where(m => m.configuration.Information.ToLower().Contains(search.ToLower()) || m.configuration.UniqId.ToLower().Contains(search.ToLower())).ToList();
+
+        PaginationSystemCofiguration = AllSystemConfiguration.Take(SettingsPageSize).ToList();
+
+        StateHasChanged();
+
+        PagingBlock.UpdatePageCount();
+
+        if (!String.IsNullOrEmpty(SearchInput))
+            isSearched = false;
+
+        StateHasChanged();
+    }
+
+    private async Task OnEditSettingsValue(string k, int settingsId)
+    {
+        var item = PaginationSystemCofiguration.Where(m => m.configuration.Id == settingsId).First();
+
+        item.loaderState = InputLoaderState.Loading;
+        StateHasChanged();
+
+        var model = await _systemConfigurationServices.GetById(settingsId);
+        model.Value = k;
+        await _systemConfigurationServices.UpdateConfigurtion(model);
+        item.configuration.Value = k;
+
+        await _adminActionServices.CreateAdminTransaction(new AdminAction()
+        {
+            AdminId = User.Id,
+            Date = DateTimeAddon.NowDateTimeStrings(),
+            HtmlText = "Администратор внеёс изменения в конфигурацию системы: '" + item.configuration.UniqId + "'.",
+            Icon = "fa users",
+            Priority = 3,
+            Type = "{to:system}"
+        });
+
+        item.loaderState = InputLoaderState.Succes;
+        StateHasChanged();
+    }
+
+    private async Task OnUpdateSearch(ValidatorEventArgs e, CancellationToken cancellationToken)
+    {
+        SearchInput = Convert.ToString(e.Value);
+
+        if (searchedStart)
+        {
+            isSearched = true;
+            StateHasChanged();
+
+            var search = SearchInput;
+
+            PagingBlock._currentPage = 1;
+
+            AllSystemConfiguration = (await _systemConfigurationServices.GetAllAsync()).Where(m => m.Type == CurrentSettingsType).Select(m => new SystemSettingModel() { configuration = m, loaderState = InputLoaderState.Waiting }).ToList();
+
+            if (search != "")
+                AllSystemConfiguration = AllSystemConfiguration.Where(m => m.configuration.Information.ToLower().Contains(search.ToLower()) || m.configuration.UniqId.ToLower().Contains(search.ToLower())).ToList();
+
+            PaginationSystemCofiguration = AllSystemConfiguration.Take(SettingsPageSize).ToList();
+
+            StateHasChanged();
+
+            PagingBlock.UpdatePageCount();
+        }
+        else searchedStart = true;
+
+        isSearched = false;
+
+        StateHasChanged();
+    }
+
+    private void OnPageChanged()
+    {
+        PagingBlock.ToggleStatus();
+        PaginationSystemCofiguration = null;
+        StateHasChanged();
+
+        PaginationSystemCofiguration = AllSystemConfiguration.Skip(SettingsPageSize * (PagingBlock._currentPage - 1)).Take(SettingsPageSize).ToList();
+        StateHasChanged();
+        PagingBlock.ToggleStatus();
+    }
+}

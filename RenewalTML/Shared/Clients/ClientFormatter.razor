@@ -1,0 +1,20 @@
+﻿@inject IClientAuthServices _userServices
+
+@if (_client != null)
+{
+    <ToLink Url="@("/profile/" + _client.Id)" IsActive="true" Class="admin-info-badge">
+        <span>@_client.ScreenName</span>
+    </ToLink>
+}
+
+@code {
+    [Parameter]
+    public int ClientId { get; set; }
+
+    private Client _client { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        _client = await _userServices.FindUserById(ClientId);
+    }
+} 

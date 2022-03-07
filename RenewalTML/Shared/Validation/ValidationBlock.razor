@@ -1,0 +1,26 @@
+﻿<div class="block-validation-msg @block.type">
+    @((MarkupString)fontIcon)<p>@((MarkupString)block.message)</p>
+</div>
+
+@code {
+    [Parameter]
+    public ValidationMessageBlock block { get; set; }
+
+    public string fontIcon { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (block.type == "error")
+        {
+            fontIcon = "<i class=\"fal fa-exclamation-circle\"></i>";
+        }
+        else if(block.type == "info")
+        {
+            fontIcon = "<i class=\"fal fa-info-circle\"></i>";
+        }
+        else if(block.type == "ok")
+        {
+            fontIcon = "<i class=\"fal fa-check-circle\"></i>";
+        }
+    }
+}

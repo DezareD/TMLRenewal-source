@@ -1,0 +1,271 @@
+﻿/* LOADER.CONSTS */
+
+$loader-bg: white;
+$loader-color: #e19f7a;
+
+$loader-speed: 1.1s;
+
+/* Z-INDEXEX */
+
+/*
+    100 - application loader
+    99 - modal
+    98 - modal fade
+    95 - page loader
+    85 - main bar
+*/
+
+
+/* LOADER.APP */
+
+._cl_application_loader {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+    height: 100%;
+    background: $loader-bg;
+
+    .group {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .bigSqr {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            overflow: hidden;
+            transform-origin: bottom left;
+            animation: bigSqrShrink $loader-speed linear infinite;
+
+            .square {
+                position: absolute;
+                width: 20px;
+                height: 20px;
+                background: $loader-color;
+            }
+
+            .first {
+                left: 0px;
+                top: 20px;
+            }
+
+            .second {
+                left: 20px;
+                top: 20px;
+                animation: drop2 $loader-speed linear infinite;
+            }
+
+            .third {
+                left: 0px;
+                top: 0px;
+                animation: drop3 $loader-speed linear infinite;
+            }
+
+            .fourth {
+                left: 20px;
+                top: 0px;
+                animation: drop4 $loader-speed linear infinite;
+            }
+        }
+    }
+}
+
+@keyframes bigSqrShrink {
+    0% {
+        transform: scale(1)
+    }
+
+    90% {
+        transform: scale(1)
+    }
+
+    100% {
+        transform: scale(0.5)
+    }
+}
+
+@keyframes drop2 {
+    0% {
+        transform: translateY(-50px)
+    }
+
+    25% {
+        transform: translate(0)
+    }
+
+    100% {
+        transform: translate(0)
+    }
+}
+
+@keyframes drop3 {
+    0% {
+        transform: translateY(-50px)
+    }
+
+    50% {
+        transform: translate(0)
+    }
+
+    100% {
+        transform: translate(0)
+    }
+}
+
+@keyframes drop4 {
+    0% {
+        transform: translateY(-50px)
+    }
+
+    75% {
+        transform: translate(0)
+    }
+
+    100% {
+        transform: translate(0)
+    }
+}
+
+/* LOADER.PAGE */
+
+._cl_page_loader {
+    z-index: 95;
+
+    .spinner {
+        width: 50px;
+        height: 40px;
+        position: fixed;
+        top: 34px;
+        right: 40px;
+        user-select: none;
+        z-index: 95;
+
+        div {
+            background-color: $loader-color;
+            height: 100%;
+            width: 6px;
+            display: inline-block;
+            -webkit-animation: sk-stretchdelay 1.2s infinite ease-in-out;
+            animation: sk-stretchdelay 1.2s infinite ease-in-out;
+        }
+
+        .rect2 {
+            -webkit-animation-delay: -1.1s;
+            animation-delay: -1.1s;
+        }
+
+        .rect3 {
+            -webkit-animation-delay: -1.0s;
+            animation-delay: -1.0s;
+        }
+
+        .rect4 {
+            -webkit-animation-delay: -0.9s;
+            animation-delay: -0.9s;
+        }
+
+        .rect5 {
+            -webkit-animation-delay: -0.8s;
+            animation-delay: -0.8s;
+        }
+    }
+}
+
+/* INFO LOADER */
+
+.loader-wrapper {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    opacity: .6;
+
+    .page {
+        width: 30px;
+        height: 30px;
+        border: 1px solid transparent;
+        border-top: 1px solid black;
+        min-width: 30px !important;
+    }
+}
+
+.inputloader {
+    width: 17px;
+    height: 17px;
+    border: 1px solid;
+    border-top: 1px;
+}
+
+@-webkit-keyframes sk-stretchdelay {
+    0%, 40%, 100% {
+        -webkit-transform: scaleY(0.4)
+    }
+
+    20% {
+        -webkit-transform: scaleY(1.0)
+    }
+}
+
+@keyframes sk-stretchdelay {
+    0%, 40%, 100% {
+        transform: scaleY(0.4);
+        -webkit-transform: scaleY(0.4);
+    }
+
+    20% {
+        transform: scaleY(1.0);
+        -webkit-transform: scaleY(1.0);
+    }
+}
+
+/* REDIRECTING */
+/* BTN LOADER */
+
+@-webkit-keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes sloading {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* SKELETON LAODING */
+
+.sloader {
+    position: relative;
+    background-color: #E2E2E2;
+
+    &:after {
+        display: block;
+        content: "";
+        top: 0;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        transform: translateX(-100%);
+        background: linear-gradient( 90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        -webkit-animation: sloading 1.5s infinite;
+        animation: sloading 1.5s infinite;
+    }
+}

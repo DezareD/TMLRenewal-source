@@ -1,0 +1,152 @@
+﻿@page "/profile/{userId:int}/leveling"
+
+@inject IAwardServices _awardServices
+@inject ILevelsServices _levelServices 
+
+@inherits RenewalTMLComponentBase
+
+@if (_isComplete)
+{
+<div class="block block-page-information" style="background: url(/imgs/application/page_banner.png)">
+    <p class="title">Опыт и таблица уровней</p>
+    <p class="info">Просматривайте ваш текущий уровень и смотрите что откроется вам на всеразличых уровнях.</p>
+ </div>
+}
+<div class="block p-normal -js-page-maxheight-relaod" style="@(_isComplete? "max-height:900px;":"max-height:90px;")">
+    @if (_isComplete)
+    {
+        <div class="level-bar-info-text">@user.CurrencyExp exp. из @nexLevelExp exp.</div>
+        <div style="display: flex; align-items: center; margin-bottom:20px;">
+            <div style="flex:1;" class="progress-bar-level"><img src="../imgs/userlevels/userlevel_@(user.Level).svg" /></div>
+            <Progress Style="flex:8;" Size="Size.Medium">
+                <ProgressBar Class="texted" Color="Color.Primary" Style="padding-left: 15px; padding-right: 15px;" Animated="true" Value="@levelProgress">@levelProgress%</ProgressBar>
+            </Progress>
+            <div style="flex:1;" class="progress-bar-level next"><img src="../imgs/userlevels/userlevel_@(user.Level==50? "50":user.Level+1).svg" /></div>
+        </div>
+        <div class="level-outer">
+            <div class="level-system-block">
+                @for (int i = 1; i <= 25; i++)
+                {
+                    var this_level = levelDataInformation.Where(m => m.Level == i).FirstOrDefault();
+
+                    if (this_level != null)
+                    {
+                        <div class="level-block" style="@((user.Level >= this_level.Level)? "" : "opacity: 0.5;")">
+                            <div class="level-outer-image"><img src="../imgs/userlevels/userlevel_@(this_level.Level).svg" /></div>
+                            <div>
+                                <p class="level-naming">@(this_level.Level) Уровень</p>
+                                @foreach (var item in this_level.InformationAttributes)
+                                {
+                                    <Check @bind-Checked="userPermissions[this_level.Level]" Class="disabled" Disabled="true" TValue="bool">@item</Check>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+            <div class="level-system-block">
+                @for (int i = 25; i <= 50; i++)
+                {
+                    var this_level = levelDataInformation.Where(m => m.Level == i).FirstOrDefault();
+
+                    if (this_level != null)
+                    {
+                        <div class="level-block" style="@((user.Level >= this_level.Level)? "" : "opacity: 0.5;")">
+                            <div class="level-outer-image"><img src="../imgs/userlevels/userlevel_@(this_level.Level).svg" /></div>
+                            <div>
+                                <p class="level-naming">@(this_level.Level) Уровень</p>
+                                @foreach (var item in this_level.InformationAttributes)
+                                {
+                                    <Check @bind-Checked="userPermissions[this_level.Level]" Class="disabled" Disabled="true" TValue="bool">@item</Check>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="loader-wrapper"><div class="btn-loader page"></div></div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int UserId { get; set; }
+
+    private Client user { get; set; }
+
+    private List<bool> userPermissions = new List<bool>();
+
+    private int levelProgress { get; set; }
+    private int nextLevel { get; set; }
+    private int nexLevelExp { get; set; }
+
+    private List<LevelDataInformation> levelDataInformation = new List<LevelDataInformation>()
+    {
+        new LevelDataInformation()
+        {
+            Level = 1,
+            InformationAttributes = new List<string>()
+            {
+                "Доступ к сайту и основным функциям"
+            }
+        },
+        new LevelDataInformation()
+        {
+            Level = 2,
+            InformationAttributes = new List<string>()
+            {
+                "Доступ к переводам между пользователями.",
+                "Доступ к пополнениям баланса."
+            }
+        },
+        new LevelDataInformation()
+        {
+            Level = 48,
+            InformationAttributes = new List<string>()
+            {
+                "Чиста тест."
+            }
+        }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await _userServices.GetClient();
+
+        if (user != null)
+        {
+
+            if (user.Id != UserId)
+            {
+                await _virtualNavigationServices.ReRedirectClient(VirtualNavigationServices.errorUrl + "404", hardLoad: true);
+                return;
+            }
+
+
+            if (user.Level == 50) levelProgress = 100;
+            else
+            {
+                nextLevel = user.Level + 1;
+                nexLevelExp = _levelServices.GetRequeryGainExpToLevel(nextLevel);
+
+                levelProgress = ((user.CurrencyExp / nexLevelExp) * 100);
+            }
+
+            for (int i = 1; i <= 50; i++)
+            {
+                userPermissions.Add(user.Level >= i);
+            }
+
+            await ChangePageLoadStatus(true);
+
+            StateHasChanged();
+
+            await _js.InvokeVoidAsync("MaxHeightLoader");
+        }
+        else await _virtualNavigationServices.ReRedirectClient(VirtualNavigationServices.accessDeniedUrl, hardLoad: true);
+    }
+}

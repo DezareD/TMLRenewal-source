@@ -1,0 +1,97 @@
+﻿@inject IVirtualFileServices _fileManager
+
+@if (AvatarSize == AvatarSize.mini)
+{
+    <svg @onclick="@(() => {})" viewBox="0 0 32 35.63" style="width: 100%;height: 100%;" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <clipPath id="@("hexagon_clip"+uniqId)">
+                <path id="@("hexagon"+uniqId)" d="M32,26.07V9.55a1.27,1.27,0,0,0-.65-1.1L16.62.16a1.3,1.3,0,0,0-1.24,0L.65,8.45A1.27,1.27,0,0,0,0,9.55V26.07a1.28,1.28,0,0,0,.65,1.11l14.73,8.28a1.25,1.25,0,0,0,1.24,0l14.73-8.28A1.28,1.28,0,0,0,32,26.07Z"></path>
+            </clipPath>
+        </defs>
+
+        @if (String.IsNullOrEmpty(userImage))
+        {
+            <div xmlns="https://www.w3.org/1999/xhtml" class="sloader heximage-mini" />
+        }
+        else
+        {
+            <image width="32" height="35.5" clip-path="url(#@("hexagon_clip"+uniqId))" href="@userImage"></image>
+        }
+
+        <use xlink:href="#@("hexagon"+uniqId)" x="0" y="0" fill="transparent"></use>
+    </svg>
+    <img class="user-level-badge mini" src="/imgs/userlevels/userlevel_@(Client.Level).svg">
+}
+else if (AvatarSize == AvatarSize._200x200)
+{
+    <svg @onclick="@(() => {})" viewBox="0 0 200 220.72" style="width: 100%;height: 100%;" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <clipPath id="@("hexagon_clip"+uniqId)">
+                <path id="@("hexagon"+uniqId)" d="M200,158.11V62.61a14.54,14.54,0,0,0-7.41-12.67L107.13,1.87a14.54,14.54,0,0,0-14.26,0L7.41,49.94A14.54,14.54,0,0,0,0,62.61v95.5a14.54,14.54,0,0,0,7.41,12.67l85.46,48.07a14.54,14.54,0,0,0,14.26,0l85.46-48.07A14.54,14.54,0,0,0,200,158.11Z"></path>
+            </clipPath>
+        </defs>
+
+        @if (String.IsNullOrEmpty(userImage))
+        {
+            <div xmlns="https://www.w3.org/1999/xhtml" class="sloader heximage-mini" />
+        }
+        else
+        {
+            <image width="200" height="220.72" clip-path="url(#@("hexagon_clip"+uniqId))" href="@userImage"></image>
+        }
+
+        <use xlink:href="#@("hexagon"+uniqId)" x="0" y="0" fill="transparent"></use>
+    </svg>
+    <img class="user-level-badge dxd" src="/imgs/userlevels/userlevel_@(Client.Level).svg">
+}
+else if (AvatarSize == AvatarSize._100x)
+{
+    <svg @onclick="@(() => {})" viewBox="0 0 200 220.72" style="width: 100%;height: 100%;" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <clipPath id="@("hexagon_clip"+uniqId)">
+                <path id="@("hexagon"+uniqId)" d="M200,158.11V62.61a14.54,14.54,0,0,0-7.41-12.67L107.13,1.87a14.54,14.54,0,0,0-14.26,0L7.41,49.94A14.54,14.54,0,0,0,0,62.61v95.5a14.54,14.54,0,0,0,7.41,12.67l85.46,48.07a14.54,14.54,0,0,0,14.26,0l85.46-48.07A14.54,14.54,0,0,0,200,158.11Z"></path>
+            </clipPath>
+        </defs>
+
+        @if (String.IsNullOrEmpty(userImage))
+        {
+            <div xmlns="https://www.w3.org/1999/xhtml" class="sloader heximage-mini" />
+        }
+        else
+        {
+            <image width="200" height="220.72" clip-path="url(#@("hexagon_clip"+uniqId))" href="@userImage"></image>
+        }
+
+        <use xlink:href="#@("hexagon"+uniqId)" x="0" y="0" fill="transparent"></use>
+    </svg>
+    <img class="user-level-badge normal" src="/imgs/userlevels/userlevel_@(Client.Level).svg">
+}
+
+@code {
+    [Parameter]
+    public Client Client { get; set; }
+
+    [Parameter]
+    public AvatarSize AvatarSize { get; set; }
+
+    private string userImage { get; set; }
+    private bool isReady { get; set; }
+    private string uniqId { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        if (AvatarSize == AvatarSize._200x200 || AvatarSize == AvatarSize._100x) userImage = await _fileManager.GetPhysicCroppedFile(Client.UserAvatar_cropp);
+        else if (AvatarSize == AvatarSize.mini) userImage = await _fileManager.GetPhysicCroppedFile(Client.UserAvatar_cropp64x64);
+
+        uniqId = ClientAuthServices.GenerateRandomString(10, false);
+        isReady = true;
+    }
+
+    public async Task ReGenerateImage()
+    {
+        if (AvatarSize == AvatarSize._200x200 || AvatarSize == AvatarSize._100x) userImage = (await _fileManager.GetPhysicCroppedFile(Client.UserAvatar_cropp)) + "?_v=" + ClientAuthServices.GenerateRandomString(10, false).ToUpperInvariant();
+        else if (AvatarSize == AvatarSize.mini) userImage = (await _fileManager.GetPhysicCroppedFile(Client.UserAvatar_cropp64x64)) + "?_v=" + ClientAuthServices.GenerateRandomString(10, false).ToUpperInvariant();
+
+        StateHasChanged();
+    }
+} 

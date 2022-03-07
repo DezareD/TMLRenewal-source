@@ -1,0 +1,118 @@
+﻿@inject IClientAuthServices _userServices
+@inject IRolePermissionServices _permissionServices
+
+@if (EnchantedList != null && isComplete)
+{
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;position:relative;">
+
+        @if (EnchantedList.Count > 0)
+        {
+            if (EnchantedList.Count == 1)
+            {
+                <div class="admin-action-line first"></div>
+            }
+            else
+            {
+                if (AllCount > EnchantedList.Count)
+                {
+                <div class="admin-action-line"></div>
+                }
+                else
+                {
+                <div class="admin-action-line stop"></div>
+                }
+            }
+        }
+
+        @foreach (var item in EnchantedList)
+        {
+            <div style="gap: 10px; display: flex;">
+                <div style="flex: 1;">
+                    <div class="admin-action-outer-icon">
+                        <div class="admin-action-icon">
+                            <i class="fal @item.action.Icon"></i>
+                        </div>
+                        @if (item.action.Priority == 0)
+                        {
+                            <i class="fal fa-hashtag admin-action-mini-icon normal"></i>
+                        }
+                        else if (item.action.Priority == 1)
+                        {
+                            <i class="fal fa-exclamation-triangle admin-action-mini-icon rare"></i>
+                        }
+                        else if (item.action.Priority == 2)
+                        {
+                            <i class="fal fa-do-not-enter admin-action-mini-icon block"></i>
+                        }
+                        else if (item.action.Priority == 3)
+                        {
+                            <i class="fal fa-ban admin-action-mini-icon extern"></i>
+                        }
+                    </div>
+                </div>
+                <div style="flex: 3;">
+                    <p style="color: #333; font-size: 14px;">@((MarkupString)item.action.HtmlText)</p>
+                    <p style="font-size: 12px; margin-top: 5px;"><span style="color: #7e8c9d;">@("@" + item.admin.ScreenName)</span> · <span>@DateTimeAddon.StringToDateTimeFormat(item.action.Date)</span></p>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="loader-wrapper"><div style="padding:30px;" class="btn-loader page"></div></div>
+}
+
+@code {
+    [Parameter]
+    public List<AdminAction> AdminActionList { get; set; }
+
+    [Parameter]
+    public int AllCount { get; set; }
+
+    private bool isComplete { get; set; }
+
+    private List<AdminActionModel> EnchantedList { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        EnchantedList = new List<AdminActionModel>();
+
+        foreach (var i in AdminActionList)
+        {
+            var user = await _userServices.FindUserById(i.AdminId);
+
+            EnchantedList.Add(new AdminActionModel()
+            {
+                action = i,
+                admin = user
+            });
+        }
+
+        isComplete = true;
+    }
+
+
+    // RE MAPPED AND SHC
+
+    public async Task SHC()
+    {
+        isComplete = false;
+        StateHasChanged();
+
+        EnchantedList = new List<AdminActionModel>();
+        foreach (var i in AdminActionList.OrderByDescending(m => DateTimeAddon.StringToDateTime(m.Date).Ticks).ToList())
+        {
+            var user = await _userServices.FindUserById(i.AdminId);
+
+            EnchantedList.Add(new AdminActionModel()
+            {
+                action = i,
+                admin = user
+            });
+        }
+
+        isComplete = true;
+        StateHasChanged();
+    }
+} 

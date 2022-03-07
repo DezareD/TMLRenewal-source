@@ -1,0 +1,238 @@
+﻿@inherits BaseTextInput<string>
+
+@inject NavigationManager UriHelper
+@inject IJSRuntime _js
+@inject IClientAuthServices _clientServices
+@inject IVirtualFileServices _fileServices
+@inject IVirtualFileServices _fileManager
+@inject IWebHostEnvironment _webhostManager
+
+@using Microsoft.AspNetCore.Hosting
+
+<div class="@ClassNames">
+    <textarea style="display: none;" id="markdownEditor-@InputCode" data-bind-text-value="@Text" data-bind-text-status-changer="@StatuChangerName"></textarea>
+    @Feedback
+    @ChildContent
+</div>
+
+@if (isLoaded)
+{
+    <Modal @ref="modalUploadImage">
+        <ModalContent Centered="true" Size="ModalSize.Default">
+            <ModalHeader>
+                <ModalTitle>Загрузка картинки</ModalTitle>
+                <i class="modal_x fal fa-times" @onclick="HideEditImageModel"></i>
+            </ModalHeader>
+            <ModalBody>
+                <div style="display: flex; gap: 20px;">
+                    <div style="flex:1;">
+                        @if (UploadImageBlock != null && UploadImageBlock.isShow)
+                        {
+                            <div style="margin-bottom:15px">
+                                <ValidationBlock block="UploadImageBlock" />
+                            </div>
+                        }
+
+                        <p class="input-upper-label">Загрузить фотографию</p>
+                        <FileEdit Changed="@OnChangedFile" Progressed="@OnProgressed" AutoReset="false" Placeholder="Выбрать файл..." Filter="image/jpeg, image/png"></FileEdit>
+                        @if (isProgressBarImageLoader)
+                        {
+                            <Progress Color="@(progressBarImageLoader >= 100? Color.Success : Color.Primary)" Value="@progressBarImageLoader" />
+                        }
+                    </div>
+                </div>
+            </ModalBody>
+            <ModalFooter>
+                <div class="footer-buttons" style="display: flex; justify-content: center;">
+                    <Button Class="primary small outline icon" Clicked="@HideEditImageModel">
+                        <ChildContent>Закрыть</ChildContent>
+                    </Button>
+                </div>
+            </ModalFooter>
+        </ModalContent>
+    </Modal>
+}
+
+@if (!isLoaded)
+{
+    <div class="loader-wrapper"><div class="btn-loader page"></div></div>
+}
+
+@code {
+    [Parameter] public string Text { get; set; }
+
+    [Parameter] public EventCallback<string> TextChanged { get; set; }
+
+    [Parameter] public Expression<Func<string>> Field { get; set; }
+
+    [Parameter] public string EditorType { get; set; }
+
+    [Parameter] public string UniqName { get; set; }
+
+    protected override string InternalValue { get => Text; set => Text = value; }
+    private string StatuChangerName { get; set; }
+
+    private Modal modalUploadImage { get; set; }
+    private ValidationMessageBlock UploadImageBlock { get; set; }
+
+    private int progressBarImageLoader { get; set; }
+    private bool isProgressBarImageLoader { get; set; }
+
+    private bool isImageUploaded { get; set; }
+    private IFileEntry imageUploaded { get; set; }
+
+    //
+
+    // mini:
+    // * bold, header ( h1 или какой там ), без автосохранения
+    // premium
+    // mini + автосохранение, цитаты, список, ссылки
+    // ultimate
+    // premium + кастомные картинки, блок кода.
+
+    // кастомные:
+
+    // upBalance - пополнение счёта. Только ссылки можно вставлять.
+
+    private string InputCode { get; set; }
+    private bool isLoaded { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var dotNetPtr = DotNetObjectReference.Create(this);
+
+        InputCode = ClientAuthServices.GenerateRandomString(10, false).ToUpperInvariant();
+        StatuChangerName = "system"; // system or user
+
+        await _js.InvokeVoidAsync("loadScript", "libs/easymde.js/easymde.min.js");
+        await _js.InvokeVoidAsync("loadScript", "libs/easymde.js/purify.min.js");
+
+        await _js.InvokeVoidAsync("MarkDown.MarkDownCreate", "#markdownEditor-" + InputCode, EditorType, UniqName, ReadOnly, dotNetPtr);
+
+        if (Text != null)
+            await _js.InvokeVoidAsync("MarkDown.MarkDownSetData", "#markdownEditor-" + InputCode, Text);
+
+        isLoaded = true;
+    }
+
+    //public async Task SetData(string data) => await _js.InvokeVoidAsync("MarkDown.MarkDownSetData", "#markdownEditor-" + InputCode, data);
+    //public async Task ClearMarkDown() => await _js.InvokeVoidAsync("MarkDown.ClearMarkDown", "#markdownEditor-" + InputCode);
+    //public async Task<string> GetData(bool isHtml) => await _js.InvokeAsync<string>("MarkDown.GetDataMarkDownEditor", "#markdownEditor-" + InputCode, isHtml); // получаем данные с mark down editor'а
+
+    [JSInvokable("UpdateMarkDownStatus")]
+    public async Task UpdateMarkDownStatus(string value) => ParentValidation.NotifyValidationStatusChanged(Enum.Parse<ValidationStatus>(value));
+
+    [JSInvokable("StartUploadImage")]
+    public async Task StartUploadImage()
+    {
+        isProgressBarImageLoader = true;
+        modalUploadImage.Show();
+    }
+
+    private async Task ChangeData(string data)
+    {
+        var context = new ValidationContext(data, null, null);
+        var results = new List<ValidationResult>();
+
+        var attrs = ComponentUtils.GetExpressionCustomAttributes(Field);
+
+        Validator.TryValidateValue(data, context, results, attrs);
+
+        if (results.Any()) ParentValidation.NotifyValidationStatusChanged(ValidationStatus.Error, results.Select(m => m.ErrorMessage).ToList());
+        else ParentValidation.NotifyValidationStatusChanged(ValidationStatus.Success);
+
+        StatuChangerName = "userchanged-" + data;
+        StateHasChanged();
+
+        await TextChanged.InvokeAsync(data);
+    }
+
+    [JSInvokable("UpdateMarkDownValue")]
+    public async Task UpdateMarkDownValue(string value) => await ChangeData(value);
+
+    private void HideEditImageModel()
+    {
+        imageUploaded = null;
+        isImageUploaded = false;
+        isProgressBarImageLoader = false;
+        progressBarImageLoader = 0;
+
+        UploadImageBlock = null;
+
+        modalUploadImage.Hide();
+    }
+
+    void OnProgressed(FileProgressedEventArgs e)
+    {
+        int percent = (Convert.ToInt32(e.Percentage - 10) < 0) ? 0 : Convert.ToInt32(e.Percentage - 10);
+        progressBarImageLoader = percent;
+        //StateHasChanged();
+    }
+
+    async Task OnChangedFile(FileChangedEventArgs e)
+    {
+        var file = e.Files.FirstOrDefault();
+
+        if (file == null)
+        {
+            UploadImageBlock = new ValidationMessageBlock("Что-то пошло не так при загрузке файлов.", "error");
+            return;
+        }
+        if (!VirtualFileManager.imageMimeTypes.Contains(file.Type))
+        {
+            UploadImageBlock = new ValidationMessageBlock("Загружаемый файл не является изоображением.", "error");
+            return;
+        }
+
+        if ((file.Size / (1024 * 1024)) > 2) // 2 mb limit
+        {
+            UploadImageBlock = new ValidationMessageBlock("Загружаемый файл слишком большой.", "error");
+            return;
+        }
+
+        isProgressBarImageLoader = true;
+        progressBarImageLoader = 0;
+        StateHasChanged();
+
+        imageUploaded = file;
+        isImageUploaded = true;
+
+        var fileStatic = new VirtualFileStatic(_webhostManager, _fileManager);
+
+        var megafile = await fileStatic.GenerateWebpFile(imageUploaded, Convert.ToDouble(imageUploaded.Size) / (1024.0 * 1024.0));
+        // файл загрузили
+
+        progressBarImageLoader = 100;
+
+        var retImage = await _fileManager.GetPhysicFileUrl(megafile.MainImageId);
+        await _js.InvokeVoidAsync("MarkDown.AddImageToEditor", "#markdownEditor-" + InputCode, retImage);
+
+        // js add image url to edtior
+
+        StateHasChanged();
+        HideEditImageModel();
+    }
+
+    /* inherit's */
+
+    protected override void BuildClasses(ClassBuilder builder)
+    {
+        builder.Append("is-invalid", ParentValidation?.Status == ValidationStatus.Error);
+        builder.Append("is-valid", ParentValidation?.Status == ValidationStatus.Success);
+        builder.Append("", ParentValidation?.Status == ValidationStatus.None);
+
+        base.BuildClasses(builder);
+    }
+
+    protected override Task OnInternalValueChanged(string value) => TextChanged.InvokeAsync(value);
+    protected override Task<ParseValue<string>> ParseValueFromStringAsync(string value) => Task.FromResult(new ParseValue<string>(true, value, null));
+
+    public async override Task SetParametersAsync(ParameterView parameters)
+    {
+        parameters.SetParameterProperties(this);
+        await base.SetParametersAsync(ParameterView.Empty);
+
+        if (ParentValidation != null)
+            await InitializeValidation();
+    }
+}

@@ -1,0 +1,15 @@
+﻿@page "/user/error/{code:int}"
+
+@inherits RenewalTMLComponentBase
+
+<h1>Error: @Code</h1>
+
+@code {
+    [Parameter]
+    public int Code { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ChangePageLoadStatus(true);
+    }
+} 

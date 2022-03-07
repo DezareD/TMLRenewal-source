@@ -1,0 +1,251 @@
+﻿@page "/apanel/tickets/requestMoney"
+
+@inherits RenewalTMLComponentBase
+
+@using RenewalTML.Data.Dto.Admin;
+
+@inject ITicketServices _ticketServices
+@inject IVirtualFileServices _fileManager
+@inject IEconomicsServices _economicsServices
+
+<div class="block p-normal">
+    <div class="admin-header">
+        <p class="header-name">
+            Проверка прошений
+            @if (_isComplete)
+            {
+                <span class="admin-info-badge">@(FillBalanceTickets_count)</span>
+            }
+        </p>
+    </div>
+    <div class="admin-page">
+        @if (_isComplete)
+        {
+            @if (FillBalanceTickets_count >= 1 && FillBalanceTickets_last != null)
+            {
+                @if (RequestMoneyError != null && RequestMoneyError.isShow)
+                {
+                    <div style="margin: 0 35px 0 35px; margin-top:10px">
+                        <ValidationBlock block="RequestMoneyError" />
+                    </div>
+                }
+
+    <div class="user-form-factor-action-panel">
+        <Validations @ref="_adminRequestTicketApprovalModule._validationContext" Model="@_adminRequestTicketApprovalModule._model" Mode="ValidationMode.Auto" ValidateOnLoad="false">
+            <Validation @ref="@_adminRequestTicketApprovalModule._fieldValidationStatus["Money"]">
+                <p class="form-note req">Количество:</p>
+                <NumericEdit @bind-Value="_adminRequestTicketApprovalModule._model.Money" Placeholder="Введите количество" TValue="int">
+                    <Feedback>
+                        <ValidationError />
+                    </Feedback>
+                </NumericEdit>
+            </Validation>
+
+            <Validation @ref="@_adminRequestTicketApprovalModule._fieldValidationStatus["Text"]">
+                <p class="form-note">Информация от пользователя:</p>
+                <MarkDownEditor @bind-Text="_adminRequestTicketApprovalModule._model.Text" ReadOnly="true" EditorType="@((string)"requestMoney")" UniqName="_cl_requestMoneyApproved">
+                    <Feedback>
+                        <ValidationError />
+                    </Feedback>
+                    <ChildContent>
+                        <p class="note-form form-row">Данное поле работает в режиме просмотра, любые изменения вами этого поля никак не коснутся записи в базе данных.</p>
+                    </ChildContent>
+                </MarkDownEditor>
+            </Validation>
+
+            <p class="form-note">Изоображения:</p>
+            <MultiImageForm fillTicketImages="_adminRequestTicketApprovalModule._model.FillTicketImages" ReadOnly="true"></MultiImageForm>
+
+            <!-- TODO: Добавить открытие картинок в полный экран -->
+            <!--
+    <MemoEdit Text="@settings.configuration.Value"
+                          TextChanged="(m) => OnEditSettingsValue(m, settings.configuration.Id)"
+                          DelayTextOnKeyPress="true"
+                          DelayTextOnKeyPressInterval="850"
+                          Class="">
+                </MemoEdit>
+    -->
+            <!-- 1. ADMINS INFORMATION: мемоэдит, где админ оставляет комментарий, но обязательно еслиотказ -->
+            <!-- 2. Выбор статуса зявки, либо отказ либо принятия, будет либо кружками, либо чекбочкс -->
+            <div class="hr-line"></div>
+
+            <Validation @ref="@_adminRequestTicketApprovalModule._fieldValidationStatus["AdminText"]">
+                <p class="form-note">Админ-информация:</p>
+                <div class="textarea-medium">
+                    <MemoEdit @bind-Text="_adminRequestTicketApprovalModule._model.AdminText" Placeholder="Введите админ-сообщение"></MemoEdit>
+                </div>
+            </Validation>
+
+            <Validation @ref="@_adminRequestTicketApprovalModule._fieldValidationStatus["AdminApproval"]">
+                <p class="form-note req">Вердикт:</p>
+                    <RadioGroup TValue="string" Name="adminStatus" Buttons="true"
+                                @bind-CheckedValue="_adminRequestTicketApprovalModule._model.AdminApproval">
+                        <Radio TValue="string" Value="@("ok")">Подтвердить</Radio>
+                        <Radio TValue="string" Value="@("no")">Отказать</Radio>
+                    </RadioGroup>
+            </Validation>
+
+            <div class="align-center button-checkbox-panel" style="margin-bottom: 25px;">
+                <Button Type="ButtonType.Submit" Class="primary normal icon" @onclick="async () => await CheckRequest()" Loading="@isStartRequestMoney">
+                    <ChildContent>Подтвердить<i class="fal fa-forward"></i></ChildContent>
+                    <LoadingTemplate><div class="btn-loader"></div></LoadingTemplate>
+                </Button>
+            </div>
+        </Validations>
+    </div>
+            }
+            else
+            {
+                <p>Больше прошений нет</p>
+            }
+        }
+        else
+        {
+            <div class="loader-wrapper"><div class="btn-loader page"></div></div>
+        }
+    </div>
+</div>
+
+
+@code {
+
+    private FillBalanceTicketModel FillBalanceTickets_last { get; set; }
+    private int FillBalanceTickets_count { get; set; }
+
+    /* REQUEST MONEY */
+
+    private ContextValidationModule<AdminRequestTicketModel> _adminRequestTicketApprovalModule { get; set; }
+
+    private ValidationMessageBlock RequestMoneyError { get; set; }
+
+    private MultiImageForm _refMultiImageForm { get; set; }
+
+    private Client adminViewer { get; set; }
+
+    private bool isStartRequestMoney { get; set; }
+
+    private async Task CheckRequest()
+    {
+        if (isStartRequestMoney == true)
+        {
+            RequestMoneyError = new ValidationMessageBlock("Дождитесь окончания загрузки предидущего действия...", "error");
+            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            StateHasChanged();
+            return;
+        }
+
+        if (String.IsNullOrEmpty(_adminRequestTicketApprovalModule._model.AdminApproval) || (_adminRequestTicketApprovalModule._model.AdminApproval != "ok" && _adminRequestTicketApprovalModule._model.AdminApproval != "no"))
+        {
+            RequestMoneyError = new ValidationMessageBlock("Вы обязаны выбрать результат заявки.", "error");
+            _adminRequestTicketApprovalModule.SetFieldStatus("AdminApproval", ValidationStatus.Error);
+            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            StateHasChanged();
+            return;
+        }
+
+        if (_adminRequestTicketApprovalModule._model.Money <= 0)
+        {
+            RequestMoneyError = new ValidationMessageBlock("Неверное количество денег.", "error");
+            _adminRequestTicketApprovalModule.SetFieldStatus("Money", ValidationStatus.Error);
+            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            StateHasChanged();
+            return;
+        }
+
+        if(_adminRequestTicketApprovalModule._model.AdminApproval == "no" && String.IsNullOrEmpty(_adminRequestTicketApprovalModule._model.AdminText))
+        {
+            RequestMoneyError = new ValidationMessageBlock("В случае отрицательного результата проверки заявки, должна быть указана причина.", "error");
+            _adminRequestTicketApprovalModule.SetFieldStatus("AdminText", ValidationStatus.Error);
+            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            StateHasChanged();
+            return;
+        }
+
+        isStartRequestMoney = true;
+
+        StateHasChanged();
+
+        var ticket = await _ticketServices.GetTicket(FillBalanceTickets_last._ticket.Id);
+
+        if (ticket.TicketStatus == "status_waiting")
+        {
+
+            ticket.AdminInformation = _adminRequestTicketApprovalModule._model.AdminText;
+            ticket.AdminViewdId = adminViewer.Id;
+            ticket.DataView = DateTimeAddon.NowDateTimeStrings();
+            ticket.JsonObject = JsonConvert.SerializeObject(new FillBalanceTicketModel()
+            {
+                CountMoney = _adminRequestTicketApprovalModule._model.Money,
+                TextInformation = _adminRequestTicketApprovalModule._model.Text,
+                ImagesIds = FillBalanceTickets_last.ImagesIds
+            });
+
+            if (_adminRequestTicketApprovalModule._model.AdminApproval == "ok")
+                ticket.TicketStatus = "status_accepted";
+            else ticket.TicketStatus = "status_declaim";
+
+            await _ticketServices.UpdateTicket(ticket);
+
+            FillBalanceTickets_last.CountMoney = _adminRequestTicketApprovalModule._model.Money;
+
+            var client = await _userServices.FindUserById(FillBalanceTickets_last._ticket.UserCreateId);
+
+            await _economicsServices.CompleteRequest(_adminRequestTicketApprovalModule._model.AdminApproval == "ok", FillBalanceTickets_last, client);
+            RequestMoneyError = null;
+        }
+
+        await UpdateTicket();
+
+        isStartRequestMoney = false;
+        await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+
+        StateHasChanged();
+    }
+
+    private async Task UpdateTicket()
+    {
+        FillBalanceTickets_last = await _ticketServices.GetFillBalanceLastTickets();
+        FillBalanceTickets_count = await _ticketServices.GetFillBalanceLastTicketsCount();
+
+        await _applicationContainer.navbar_ref.EventNavbarUpdate();
+
+        if (FillBalanceTickets_last != null)
+        {
+            _adminRequestTicketApprovalModule._model.Money = FillBalanceTickets_last.CountMoney;
+            _adminRequestTicketApprovalModule._model.AdminApproval = null;
+            _adminRequestTicketApprovalModule._model.Text = FillBalanceTickets_last.TextInformation;
+            _adminRequestTicketApprovalModule._model.AdminText = "";
+
+            _adminRequestTicketApprovalModule._model.FillTicketImages = ComponentUtils.MultiImageFormRecreate(isReadOnly: true);
+
+            int index = 0;
+
+            foreach (var k in FillBalanceTickets_last.ImagesIds)
+            {
+                var img = await _fileManager.GetPhysicFileUrl(k);
+
+                _adminRequestTicketApprovalModule._model.FillTicketImages[index].ImageId = k;
+                _adminRequestTicketApprovalModule._model.FillTicketImages[index].ImageUrl = img;
+
+                index++;
+            }
+
+            _adminRequestTicketApprovalModule.SetFielAllStatus(ValidationStatus.None);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        adminViewer = await _userServices.GetClient();
+        var role = await _roleServices.GetRoleAsync(adminViewer.RoleId);
+
+        if (role.isHaveAccesToAdminPanel && role.isHaveToModerateUserAccount)
+        {
+            _adminRequestTicketApprovalModule = new ContextValidationModule<AdminRequestTicketModel>(new AdminRequestTicketModel());
+            await UpdateTicket();
+
+            await ChangePageLoadStatus(true);
+        }
+        else await _virtualNavigationServices.ReRedirectClient(VirtualNavigationServices.accessDeniedUrl, hardLoad: true);
+    }
+}

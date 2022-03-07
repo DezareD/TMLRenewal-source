@@ -1,0 +1,628 @@
+﻿@page "/apanel/roles"
+
+@inherits RenewalTMLComponentBase
+
+@inject IAdminActionServices _adminActionServices
+
+    <div class="block p-normal">
+        <div class="admin-header">
+            <p class="header-name">Роли</p>
+            <Button @onclick="ShowRoleAddModal" Class="primary normal icon">
+                <ChildContent>Создать роль<i class="fal fa-plus"></i></ChildContent>
+            </Button>
+        </div>
+        <div class="admin-page">
+            @if (RoleList != null)
+            {
+                <div class="outoftable">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHeaderCell>#</TableHeaderCell>
+                                <TableHeaderCell>Название роли</TableHeaderCell>
+                                <TableHeaderCell>Действия</TableHeaderCell>
+                                <TableHeaderCell>Количество аккаунтов с данной роль</TableHeaderCell>
+                                <TableHeaderCell>Имеет ли доступ к сайту?</TableHeaderCell>
+                                <TableHeaderCell>Имеет ли доступ к админ-панеле?</TableHeaderCell>
+                                <TableHeaderCell>Имеет ли доступ к редактированию ролей?</TableHeaderCell>
+                                <TableHeaderCell>Имеет ли доступ к модерированию транзакций?</TableHeaderCell>
+                                <TableHeaderCell>Может ли просматривать список пользователей?</TableHeaderCell>
+                                <TableHeaderCell>Может ли модерировать аккаунты?</TableHeaderCell>
+                                <TableHeaderCell>Может ли администрировать аккаунты?</TableHeaderCell>
+                                <TableHeaderCell>Имеет ли доступ к премиальному редактору?</TableHeaderCell>
+                                <TableHeaderCell>Имеет ли доступ к админскому редактору?</TableHeaderCell>
+                                <TableHeaderCell>Заблокированы ли экономические действия?</TableHeaderCell>
+                                <TableHeaderCell>Можно ли просматривать настройки сайта?</TableHeaderCell>
+                                <TableHeaderCell>Можно ли менять системные настройки сайта?</TableHeaderCell>
+                                <TableHeaderCell>Можно ли менять экономические настройки сайта?</TableHeaderCell>
+                                <TableHeaderCell>Есть ли доступ к выключенному сайту?</TableHeaderCell>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            @foreach (var item in RoleList)
+                            {
+                            <TableRow>
+                                <TableRowCell>@item.role.Id</TableRowCell>
+                                <TableRowCell>@item.role.RoleName</TableRowCell>
+
+                                <TableRowCell>
+                                    <div class="centred-table admin-badges-panel">
+                                        @if (String.IsNullOrEmpty(item.role.RequereName))
+                                        {
+                                            <div class="a-badge a-delete" @onclick="() => ShowRoleDeleteModal(item.role.Id)"><i class="fal fa-minus-circle"></i></div>
+                                        }
+                                        <div class="a-badge a-edit" @onclick="() => ShowRoleEditModal(item.role.Id)"><i class="fal fa-cog"></i></div>
+                                    </div>
+                                </TableRowCell>
+
+                                <TableRowCell>@item.UserCount</TableRowCell> <!-- TODO: Сделать кликабельным, что бы выдавалсь панель список пользователей -->
+                                <TableRowCell><div class="disabled-cb centred-table"><Check Class="disabled" @bind-Checked="item.role.isHaveAccessToSite" Disabled="true" TValue="bool"></Check></div></TableRowCell>
+                                <TableRowCell><div class="disabled-cb centred-table"><Check Class="disabled" @bind-Checked="item.role.isHaveAccesToAdminPanel" Disabled="true" TValue="bool"></Check></div></TableRowCell>
+                                <TableRowCell><div class="disabled-cb centred-table"><Check Class="disabled" @bind-Checked="item.role.isHaveAccesToEditRoles" Disabled="true" TValue="bool"></Check></div></TableRowCell>
+                                <TableRowCell><div class="disabled-cb centred-table"><Check Class="disabled" @bind-Checked="item.role.isHaveToModerateTransactions" Disabled="true" TValue="bool"></Check></div></TableRowCell>
+
+                                <TableRowCell><div class="disabled-cb centred-table"><Check Class="disabled" @bind-Checked="item.role.isHaveToViewUserList" Disabled="true" TValue="bool"></Check></div></TableRowCell>
+                                <TableRowCell><div class="disabled-cb centred-table"><Check Class="disabled" @bind-Checked="item.role.isHaveToModerateUserAccount" Disabled="true" TValue="bool"></Check></div></TableRowCell>
+                                <TableRowCell><div class="disabled-cb centred-table"><Check Class="disabled" @bind-Checked="item.role.isHaveToAdministrateUserAccount" Disabled="true" TValue="bool"></Check></div></TableRowCell>
+                                <TableRowCell><div class="disabled-cb centred-table"><Check Class="disabled" @bind-Checked="item.role.isHaveAccesToPremiumEditor" Disabled="true" TValue="bool"></Check></div></TableRowCell>
+                                <TableRowCell><div class="disabled-cb centred-table"><Check Class="disabled" @bind-Checked="item.role.isHaveAccesToUltimateEditor" Disabled="true" TValue="bool"></Check></div></TableRowCell>
+                                <TableRowCell><div class="disabled-cb centred-table"><Check Class="disabled" @bind-Checked="item.role.isBlockedEconomic" Disabled="true" TValue="bool"></Check></div></TableRowCell>
+                                <TableRowCell><div class="disabled-cb centred-table"><Check Class="disabled" @bind-Checked="item.role.isHaveAccesToViewSystemSettings" Disabled="true" TValue="bool"></Check></div></TableRowCell>
+                                <TableRowCell><div class="disabled-cb centred-table"><Check Class="disabled" @bind-Checked="item.role.isHaveAccesToEditSettings_System" Disabled="true" TValue="bool"></Check></div></TableRowCell>
+                                <TableRowCell><div class="disabled-cb centred-table"><Check Class="disabled" @bind-Checked="item.role.isHaveAccesToEditSettings_Economic" Disabled="true" TValue="bool"></Check></div></TableRowCell>
+                                <TableRowCell><div class="disabled-cb centred-table"><Check Class="disabled" @bind-Checked="item.role.isHaveAccesToOfflineSite" Disabled="true" TValue="bool"></Check></div></TableRowCell>
+
+                            </TableRow>
+                            }
+                        </TableBody>
+                    </Table>
+                </div>
+            }
+            else
+            {
+                <div class="loader-wrapper"><div class="btn-loader page"></div></div>
+            }
+        </div>
+    </div>
+
+    <!-- MODALS  -->
+
+    <Modal @ref="modalRef">
+        <ModalContent Centered="true">
+            <ModalHeader>
+                <ModalTitle>Изменить роль</ModalTitle>
+                <i class="modal_x fal fa-times" @onclick="HideRoleEditModal"></i>
+            </ModalHeader>
+            <ModalBody>
+                @if (editRoleModel != null)
+                {
+                    @if (EditRoleValidationBlock != null && EditRoleValidationBlock.isShow)
+                    {
+                        <div>
+                            <ValidationBlock block="EditRoleValidationBlock" />
+                        </div>
+                    }
+                    <EditForm Model="@editRoleModel">
+                        <Validations @ref="editRoleValidation" Mode="ValidationMode.Auto" ValidateOnLoad="false" EditContext="@_edcEditrole">
+                            <Fields Class="modal-form-wrapper">
+                                <Field>
+                                    <Validation>
+                                        <TextEdit @bind-Text="@editRoleModel.Name" Placeholder="Имя роли">
+                                            <Feedback>
+                                                <ValidationError />
+                                            </Feedback>
+                                        </TextEdit>
+                                        <ValidationMessage For="() => editRoleModel.Name" />
+                                    </Validation>
+                                </Field>
+                                <Field>
+                                    <Validation>
+                                        <TextEdit @bind-Text="@editRoleModel.Class" Placeholder="Стиль роли">
+                                            <Feedback>
+                                                <ValidationError />
+                                            </Feedback>
+                                        </TextEdit>
+                                        <ValidationMessage For="() => editRoleModel.Class" />
+                                    </Validation>
+                                </Field>
+                                <p class="modal-fields-separator-text">Основное:</p>
+                                <Field>
+                                    <Check @bind-Checked="editRoleModel.isHaveAccessToSite" TValue="bool">Есть ли доступ к сайту?</Check>
+                                </Field>
+                                <Field>
+                                    <Check @bind-Checked="editRoleModel.isHaveAccesToPremiumEditor" TValue="bool">Есть ли доступ к премиуальному редактору?</Check>
+                                </Field>
+                                <Field>
+                                    <Check @bind-Checked="editRoleModel.isHaveAccesToUltimateEditor" TValue="bool">Есть ли доступ к административному редактору?</Check>
+                                </Field>
+                                <Field>
+                                    <Check @bind-Checked="editRoleModel.isHaveAccesToOfflineSite" TValue="bool">Есть ли доступ к выключенному сайту?</Check>
+                                </Field>
+                                <p class="modal-fields-separator-text">Админ-панель:</p>
+                                <Field>
+                                    <Check @bind-Checked="editRoleModel.isHaveAccesToAdminPanel" TValue="bool">Есть ли доступ к админ-панеле? ( Видна ли возможность зайти в админ-панель, но при этом все админ-функции могут быть отключены ).</Check>
+                                </Field>
+                                <Field>
+                                    <Check @bind-Checked="editRoleModel.isHaveAccesToEditRoles" TValue="bool">Есть ли доступ к редактированию ролей?</Check>
+                                </Field>
+                                <Field>
+                                    <Check @bind-Checked="editRoleModel.isHaveToViewUserList" TValue="bool">Есть ли доступ к просмотру списку пользователей?</Check>
+                                </Field>
+                                <Field>
+                                    <Check @bind-Checked="editRoleModel.isHaveToModerateUserAccount" TValue="bool">Есть ли доступ к модерированию пользователей?</Check>
+                                </Field>
+                                <Field>
+                                    <Check @bind-Checked="editRoleModel.isHaveToAdministrateUserAccount" TValue="bool">Есть ли доступ к администрированию пользователей?</Check>
+                                </Field>
+                                <p class="modal-fields-separator-text">Экономика и системы:</p>
+                                <Field>
+                                    <Check @bind-Checked="editRoleModel.isHaveToModerateTransaction" TValue="bool">Есть ли доступ к модерированию транзакций.</Check>
+                                </Field>
+                                <Field>
+                                    <Check @bind-Checked="editRoleModel.isBlockedEconomic" TValue="bool">Заблокированы ли эконом. действия?.</Check>
+                                </Field>
+                                <p class="modal-fields-separator-text">Настройки сайта:</p>
+                                <Field>
+                                    <Check @bind-Checked="editRoleModel.isHaveAccesToViewSystemSettings" TValue="bool">Можно ли смотреть настройки сайта.</Check>
+                                </Field>
+                                <Field>
+                                    <Check @bind-Checked="editRoleModel.isHaveAccesToEditSettings_System" TValue="bool">Есть ли возможность редактировать системные настройки сайта.</Check>
+                                </Field>
+                                <Field>
+                                    <Check @bind-Checked="editRoleModel.isHaveAccesToEditSettings_Economic" TValue="bool">Есть ли возможность редактировать экономические настройки сайта.</Check>
+                                </Field>
+                            </Fields>
+                        </Validations>
+                    </EditForm>
+                }
+            </ModalBody>
+            <ModalFooter>
+                <div class="footer-buttons" style="display: flex; justify-content: center;">
+                    <Button Class="primary normal icon" Clicked="@EditModelExecuted" Loading="@isEditLoading">
+                        <ChildContent>Изменить<i class="fal fa-cog"></i></ChildContent>
+                        <LoadingTemplate><div class="btn-loader"></div></LoadingTemplate>
+                    </Button>
+                    <Button Class="primary outline icon" Clicked="@HideRoleEditModal">
+                        <ChildContent>Отменить</ChildContent>
+                    </Button>
+                </div>
+            </ModalFooter>
+        </ModalContent>
+    </Modal>
+
+    <Modal @ref="modalRefAddRole">
+        <ModalContent Centered="true">
+            <ModalHeader>
+                <ModalTitle>Добавить роль</ModalTitle>
+                <i class="modal_x fal fa-times" @onclick="HideRoleAddModal"></i>
+            </ModalHeader>
+            <ModalBody>
+                @if (addRoleModel != null)
+                {
+                    @if (AddRoleValidationBlock != null && AddRoleValidationBlock.isShow)
+                    {
+                        <div>
+                            <ValidationBlock block="AddRoleValidationBlock" />
+                        </div>
+                    }
+                    <EditForm Model="@addRoleModel">
+                        <Validations @ref="addRoleValidation" Mode="ValidationMode.Auto" ValidateOnLoad="false" EditContext="@_edcAddrole">
+                            <Fields Class="modal-form-wrapper">
+                                <Field>
+                                    <Validation>
+                                        <TextEdit @bind-Text="@addRoleModel.Name" Placeholder="Имя роли">
+                                            <Feedback>
+                                                <ValidationError />
+                                            </Feedback>
+                                        </TextEdit>
+                                        <ValidationMessage For="() => addRoleModel.Name" />
+                                    </Validation>
+                                </Field>
+                                <Field>
+                                    <Validation>
+                                        <TextEdit @bind-Text="@addRoleModel.Class" Placeholder="Стиль роли">
+                                            <Feedback>
+                                                <ValidationError />
+                                            </Feedback>
+                                        </TextEdit>
+                                        <ValidationMessage For="() => addRoleModel.Class" />
+                                    </Validation>
+                                </Field>
+                                <p class="modal-fields-separator-text">Основное:</p>
+                                <Field>
+                                    <Check @bind-Checked="addRoleModel.isHaveAccessToSite" TValue="bool">Есть ли доступ к сайту?</Check>
+                                </Field>
+                                <Field>
+                                    <Check @bind-Checked="addRoleModel.isHaveAccesToPremiumEditor" TValue="bool">Есть ли доступ к премиуальному редактору?</Check>
+                                </Field>
+                                <Field>
+                                    <Check @bind-Checked="addRoleModel.isHaveAccesToUltimateEditor" TValue="bool">Есть ли доступ к административному редактору?</Check>
+                                </Field>
+                                <Field>
+                                    <Check @bind-Checked="addRoleModel.isHaveAccesToOfflineSite" TValue="bool">Есть ли доступ к выключенному сайту?</Check>
+                                </Field>
+                                <p class="modal-fields-separator-text">Админ-панель:</p>
+                                <Field>
+                                    <Check @bind-Checked="addRoleModel.isHaveAccesToAdminPanel" TValue="bool">Есть ли доступ к админ-панеле? ( Видна ли возможность зайти в админ-панель, но при этом все админ-функции могут быть отключены ).</Check>
+                                </Field>
+                                <Field>
+                                    <Check @bind-Checked="addRoleModel.isHaveAccesToEditRoles" TValue="bool">Есть ли доступ к редактированию ролей?</Check>
+                                </Field>
+                                <Field>
+                                    <Check @bind-Checked="addRoleModel.isHaveToViewUserList" TValue="bool">Есть ли доступ к просмотру списку пользователей?</Check>
+                                </Field>
+                                <Field>
+                                    <Check @bind-Checked="addRoleModel.isHaveToModerateUserAccount" TValue="bool">Есть ли доступ к модерированию пользователей?</Check>
+                                </Field>
+                                <Field>
+                                    <Check @bind-Checked="addRoleModel.isHaveToAdministrateUserAccount" TValue="bool">Есть ли доступ к администрированию пользователей?</Check>
+                                </Field>
+                                <p class="modal-fields-separator-text">Экономика и системы:</p>
+                                <Field>
+                                    <Check @bind-Checked="addRoleModel.isHaveToModerateTransaction" TValue="bool">Есть ли доступ к модерированию транзакций.</Check>
+                                </Field>
+                                <Field>
+                                    <Check @bind-Checked="addRoleModel.isBlockedEconomic" TValue="bool">Заблокированы ли эконом. действия?.</Check>
+                                </Field>
+                                <p class="modal-fields-separator-text">Настройки сайта:</p>
+                                <Field>
+                                    <Check @bind-Checked="addRoleModel.isHaveAccesToViewSystemSettings" TValue="bool">Можно ли смотреть настройки сайта.</Check>
+                                </Field>
+                                <Field>
+                                    <Check @bind-Checked="addRoleModel.isHaveAccesToEditSettings_System" TValue="bool">Есть ли возможность редактировать системные настройки сайта.</Check>
+                                </Field>
+                                <Field>
+                                    <Check @bind-Checked="addRoleModel.isHaveAccesToEditSettings_Economic" TValue="bool">Есть ли возможность редактировать экономические настройки сайта.</Check>
+                                </Field>
+                            </Fields>
+                        </Validations>
+                    </EditForm>
+                }
+            </ModalBody>
+            <ModalFooter>
+                <div class="footer-buttons" style="display: flex; justify-content: center;">
+                    <Button Class="primary normal icon" Clicked="@AddModelExecuted" Loading="@isAddLoading">
+                        <ChildContent>Создать<i class="fal fa-plus-circle"></i></ChildContent>
+                        <LoadingTemplate><div class="btn-loader"></div></LoadingTemplate>
+                    </Button>
+                    <Button Class="primary outline icon" Clicked="@HideRoleAddModal">
+                        <ChildContent>Отменить</ChildContent>
+                    </Button>
+                </div>
+            </ModalFooter>
+        </ModalContent>
+    </Modal>
+
+    <Modal @ref="modalRefDeleteRole">
+        <ModalContent Centered="true" Size="ModalSize.Small">
+            <ModalHeader>
+                <i class="modal_x fal fa-times" @onclick="HideRoleDeleteModal"></i>
+            </ModalHeader>
+            <ModalBody>
+                @if (deleteRole != null && deleteRole.role != null)
+                {
+                    @if (DeleteRoleValidationBlock != null && DeleteRoleValidationBlock.isShow)
+                    {
+                        <div>
+                            <ValidationBlock block="DeleteRoleValidationBlock" />
+                        </div>
+                    }
+
+                    <p class="modal-info">Вы действительно хотите удалить роль '@deleteRole.role.RoleName'?</p>
+                    @if (deleteRole.UserCount > 0)
+                    {
+                        <p class="modal-info mini">Все пользователи (@deleteRole.UserCount Шт.) будут перенесены в группу обычных пользователей.</p>
+                    }
+                 }
+
+                <!-- TODO: Сделать выбор роли, в которую перенесуться все пользователи из этой при удалении. -->
+            </ModalBody>
+            <ModalFooter>
+                <div class="footer-buttons">
+                    <Button Class="tertiary normal icon warning" Clicked="@DeleteModelExecuted" Loading="@isDeleterLoading">
+                        <ChildContent>Удалить роль</ChildContent>
+                        <LoadingTemplate><div class="btn-loader"></div></LoadingTemplate>
+                    </Button>
+                </div>
+            </ModalFooter>
+        </ModalContent>
+    </Modal>
+
+
+@code {
+    private Modal modalRef { get; set; }
+    private List<RoleEnchantedModel> RoleList { get; set; }
+
+    private Modal modalRefAddRole { get; set; }
+    private Modal modalRefDeleteRole { get; set; }
+
+    /* Create role */
+    private RoleModel addRoleModel { get; set; }
+    private EditContext _edcAddrole { get; set; }
+    private Validations addRoleValidation { get; set; }
+    private bool isAddLoading { get; set; }
+    private ValidationMessageBlock AddRoleValidationBlock { get; set; }
+
+    /* Edit Role */
+    private RoleModel editRoleModel { get; set; }
+    private EditContext _edcEditrole { get; set; }
+    private Validations editRoleValidation { get; set; }
+    private bool isEditLoading { get; set; }
+    private ValidationMessageBlock EditRoleValidationBlock { get; set; }
+
+    /* Delete Role */
+    private bool isDeleterLoading { get; set; }
+    private RoleEnchantedModel deleteRole { get; set; }
+    private ValidationMessageBlock DeleteRoleValidationBlock { get; set; }
+
+    private Client adminView { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        adminView = await _userServices.GetClient();
+        var role = await _roleServices.GetRoleAsync(adminView.RoleId);
+
+        // todo isHaveToViewUserList
+        if (role.isHaveAccesToAdminPanel && role.isHaveAccesToEditRoles)
+        {
+            RoleList = await _roleServices.GetAllEnchantedRoles();
+
+            editRoleModel = new RoleModel();
+            _edcEditrole = new EditContext(editRoleModel);
+
+            addRoleModel = new RoleModel();
+            _edcAddrole = new EditContext(addRoleModel);
+
+            deleteRole = new RoleEnchantedModel();
+
+            await ChangePageLoadStatus(true);
+        }
+        else await _virtualNavigationServices.ReRedirectClient(VirtualNavigationServices.accessDeniedUrl, hardLoad: true);
+    }
+
+    /* EDIT ROLE */
+
+    private async Task EditModelExecuted()
+    {
+        isEditLoading = true;
+        if (editRoleValidation.ValidateAll())
+        {
+            try
+            {
+                var role = await _roleServices.GetRoleAsync(editRoleModel.Id);
+
+                role.RoleName = editRoleModel.Name;
+                role.RoleStyle = editRoleModel.Class;
+                role.isHaveAccessToSite = editRoleModel.isHaveAccessToSite;
+                role.isHaveAccesToAdminPanel = editRoleModel.isHaveAccesToAdminPanel;
+                role.isHaveAccesToEditRoles = editRoleModel.isHaveAccesToEditRoles;
+                role.isHaveToModerateTransactions = editRoleModel.isHaveToModerateTransaction;
+
+                role.isHaveToViewUserList = editRoleModel.isHaveToViewUserList;
+                role.isHaveToModerateUserAccount = editRoleModel.isHaveToViewUserList;
+                role.isHaveToAdministrateUserAccount = editRoleModel.isHaveToAdministrateUserAccount;
+                role.isHaveAccesToPremiumEditor = editRoleModel.isHaveAccesToPremiumEditor;
+                role.isHaveAccesToUltimateEditor = editRoleModel.isHaveAccesToUltimateEditor;
+                role.isBlockedEconomic = editRoleModel.isBlockedEconomic;
+
+                role.isHaveAccesToViewSystemSettings = editRoleModel.isHaveAccesToViewSystemSettings;
+                role.isHaveAccesToEditSettings_System = editRoleModel.isHaveAccesToEditSettings_System;
+                role.isHaveAccesToEditSettings_Economic = editRoleModel.isHaveAccesToEditSettings_Economic;
+
+                role.isHaveAccesToOfflineSite = editRoleModel.isHaveAccesToOfflineSite;
+
+                if ((role.isHaveToViewUserList || role.isHaveAccesToEditRoles
+                    || role.isHaveToModerateUserAccount || role.isHaveToAdministrateUserAccount
+                    || role.isHaveAccesToViewSystemSettings || role.isHaveAccesToEditSettings_System
+                    || role.isHaveAccesToEditSettings_Economic) && !role.isHaveAccesToAdminPanel)
+                {
+                    EditRoleValidationBlock = new ValidationMessageBlock("Вы дали админ-привилегии, но не дали доступ в админ-панель.", "error");
+                    isEditLoading = false;
+                    return;
+                }
+
+                if(!role.isHaveAccesToViewSystemSettings && (role.isHaveAccesToEditSettings_Economic || role.isHaveAccesToEditSettings_System))
+                {
+                    EditRoleValidationBlock = new ValidationMessageBlock("Вы дали возможность просмотра настроек, но ни одна из категорий не выбрана.", "error");
+                    isEditLoading = false;
+                    return;
+                }
+
+                await _roleServices.UpdateRole(role);
+
+                await _adminActionServices.CreateAdminTransaction(new AdminAction()
+                {
+                    AdminId = adminView.Id,
+                    Date = DateTimeAddon.NowDateTimeStrings(),
+                    HtmlText = "Администратор произвел изменения над ролью: '" + role.RoleName + "'.",
+                    Icon = "fa users",
+                    Priority = 2,
+                    Type = "{to:system}"
+                });
+
+                RoleList = await _roleServices.GetAllEnchantedRoles();
+
+                HideRoleEditModal();
+            }
+            catch (Exception)
+            {
+                EditRoleValidationBlock = new ValidationMessageBlock("Ошибка обновления роли.", "error");
+            }
+        }
+        isEditLoading = false;
+    }
+
+    private async Task ShowRoleEditModal(int id)
+    {
+        var role = await _roleServices.GetRoleAsync(id);
+
+        editRoleModel = new RoleModel()
+        {
+            Id = role.Id,
+            isHaveAccessToSite = role.isHaveAccessToSite,
+            isHaveAccesToAdminPanel = role.isHaveAccesToAdminPanel,
+            isHaveAccesToEditRoles = role.isHaveAccesToEditRoles,
+            isHaveToModerateTransaction = role.isHaveToModerateTransactions,
+            isHaveAccesToPremiumEditor = role.isHaveAccesToPremiumEditor,
+            isHaveAccesToUltimateEditor = role.isHaveAccesToUltimateEditor,
+            isHaveToAdministrateUserAccount = role.isHaveToAdministrateUserAccount,
+            isHaveToModerateUserAccount = role.isHaveToModerateUserAccount,
+            isHaveToViewUserList = role.isHaveToViewUserList,
+            isBlockedEconomic = role.isBlockedEconomic,
+            isHaveAccesToEditSettings_Economic = role.isHaveAccesToEditSettings_Economic,
+            isHaveAccesToEditSettings_System = role.isHaveAccesToEditSettings_System,
+            isHaveAccesToViewSystemSettings = role.isHaveAccesToViewSystemSettings,
+            Name = role.RoleName,
+            isHaveAccesToOfflineSite = role.isHaveAccesToOfflineSite,
+            Class = role.RoleStyle
+        };
+
+        modalRef.Show();
+    }
+
+    private void HideRoleEditModal()
+    {
+        editRoleModel = new RoleModel();
+        EditRoleValidationBlock = null;
+        modalRef.Hide();
+    }
+
+    /* ADD ROLE */
+
+    private async Task AddModelExecuted()
+    {
+        isAddLoading = true;
+
+        if (addRoleValidation.ValidateAll())
+        {
+            try
+            {
+                if ((addRoleModel.isHaveToViewUserList || addRoleModel.isHaveAccesToEditRoles
+                    || addRoleModel.isHaveToModerateUserAccount || addRoleModel.isHaveToAdministrateUserAccount
+                    || addRoleModel.isHaveAccesToViewSystemSettings || addRoleModel.isHaveAccesToEditSettings_System
+                    || addRoleModel.isHaveAccesToEditSettings_Economic) && !addRoleModel.isHaveAccesToAdminPanel)
+                {
+                    AddRoleValidationBlock = new ValidationMessageBlock("Вы дали админ-привилегии, но не дали доступ в админ-панель.", "error");
+                    isAddLoading = false;
+                    return;
+                }
+
+
+                if (!addRoleModel.isHaveAccesToViewSystemSettings && (addRoleModel.isHaveAccesToEditSettings_Economic || addRoleModel.isHaveAccesToEditSettings_System))
+                {
+                    AddRoleValidationBlock = new ValidationMessageBlock("Вы дали возможность просмотра настроек, но ни одна из категорий не выбрана.", "error");
+                    isEditLoading = false;
+                    return;
+                }
+
+                var role = new Role()
+                {
+                    RequereName = "",
+                    isHaveAccessToSite = addRoleModel.isHaveAccessToSite,
+                    isHaveAccesToAdminPanel = addRoleModel.isHaveAccesToAdminPanel,
+                    isHaveAccesToEditRoles = addRoleModel.isHaveAccesToEditRoles,
+                    isHaveToModerateTransactions = addRoleModel.isHaveToModerateTransaction,
+                    isHaveAccesToPremiumEditor = addRoleModel.isHaveAccesToPremiumEditor,
+                    isHaveAccesToUltimateEditor = addRoleModel.isHaveAccesToUltimateEditor,
+                    isHaveToAdministrateUserAccount = addRoleModel.isHaveToAdministrateUserAccount,
+                    isHaveToModerateUserAccount = addRoleModel.isHaveToModerateUserAccount,
+                    isHaveToViewUserList = addRoleModel.isHaveToViewUserList,
+                    isBlockedEconomic = addRoleModel.isBlockedEconomic,
+                    isHaveAccesToEditSettings_Economic = addRoleModel.isHaveAccesToEditSettings_Economic,
+                    isHaveAccesToEditSettings_System = addRoleModel.isHaveAccesToEditSettings_System,
+                    isHaveAccesToViewSystemSettings = addRoleModel.isHaveAccesToViewSystemSettings,
+                    isHaveAccesToOfflineSite = addRoleModel.isHaveAccesToOfflineSite,
+                    RoleName = addRoleModel.Name,
+                    RoleStyle = addRoleModel.Class
+                };
+
+                await _roleServices.CreateRole(role);
+
+                await _adminActionServices.CreateAdminTransaction(new AdminAction()
+                {
+                    AdminId = adminView.Id,
+                    Date = DateTimeAddon.NowDateTimeStrings(),
+                    HtmlText = "Администратор создал роль: '" + role.RoleName + "'.",
+                    Icon = "fa users",
+                    Priority = 2,
+                    Type = "{to:system}"
+                });
+
+                RoleList = await _roleServices.GetAllEnchantedRoles();
+
+                HideRoleAddModal();
+            }
+            catch (Exception)
+            {
+                DeleteRoleValidationBlock = new ValidationMessageBlock("Ошибка удаления роли.", "error");
+            }
+        }
+
+        isAddLoading = false;
+    }
+
+    private void ShowRoleAddModal()
+    {
+        addRoleModel = new RoleModel() { };
+
+        modalRefAddRole.Show();
+    }
+
+    private void HideRoleAddModal()
+    {
+        addRoleModel = new RoleModel();
+        AddRoleValidationBlock = null;
+        modalRefAddRole.Hide();
+    }
+
+    /* DELETE ROLE */
+
+    private async Task DeleteModelExecuted()
+    {
+        isDeleterLoading = true;
+
+        try
+        { 
+            await _adminActionServices.CreateAdminTransaction(new AdminAction()
+            {
+                AdminId = adminView.Id,
+                Date = DateTimeAddon.NowDateTimeStrings(),
+                HtmlText = "Администратор удалил роль: '" + deleteRole.role.RoleName + "'.",
+                Icon = "fa users",
+                Priority = 2,
+                Type = "{to:system}"
+            });
+
+            await _roleServices.RebaseBeforeDelete(deleteRole.role.Id);
+            await _roleServices.DeleteRole(deleteRole.role);
+
+            RoleList = await _roleServices.GetAllEnchantedRoles();
+
+            HideRoleDeleteModal();
+        }
+        catch (Exception)
+        {
+            AddRoleValidationBlock = new ValidationMessageBlock("Ошибка создания роли.", "error");
+        }
+
+        isDeleterLoading = false;
+    }
+
+    private async Task ShowRoleDeleteModal(int id)
+    {
+        deleteRole = new RoleEnchantedModel();
+
+        deleteRole.role = await _roleServices.GetRoleAsync(id);
+        deleteRole.UserCount = await _userServices.GetCountClientByRoleId(deleteRole.role.Id);
+
+        modalRefDeleteRole.Show();
+    }
+
+    private void HideRoleDeleteModal()
+    {
+        deleteRole = new RoleEnchantedModel();
+        DeleteRoleValidationBlock = null;
+
+        modalRefDeleteRole.Hide();
+    }
+}

@@ -1,0 +1,280 @@
+﻿@inject IClientAuthServices _clientAuthServices
+@inject IVirtualFileServices _fileManager
+@inject NavigationManager _nm
+@inject IJSRuntime _js
+@inject INotificationServices _notificationServices
+@inject IRawTextHtmlizer _rawHtmlizer 
+@inject IRolePermissionServices _roleServices 
+@inject ISystemConfigurationServices _systemServices
+
+@if (isLogout == false)
+{
+    <heder class="@(AdminTheme(RtBlock) ? "main-bar admin" : "main-bar")">
+        <div class="container bar-inner">
+            <ToLink Url="@((RtBlock != null && RtBlock.isShowBar) ? "" : null)" Class="bar-item" IsActive="true">
+                <div class="logotype32x32-outer logotype-outer">
+                    <!--<img src="../imgs/logos/_cl_app_logotype_32x32.png" alt="TML Renewal - Главная" asp-append-version="true" />-->
+                    <SiteLogotype />
+                </div>
+                <div>
+                    @if (RtBlock != null)
+                    {
+                        <span class="@(AdminTheme(RtBlock) ? "bar-site-naming admin" : "bar-site-naming")">@RtBlock.BrandName</span>
+                        <span class="bar-site-naming-postfix">@RtBlock.informer</span>
+                    }
+                </div>
+            </ToLink>
+            @if (RtBlock != null && RtBlock.isShowBar)
+            {
+        <div class="bar-item right">
+            @if (user != null && BlockShowMoney == false)
+            {
+                <div style="font-size: 13.5px;" class="js-blinked-text-balance @(AdminTheme(RtBlock) ? "bar-icon-item admin" : "bar-icon-item")">@CurrencyAddon.Format(Balance) <i style="margin-left: 5px;" class="fas fa-coins"></i></div>
+            }
+
+            <ToLink IsActive="false" Class="@("-tp-mainbar-continental disablde-bar-icon " + (AdminTheme(RtBlock) ? "bar-icon-item admin" : "bar-icon-item"))">
+                <i class="fal fa-globe-americas"></i>
+            </ToLink>
+            <ToLink IsActive="false" Class="@("-tp-mainbar-shop disablde-bar-icon " + (AdminTheme(RtBlock) ? "bar-icon-item admin" : "bar-icon-item"))">
+                <i class="fal fa-shopping-bag"></i>
+            </ToLink>
+
+            @if (user != null)
+            {
+                <!-- transform: scale(1.0005); fix for blur element-->
+                <Dropdown ElementId="NotificationMenu" Direction="Direction.Down" RightAligned="true" @ref="usernotificationMenu" Style="display: flex; transform: scale(1.0000);"
+                          Toggled="OpenNotificationMenu">
+                    <DropdownToggle Class="clear-btn">
+                        <a class="@("-tp-mainbar-notification " + (AdminTheme(RtBlock) ? "bar-icon-item admin" : "bar-icon-item"))">
+                            <i class="fal fa-bell"></i>
+                            @if (CountNewNotification > 0)
+                            {
+                                <div class="notification-badge"></div>
+                            }
+                        </a>
+                    </DropdownToggle>
+                    <DropdownMenu Class="notification-menu">
+                        @if (UserLastNotification != null
+               && UserAllNotification != null)
+                        {
+                            @if (UserLastNotification.Count == 0 && UserAllNotification.Count == 0)
+                            {
+                                <p class="notification-text-separator">Уведомлений нет.</p>
+                            }
+                            else
+                            {
+
+                                @if (UserLastNotification.Count > 0)
+                                {
+                                    <p class="notification-text-separator">Новых уведомлений: @UserLastNotification.Count</p>
+                                }
+
+                                @foreach (var notification in UserLastNotification.OrderByDescending(m => m.RealDateTime.Ticks))
+                                {
+                                    <NotificationItem Notification="notification" />
+                                }
+
+                                @if (UserLastNotification.Count > 0 && UserAllNotification.Count > 0)
+                                {
+                                    <p class="notification-text-separator">Старые уведомления:</p>
+                                }
+                                else if (UserLastNotification.Count == 0 && UserAllNotification.Count > 0)
+                                {
+                                    <p class="notification-text-separator">Новых уведомлений нет.</p>
+                                }
+
+                                @foreach (var notification in UserAllNotification.OrderByDescending(m => m.RealDateTime.Ticks))
+                                {
+                                    <NotificationItem Notification="notification" />
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <div class="loader-wrapper"><div class="btn-loader page"></div></div>
+                        }
+                    </DropdownMenu>
+                </Dropdown>
+                <Dropdown Direction="Direction.Down" RightAligned="true" @ref="usermainmenuBar" Style="display: flex;">
+                    <DropdownToggle Class="clear-btn bar-image -tp-mainbar-userbutton" Style="margin-left: 16px;">
+                        <ClientAvatar @ref="clientAvatar" AvatarSize="AvatarSize.mini" Client="user"></ClientAvatar>
+                    </DropdownToggle>
+                    <DropdownMenu>
+                        <DropdownItem><ToLink IsActive="true" Url="@($"profile/{user.Id}")"><i class="far fa-user"></i>Профиль</ToLink></DropdownItem>
+                        <DropdownItem><ToLink IsActive="true" Url="@($"profile/{user.Id}/actions#transferMoney")"><i class="far fa-comments-alt-dollar"></i>Действия</ToLink></DropdownItem>
+                        <DropdownDivider />
+                        <div class="mainmenu-bottom-outer">
+                            <ToLink IsActive="true" Url="@($"profile/{user.Id}/settings")"><div class="bottom-item icon"><i class="far fa-cog"></i>Настройки</div></ToLink>
+                            <div class="bottom-item" style="cursor:pointer" @onclick="LogoutUser"><i class="far fa-sign-out-alt"></i></div>
+                        </div>
+                    </DropdownMenu>
+                </Dropdown>
+            }
+        </div>
+            }
+        </div>
+    </heder>
+}
+else
+{
+    <ToPage HardGo="false" Url="auth" />
+}
+
+@code {
+    [Parameter]
+    public CompleteVirtualRedirect RtBlock { get; set; }
+
+    private Client user { get; set; }
+    private Dropdown usermainmenuBar { get; set; }
+    private Dropdown usernotificationMenu { get; set; }
+    private ClientAvatar clientAvatar { get; set; }
+    private bool isLogout { get; set; }
+
+    private List<NotificationViewer> UserLastNotification { get; set; }
+    private List<NotificationViewer> UserAllNotification { get; set; }
+
+    private int CountNewNotification { get; set; }
+
+    private int Balance { get; set; }
+    private bool BlockShowMoney { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await _clientAuthServices.GetClient();
+
+        if (user != null)
+        {
+            // получаем количество нотификаций
+
+            var queryNew = await _notificationServices.GetNotViewedNotificationAsync(user);
+            var role = await _roleServices.GetRoleAsync(user.RoleId);
+
+            if (role.isBlockedEconomic)
+                BlockShowMoney = true;
+
+            CountNewNotification = queryNew.Count();
+
+            Balance = user.Balance;
+
+            await _js.InvokeVoidAsync("loadScript", "libs/tippy.js/tippy.min.js");
+
+            await _js.InvokeVoidAsync("CreateTippyElement",
+                new List<TooltipModel>() {
+                    new TooltipModel(".-tp-mainbar-continental", "Государства и организации. ( не доступно )", ToolTipStyles.DefaultStyle, width: 350),
+                    new TooltipModel(".-tp-mainbar-shop", "Магазин и товары. ( не доступно )", ToolTipStyles.DefaultStyle, width: 350),
+                    new TooltipModel(".-tp-mainbar-notification", "Все уведомления.", ToolTipStyles.DefaultStyle, width: 350),
+                    new TooltipModel(".-tp-mainbar-userbutton", "Ваш профиль.", ToolTipStyles.DefaultStyle, width: 350)
+                }
+            );
+        }
+    }
+
+    public async Task SetFirstLoadNotificationTitle()
+    {
+        if (CountNewNotification > 0)
+        {
+            await _js.InvokeVoidAsync("SetNotificationTitleCount", CountNewNotification);
+        }
+    }
+
+    private async Task OpenNotificationMenu(bool isOpen)
+    {
+        if (isOpen)
+        {
+            var queryNew = await _notificationServices.GetNotViewedNotificationAsync(user);
+            var query = await _notificationServices.GetNotificationClientAsync(user, 15);
+
+            // TODO: Сделать страницу с полной историей нотификаций
+
+            UserLastNotification = new List<NotificationViewer>();
+            UserAllNotification = new List<NotificationViewer>();
+
+            foreach (var ntf in queryNew)
+            {
+                var notificator = new NotificationViewer(ntf);
+                await notificator.GenerateHtmlRawText(_rawHtmlizer);
+
+                UserLastNotification.Add(notificator);
+            }
+
+            foreach (var ntf in query)
+            {
+                var notificator = new NotificationViewer(ntf);
+                await notificator.GenerateHtmlRawText(_rawHtmlizer);
+
+                UserAllNotification.Add(notificator);
+            }
+
+            await _notificationServices.SetNotificationViewed(user);
+
+            CountNewNotification = 0;
+            await _js.InvokeVoidAsync("SetNotificationTitleCount", CountNewNotification);
+        }
+    }
+
+    private void LogoutUser()
+    {
+        _clientAuthServices.LogOut();
+        isLogout = true;
+    }
+
+    // Добавляем уведомление в пользовательский интерфейс, с оповещением.
+    public async Task AddNotificationToUserLogic(Notification notification)
+    {
+        var notificator = new NotificationViewer(notification);
+        await notificator.GenerateHtmlRawText(_rawHtmlizer);
+
+        if (UserLastNotification == null)
+            UserLastNotification = new List<NotificationViewer>();
+
+        UserLastNotification.Add(notificator);
+
+        CountNewNotification++;
+        await _js.InvokeVoidAsync("SetNotificationTitleCount", CountNewNotification);
+
+        StateHasChanged();
+    }
+
+    // Изменяем деньхи
+    public async Task EditUserBalance(int balance)
+    {
+        Balance += balance;
+
+        StateHasChanged();
+
+        if (balance < 0) await _js.InvokeVoidAsync("ColoringBar.BlnkText", ".js-blinked-text-balance", "red");
+        else if(balance == 0) await _js.InvokeVoidAsync("ColoringBar.BlnkText", ".js-blinked-text-balance", "none");
+        else await _js.InvokeVoidAsync("ColoringBar.BlnkText", ".js-blinked-text-balance", "green");
+    }
+
+    public async Task UpdateUserImage(bool isAuth)
+    {
+        user = await _clientAuthServices.GetClient();
+
+        if (user != null)
+        {
+            // получаем количество нотификаций
+
+            var queryNew = await _notificationServices.GetNotViewedNotificationAsync(user);
+
+            CountNewNotification = queryNew.Count();
+
+            if(isAuth) isLogout = false;
+
+            StateHasChanged(); // Обновляем бар, что бы получить ссылку на clientAvatar
+
+            if(clientAvatar != null)
+                await clientAvatar.ReGenerateImage(); // регенерируем изоображения
+
+            Balance = user.Balance;
+        }
+    }
+
+    private bool AdminTheme(CompleteVirtualRedirect RtBlock)
+    {
+        if (RtBlock != null)
+            if (RtBlock.informer == "admin")
+                return true;
+        return false;
+    }
+}
