@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using RenewalTML.Data.Model;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Repositories;
 
@@ -26,6 +28,12 @@ namespace RenewalTML.Data
 
             if (search != null) return Path.Combine(search.SitePath, search.Name + search.Extension);
             else return null;
+        }
+
+        public async Task<File> GetFileByName(string name)
+        {
+            var search = await (await _genericRepository.GetQueryableAsync()).Where(m => m.Name == name).FirstOrDefaultAsync();
+            return search;
         }
     }
 

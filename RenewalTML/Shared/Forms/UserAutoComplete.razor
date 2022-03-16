@@ -1,7 +1,7 @@
 ﻿@inherits BaseTextInput<string>
 
 @inject NavigationManager UriHelper
-@inject IJSRuntime _js
+@inject IJSModularityServices _js
 @inject IClientAuthServices _clientServices
 @inject IVirtualFileServices _fileServices
 
@@ -10,7 +10,7 @@
         <span class="input-group-text">@@</span>
     </div>
     <input style="width:100%; @(isLoaded == false? "display:none;" : "")" id="userAutoComplete-@InputCode" class="input-left-none form-control @ClassNames"
-           @oninput="OnChange" value="@Text">
+           @oninput="OnInput" value="@Text" data-bind-text-value="@Text" data-bind-text-status-changer="@StatuChangerName">
     @Feedback
 </div>
 
@@ -30,16 +30,22 @@
 
     protected override string InternalValue { get => Text; set => Text = value; }
 
+    private string StatuChangerName { get; set; }
+
     private string InputCode { get; set; }
     private bool isLoaded { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        var dotNetPtr = DotNetObjectReference.Create(this);
+
         InputCode = ClientAuthServices.GenerateRandomString(10, false).ToUpperInvariant();
 
         var userList = await _clientServices.GetAllFilterClient(false, false);
 
         var jsonList = new List<AutoCompleteDataInterop>();
+
+        // TODO: Что бы каждый раз не грузить, можно сделать бэкграунд джоб который будет хранить большой список всех пользователей в памяти.
 
         foreach (var k in userList)
         {
@@ -47,26 +53,34 @@
             jsonList.Add(new AutoCompleteDataInterop() { ScreenName = k.ScreenName, Login = k.UserName, ImageUrl = image });
         }
 
-        await _js.InvokeVoidAsync("loadScript", "libs/autocomplete/autocomplete.min.js");
-        await _js.InvokeVoidAsync("AutoComplete.GenerateAutoComplete_userlist", "#userAutoComplete-" + InputCode, jsonList, Placeholder);
+        await _js.InvokeVoidAsync("loadSciptsModule", "loadScript", "libs/autocomplete/autocomplete.min.js");
+        await _js.InvokeVoidAsync("autoCompleteModule", "GenerateAutoComplete_userlist", "#userAutoComplete-" + InputCode, jsonList, Placeholder, dotNetPtr);
 
         isLoaded = true;
     }
 
-    private async Task OnChange(ChangeEventArgs e)
+    private async Task OnInput(ChangeEventArgs e) => await ChangeData((string)e.Value);
+
+    private async Task ChangeData(string data)
     {
-        var context = new ValidationContext((string)e.Value, null, null);
+        var context = new ValidationContext(data, null, null);
         var results = new List<ValidationResult>();
 
         var attrs = ComponentUtils.GetExpressionCustomAttributes(Field);
 
-        Validator.TryValidateValue((string)e.Value, context, results, attrs);
+        Validator.TryValidateValue(data, context, results, attrs);
 
         if (results.Any()) ParentValidation.NotifyValidationStatusChanged(ValidationStatus.Error, results.Select(m => m.ErrorMessage).ToList());
         else ParentValidation.NotifyValidationStatusChanged(ValidationStatus.Success);
 
-        await TextChanged.InvokeAsync((string)e.Value);
+        StatuChangerName = "userchanged-" + data;
+        StateHasChanged();
+
+        await TextChanged.InvokeAsync(data);
     }
+
+    [JSInvokable("UpdateAutoCompleteValue")]
+    public async Task UpdateMarkDownValue(string value) => await ChangeData(value);
 
     /* INHERITS */
 

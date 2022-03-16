@@ -1,7 +1,7 @@
 ﻿@inherits BaseTextInput<string>
 
 @inject NavigationManager UriHelper
-@inject IJSRuntime _js
+@inject IJSModularityServices _js
 @inject IClientAuthServices _clientServices
 @inject IVirtualFileServices _fileServices
 @inject IVirtualFileServices _fileManager
@@ -104,20 +104,16 @@
         InputCode = ClientAuthServices.GenerateRandomString(10, false).ToUpperInvariant();
         StatuChangerName = "system"; // system or user
 
-        await _js.InvokeVoidAsync("loadScript", "libs/easymde.js/easymde.min.js");
-        await _js.InvokeVoidAsync("loadScript", "libs/easymde.js/purify.min.js");
+        await _js.InvokeVoidAsync("loadSciptsModule", "loadScript", "libs/easymde.js/easymde.min.js");
+        await _js.InvokeVoidAsync("loadSciptsModule", "loadScript", "libs/easymde.js/purify.min.js");
 
-        await _js.InvokeVoidAsync("MarkDown.MarkDownCreate", "#markdownEditor-" + InputCode, EditorType, UniqName, ReadOnly, dotNetPtr);
+        await _js.InvokeVoidAsync("markDownModule", "MarkDownCreate", "#markdownEditor-" + InputCode, EditorType, UniqName, ReadOnly, dotNetPtr);
 
         if (Text != null)
-            await _js.InvokeVoidAsync("MarkDown.MarkDownSetData", "#markdownEditor-" + InputCode, Text);
+            await _js.InvokeVoidAsync("markDownModule", "MarkDownSetData", "#markdownEditor-" + InputCode, Text);
 
         isLoaded = true;
     }
-
-    //public async Task SetData(string data) => await _js.InvokeVoidAsync("MarkDown.MarkDownSetData", "#markdownEditor-" + InputCode, data);
-    //public async Task ClearMarkDown() => await _js.InvokeVoidAsync("MarkDown.ClearMarkDown", "#markdownEditor-" + InputCode);
-    //public async Task<string> GetData(bool isHtml) => await _js.InvokeAsync<string>("MarkDown.GetDataMarkDownEditor", "#markdownEditor-" + InputCode, isHtml); // получаем данные с mark down editor'а
 
     [JSInvokable("UpdateMarkDownStatus")]
     public async Task UpdateMarkDownStatus(string value) => ParentValidation.NotifyValidationStatusChanged(Enum.Parse<ValidationStatus>(value));
@@ -205,7 +201,7 @@
         progressBarImageLoader = 100;
 
         var retImage = await _fileManager.GetPhysicFileUrl(megafile.MainImageId);
-        await _js.InvokeVoidAsync("MarkDown.AddImageToEditor", "#markdownEditor-" + InputCode, retImage);
+        await _js.InvokeVoidAsync("markDownModule", "AddImageToEditor", "#markdownEditor-" + InputCode, retImage);
 
         // js add image url to edtior
 

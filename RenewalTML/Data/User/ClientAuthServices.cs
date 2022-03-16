@@ -37,7 +37,7 @@ namespace RenewalTML.Data
 
         Task UpdateUser(Client user);
 
-        Task<List<Client>> GetAllFilterClient(bool getBanned = false, bool getAdmin = true, bool getMe = false);
+        Task<List<Client>> GetAllFilterClient(bool getBanned = false, bool getAdmin = true, bool getMe = false, bool getBlockedEconomicUser = false);
         Task<int> GetCountClientByRoleId(int id);
     }
 
@@ -46,55 +46,51 @@ namespace RenewalTML.Data
         private readonly ClientManager _clientManager;
         private readonly IHttpContextAccessor _httpContext;
         private readonly IStringEncryptionService _encryptService;
-        private readonly IJSRuntime _js;
         private readonly RoleManager _rm;
         private readonly IVirtualFileServices _virtualFileServices;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly INotificationServices _notificationServices;
         private readonly IAwardServices _awardServices;
+        private readonly IJSModularityServices _jsModularityServices;
 
         private readonly string cookie_authKey = "_cl_tmlRenewalApplicationCookie_auth";
 
         public ClientAuthServices(ClientManager clientManager,
             IHttpContextAccessor httpcontext,
             IStringEncryptionService encryptService,
-            IJSRuntime js,
             RoleManager rm,
             IVirtualFileServices virtualFileServices,
             IWebHostEnvironment webHostEnvironment,
             INotificationServices notificationServices,
-            IAwardServices awardServices)
+            IAwardServices awardServices,
+            IJSModularityServices jsModularityServices)
         {
             _clientManager = clientManager;
             _httpContext = httpcontext;
             _encryptService = encryptService;
-            _js = js;
             _rm = rm;
             _virtualFileServices = virtualFileServices;
             _webHostEnvironment = webHostEnvironment;
             _notificationServices = notificationServices;
             _awardServices = awardServices;
+            _jsModularityServices = jsModularityServices;
         }
 
         /* Добавить пользователю в браузер зашифрованные куки с уникальными данными пользователя ( в совокупности ) 
          * для проверки подлинности. */
-        public Task Authenticate(Client client, bool isPersistant = true)
+        public async Task Authenticate(Client client, bool isPersistant = true)
         {
             string cookieUserData = $"id:'{client.Id}' vkid:'{client.VkId}'";
 
             var cryptcookieUserData = _encryptService.Encrypt(cookieUserData);
 
-            _js.InvokeVoidAsync("CookiesRepository.addCookie", cookie_authKey, cryptcookieUserData, isPersistant ? 365 : 1);
-
-            return Task.CompletedTask;
+            await _jsModularityServices.InvokeVoidAsync("cookiesModule", "addCookie", cookie_authKey, cryptcookieUserData, isPersistant ? 365 : 1);
         }
 
         /* Удаляёт куки у текущего пользователя. */
-        public Task LogOut()
+        public async Task LogOut()
         {
-            _js.InvokeVoidAsync("CookiesRepository.deleteCookie", cookie_authKey);
-
-            return Task.CompletedTask;
+            await _jsModularityServices.InvokeVoidAsync("cookiesModule", "deleteCookie", cookie_authKey);
         }
 
         public async Task<int> GetCountClientByRoleId(int id) => await _clientManager.GetCountClientByRoleId(id); 
@@ -110,7 +106,7 @@ namespace RenewalTML.Data
 
         public async Task<Client> GetClient()
         {
-            var authString = await _js.InvokeAsync<string>("CookiesRepository.getCookie", cookie_authKey);
+            var authString = await _jsModularityServices.InvokeAsync<string>("cookiesModule", "getCookie", cookie_authKey);
 
             if (String.IsNullOrEmpty(authString)) return null;
 
@@ -284,7 +280,7 @@ namespace RenewalTML.Data
         а модераторы могут, всоре параметр isHaveAccesToAdminPanel будет расширен в isBlockAdminEconimcs которые точно задает то,
         что пользователь админ и запрещает ему передавать деньги.
          */
-        public async Task<List<Client>> GetAllFilterClient(bool getBanned = false, bool getAdmin = true, bool getMe = false)
+        public async Task<List<Client>> GetAllFilterClient(bool getBanned = false, bool getAdmin = true, bool getMe = false, bool getBlockedEconomicUser = false)
         {
             var list = await _clientManager.GetAllAsync();
             var client = await GetClient();
@@ -307,6 +303,9 @@ namespace RenewalTML.Data
                 // check is admin
 
                 if (roleUser.isHaveAccesToAdminPanel && !getAdmin)
+                    continue;
+
+                if(roleUser.isBlockedEconomic && !getBlockedEconomicUser)
                     continue;
 
                 returnList.Add(i);

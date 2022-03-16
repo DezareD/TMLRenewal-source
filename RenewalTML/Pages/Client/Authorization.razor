@@ -196,7 +196,7 @@
     public ValidationMessageBlock AuthErrorMessage { get; set; }
     public ValidationMessageBlock TwoPhaseInfo { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    public override async Task OnInitializedComponent()
     {
         _userLoginModule = new ContextValidationModule<UserLoginModel>(new UserLoginModel());
         _twoPhaseRegistrationModule = new ContextValidationModule<TwoPhaseRegistrationVK>(new TwoPhaseRegistrationVK());
@@ -205,9 +205,9 @@
 
         /* tippy loader and create */
 
-        await _js.InvokeVoidAsync("loadScript", "libs/tippy.js/tippy.min.js");
+        await _js.InvokeVoidAsync("loadSciptsModule","loadScript", "libs/tippy.js/tippy.min.js");
 
-        await _js.InvokeVoidAsync("CreateTippyElement",
+        await _js.InvokeVoidAsync("tippyModule", "CreateTippyElement",
         new List<TooltipModel>() {
                                 new TooltipModel(".-tp-remember-me", "Запомнить ваш аккаунт на день или на год?", ToolTipStyles.DefaultStyle, width: 350)
                                                     });
@@ -239,7 +239,7 @@
                 //await navbar_update.InvokeAsync(); // Обновляем саму менюшку, если добавились поля с авторизацией или типо того
 
                 //await _virtualNavigationServices.ReRedirectClient("");
-                await _js.InvokeVoidAsync("LoadingRepositry.reloadPage");
+                await _js.InvokeVoidAsync("loadingModule", "reloadPage");
             }
         }
         authIsLoading = false;
@@ -275,7 +275,7 @@
                 {
                     var user = await _userServices.RegisterClient(_twoPhaseRegistrationModule._model, vkSessionObject);
                     await _userServices.Authenticate(user, true);
-                    await _js.InvokeVoidAsync("LoadingRepositry.reloadPage");
+                    await _js.InvokeVoidAsync("loadingModule", "reloadPage");
                 }
             }
         }
@@ -287,7 +287,7 @@
     private async Task ExecutedVkAuthorization()
     {
         authVKIsLoading = true;
-        await _js.InvokeVoidAsync("VKAuthorizeFunction.AuthorizeVk", DotNetObjectReference.Create(this));
+        await _js.InvokeVoidAsync("vkAuthorizeModule", "AuthorizeVk", DotNetObjectReference.Create(this));
     }
 
     [JSInvokable]
@@ -314,7 +314,7 @@
                     //await mainbar_updateImage.InvokeAsync(true);
 
                     //await _virtualNavigationServices.ReRedirectClient("");
-                    await _js.InvokeVoidAsync("LoadingRepositry.reloadPage");
+                    await _js.InvokeVoidAsync("loadingModule", "reloadPage");
                 }
                 else
                 {

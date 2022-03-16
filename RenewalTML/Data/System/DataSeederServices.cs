@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Hosting;
 using RenewalTML.Shared.Exstention.ClassAddons;
 using Serilog;
 using System.Collections.Generic;
+using System.IO;
+using File = RenewalTML.Data.Model.File;
 
 namespace RenewalTML.Data
 {
@@ -41,6 +43,48 @@ namespace RenewalTML.Data
             {
                 RoleName = "Забаненный",
                 RequereName = RoleManager.defaultRoleName_banned
+            }
+        };
+
+        public static List<File> seedDataFiledList = new List<File>()
+        {
+            new File()
+            {
+                Name = "_img_defaultavatar",
+                Extension = ".webp",
+                Path = Directory.GetCurrentDirectory() + @"\wwwroot\imgs\defaultavatar",
+                Size = 0,
+                SitePath = @$"imgs\defaultavatar",
+                hourseToDelete = 0
+            },
+            new File()
+            {
+                Name = "x64__img_defaultavatar",
+                Extension = ".webp",
+                Path = Directory.GetCurrentDirectory() + @"\wwwroot\imgs\defaultavatar",
+                Size = 0,
+                SitePath = @$"imgs\defaultavatar",
+                hourseToDelete = 0
+            }
+        };
+
+        public static List<CroppedImageFile> croppedSeedDataList = new List<CroppedImageFile>()
+        {
+            new CroppedImageFile()
+            {
+                x = 0,
+                y = 0,
+                width = 240,
+                height = 240,
+                ImageId = seedDataFiledList[0].Id,
+            },
+            new CroppedImageFile()
+            {
+                x = 0,
+                y = 0,
+                width = 64,
+                height = 64,
+                ImageId = seedDataFiledList[1].Id,
             }
         };
 
@@ -108,12 +152,17 @@ namespace RenewalTML.Data
         private readonly RoleManager _roleManager;
         private readonly AwardManager _awardManager;
         private readonly SystemConfigurationManager _configurationManager;
+        private readonly VirtualFileManager _fileManager;
+        private readonly VirtualCroopedFileManager _virtualCroopedFileManager;
 
-        public DataSeederServices(RoleManager roleManager, AwardManager awardManager, SystemConfigurationManager configurationManager)
+        public DataSeederServices(RoleManager roleManager, AwardManager awardManager, SystemConfigurationManager configurationManager,
+            VirtualFileManager fileManager, VirtualCroopedFileManager virtualCroopedFileManager)
         {
             _roleManager = roleManager;
             _awardManager = awardManager;
             _configurationManager = configurationManager;
+            _fileManager = fileManager;
+            _virtualCroopedFileManager = virtualCroopedFileManager;
         }
 
         public async Task SeedData()
@@ -157,6 +206,20 @@ namespace RenewalTML.Data
                     {
                         await _configurationManager.AddAsync(config);
                         Log.Information($"Phase 3. Entity: 'SystemConfiguration'. Entity '{config.UniqId}' has been added by data seed process.");
+                    }
+                }
+
+
+                Log.Information("Phase 4. Entity: 'Files");
+
+                foreach (var file in DataSeedStaticElements.seedDataFiledList)
+                {
+                    var search = await _fileManager.GetFileByName(file.Name);
+
+                    if (search == null)
+                    {
+                        await _fileManager.AddAsync(file);
+                        Log.Information($"Phase 4. Entity: 'SystemConfiguration'. Entity '{file.Name}' has been added by data seed process.");
                     }
                 }
 

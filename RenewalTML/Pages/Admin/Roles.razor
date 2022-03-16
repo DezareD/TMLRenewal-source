@@ -357,7 +357,7 @@
 
     private Client adminView { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    public override async Task OnInitializedComponent()
     {
         adminView = await _userServices.GetClient();
         var role = await _roleServices.GetRoleAsync(adminView.RoleId);

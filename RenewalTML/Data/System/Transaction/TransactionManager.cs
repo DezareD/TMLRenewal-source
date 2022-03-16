@@ -58,7 +58,7 @@ namespace RenewalTML.Data
         public async Task<int> GetEntityTransactionCount(string entityName, int entityId)
         {
             // берем только те, котоыре как то связаны с нашей сущьностью
-            var list = await _genericRepository.Where(m => m.OutEntityId == entityId || m.ToEntityId == entityId).ToListAsync();
+            var list = await (await _genericRepository.GetQueryableAsync()).Where(m => m.OutEntityId == entityId || m.ToEntityId == entityId).ToListAsync();
 
             var cnt1 = list.Where(m => IsTransactionTypeEquals(entityName, m.TransactionType, true)).Where(m => IsTransactionEntityIdEquals(entityId, m.OutEntityId, m.ToEntityId, true)).Count();
             var cnt2 = list.Where(m => IsTransactionTypeEquals(entityName, m.TransactionType, false)).Where(m => IsTransactionEntityIdEquals(entityId, m.OutEntityId, m.ToEntityId, false)).Count();
@@ -68,7 +68,7 @@ namespace RenewalTML.Data
         public async Task<List<Transaction>> GetEntityTransaction(string entityName, int entityId, bool isOut, int limit, int skipped = 0)
         {
             // берем только те, котоыре как то связаны с нашей сущьностью
-            var list = await _genericRepository.Where(m => m.OutEntityId == entityId || m.ToEntityId == entityId).ToListAsync();
+            var list = await (await _genericRepository.GetQueryableAsync()).Where(m => m.OutEntityId == entityId || m.ToEntityId == entityId).ToListAsync();
 
             // уже отсеиваем, фильтруем и т.д
             if(limit > 0) return list.Where(m => IsTransactionTypeEquals(entityName, m.TransactionType, isOut)).Where(m => IsTransactionEntityIdEquals(entityId, m.OutEntityId, m.ToEntityId, isOut)).OrderByDescending(m => DateTimeAddon.StringToDateTime(m.Date).Ticks).Skip(skipped).Take(limit).ToList();

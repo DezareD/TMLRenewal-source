@@ -15,6 +15,6 @@ namespace RenewalTML.Shared
         [Inject] protected NavigationManager nm { get; set; }
         [Inject] protected IClientAuthServices _clientAuthServices { get; set; }
         [Inject] protected IRolePermissionServices _permissionService { get; set; }
-        [Inject] protected IJSRuntime _js { get; set; }
+        [Inject] protected IJSModularityServices _js { get; set; }
     }
 }

@@ -1,11 +1,7 @@
 **/.vs
-#appsettings.json
+appsettings.json
 **/PublishProfiles
 **/obj
 **/Logs
 **/bin
-!**/userImages/
 **/userImages/**
-!**/userImages/defaultavatar/
-
-!**/userImages/defaultavatar/

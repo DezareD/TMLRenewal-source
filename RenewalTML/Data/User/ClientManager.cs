@@ -17,9 +17,9 @@ namespace RenewalTML.Data
             _genericRepository = _clientRepository;
         }
 
-        public async Task<int> GetCountClientByRoleId(int roleId) => await AsyncExecuter.CountAsync(_genericRepository.Where(m => m.RoleId == roleId));
-        public async Task<Client> GetClientByNameAsync(string userName) => await AsyncExecuter.FirstOrDefaultAsync(_genericRepository.Where(m => m.UserName == userName));
-        public async Task<Client> FindClientWithVKID(string vkid) => await AsyncExecuter.FirstOrDefaultAsync(_genericRepository.Where(m => m.VkId == vkid));
+        public async Task<int> GetCountClientByRoleId(int roleId) => await AsyncExecuter.CountAsync((await _genericRepository.GetQueryableAsync()).Where(m => m.RoleId == roleId));
+        public async Task<Client> GetClientByNameAsync(string userName) => await AsyncExecuter.FirstOrDefaultAsync((await _genericRepository.GetQueryableAsync()).Where(m => m.UserName == userName));
+        public async Task<Client> FindClientWithVKID(string vkid) => await AsyncExecuter.FirstOrDefaultAsync((await _genericRepository.GetQueryableAsync()).Where(m => m.VkId == vkid));
 
     }
 }

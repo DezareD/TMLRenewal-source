@@ -149,7 +149,7 @@
     private Role UserRole { get; set; }
     private Client User { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    public override async Task OnInitializedComponent()
     {
         User = await _userServices.GetClient();
         UserRole = await _roleServices.GetRoleAsync(User.RoleId);
@@ -159,9 +159,9 @@
         if (UserRole.isHaveAccesToAdminPanel && UserRole.isHaveAccesToViewSystemSettings &&
             (UserRole.isHaveAccesToEditSettings_Economic || UserRole.isHaveAccesToEditSettings_System))
         {
-            await _js.InvokeVoidAsync("loadScript", "libs/tippy.js/tippy.min.js");
+            await _js.InvokeVoidAsync("loadSciptsModule", "loadScript", "libs/tippy.js/tippy.min.js");
 
-            await _js.InvokeVoidAsync("CreateTippyElement",
+            await _js.InvokeVoidAsync("tippyModule", "CreateTippyElement",
             new List<TooltipModel>() {
                 new TooltipModel(".-tp-autosave-info", "Данное поле автосохраняемое, просто вводите текст, а этот индикатор покажет статус изменения.", ToolTipStyles.DefaultStyle, width: 350)
                     });

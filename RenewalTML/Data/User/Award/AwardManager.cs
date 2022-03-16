@@ -21,7 +21,7 @@ namespace RenewalTML.Data
             _genericRepository = _awardRepository;
         }
 
-        public async Task<Award> FindByRequeryName(string req_name) => await AsyncExecuter.FirstOrDefaultAsync(_genericRepository.Where(m => m.requereName == req_name));
+        public async Task<Award> FindByRequeryName(string req_name) => await AsyncExecuter.FirstOrDefaultAsync((await _genericRepository.GetQueryableAsync()).Where(m => m.requereName == req_name));
     }
 
     public class ClientAwardManager : GenericManager<ClientAward>
@@ -31,8 +31,8 @@ namespace RenewalTML.Data
             _genericRepository = _awardRepository;
         }
 
-        public async Task<ClientAward> GetClientAward(Client client, Award award) => await AsyncExecuter.FirstOrDefaultAsync(_genericRepository.Where(m => m.ClientId == client.Id).Where(m => m.AwardId == award.Id));
-        public async Task<List<ClientAward>> GetClientList(Client client) => await AsyncExecuter.ToListAsync(_genericRepository.Where(m => m.ClientId == client.Id));
+        public async Task<ClientAward> GetClientAward(Client client, Award award) => await AsyncExecuter.FirstOrDefaultAsync((await _genericRepository.GetQueryableAsync()).Where(m => m.ClientId == client.Id).Where(m => m.AwardId == award.Id));
+        public async Task<List<ClientAward>> GetClientList(Client client) => await AsyncExecuter.ToListAsync((await _genericRepository.GetQueryableAsync()).Where(m => m.ClientId == client.Id));
 
     }
 }

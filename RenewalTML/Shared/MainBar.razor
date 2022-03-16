@@ -1,7 +1,7 @@
 ﻿@inject IClientAuthServices _clientAuthServices
 @inject IVirtualFileServices _fileManager
 @inject NavigationManager _nm
-@inject IJSRuntime _js
+@inject IJSModularityServices _js
 @inject INotificationServices _notificationServices
 @inject IRawTextHtmlizer _rawHtmlizer 
 @inject IRolePermissionServices _roleServices 
@@ -156,9 +156,9 @@ else
 
             Balance = user.Balance;
 
-            await _js.InvokeVoidAsync("loadScript", "libs/tippy.js/tippy.min.js");
+            await _js.InvokeVoidAsync("loadSciptsModule", "loadScript", "libs/tippy.js/tippy.min.js");
 
-            await _js.InvokeVoidAsync("CreateTippyElement",
+            await _js.InvokeVoidAsync("tippyModule", "CreateTippyElement",
                 new List<TooltipModel>() {
                     new TooltipModel(".-tp-mainbar-continental", "Государства и организации. ( не доступно )", ToolTipStyles.DefaultStyle, width: 350),
                     new TooltipModel(".-tp-mainbar-shop", "Магазин и товары. ( не доступно )", ToolTipStyles.DefaultStyle, width: 350),
@@ -173,7 +173,7 @@ else
     {
         if (CountNewNotification > 0)
         {
-            await _js.InvokeVoidAsync("SetNotificationTitleCount", CountNewNotification);
+            await _js.InvokeVoidAsync("notificationModule", "SetNotificationTitleCount", CountNewNotification);
         }
     }
 
@@ -208,7 +208,7 @@ else
             await _notificationServices.SetNotificationViewed(user);
 
             CountNewNotification = 0;
-            await _js.InvokeVoidAsync("SetNotificationTitleCount", CountNewNotification);
+            await _js.InvokeVoidAsync("notificationModule", "SetNotificationTitleCount", CountNewNotification);
         }
     }
 
@@ -230,7 +230,7 @@ else
         UserLastNotification.Add(notificator);
 
         CountNewNotification++;
-        await _js.InvokeVoidAsync("SetNotificationTitleCount", CountNewNotification);
+        await _js.InvokeVoidAsync("notificationModule", "SetNotificationTitleCount", CountNewNotification);
 
         StateHasChanged();
     }
@@ -242,9 +242,9 @@ else
 
         StateHasChanged();
 
-        if (balance < 0) await _js.InvokeVoidAsync("ColoringBar.BlnkText", ".js-blinked-text-balance", "red");
-        else if(balance == 0) await _js.InvokeVoidAsync("ColoringBar.BlnkText", ".js-blinked-text-balance", "none");
-        else await _js.InvokeVoidAsync("ColoringBar.BlnkText", ".js-blinked-text-balance", "green");
+        if (balance < 0) await _js.InvokeVoidAsync("uiUtilsModule", "BlnkTextOnBar", ".js-blinked-text-balance", "red");
+        else if(balance == 0) await _js.InvokeVoidAsync("uiUtilsModule", "BlnkTextOnBar", ".js-blinked-text-balance", "none");
+        else await _js.InvokeVoidAsync("uiUtilsModule", "BlnkTextOnBar", ".js-blinked-text-balance", "green");
     }
 
     public async Task UpdateUserImage(bool isAuth)

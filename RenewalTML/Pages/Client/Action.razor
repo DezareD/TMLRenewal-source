@@ -144,7 +144,7 @@
                         </MarkDownEditor>
                     </Validation>
 
-                    <Validation @ref="@_requestMoneyModule._fieldValidationStatus["Text"]">
+                    <Validation @ref="@_requestMoneyModule._fieldValidationStatus["FillTicketImage"]">
                         <p class="form-note">Изоображения:</p>
                         <MultiImageForm @ref="_refMultiImageForm" @bind-fillTicketImages="_requestMoneyModule._model.FillTicketImage" MaxImagesCount="6">
                             <Feedback>
@@ -233,7 +233,7 @@
         if (isStartRequestMoney)
         {
             RequestMoneyError = new ValidationMessageBlock("Дождитесь окончания загрузки предидущего действия...", "error");
-            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            await _js.InvokeVoidAsync("uiUtilsModule", "ScrollToTop");
             StateHasChanged();
             return;
         }
@@ -242,7 +242,7 @@
         {
             RequestMoneyError = new ValidationMessageBlock("Дождитесь окончания загрузки изоображений.", "error");
             _requestMoneyModule.SetFieldStatus("FillTicketImage", ValidationStatus.Error);
-            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            await _js.InvokeVoidAsync("uiUtilsModule", "ScrollToTop");
             StateHasChanged();
             return;
         }
@@ -255,7 +255,7 @@
             RequestMoneyError = new ValidationMessageBlock("Введено неверное количество.", "error");
             _requestMoneyModule.SetFieldStatus("Money", ValidationStatus.Error);
             isStartRequestMoney = false;
-            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            await _js.InvokeVoidAsync("uiUtilsModule", "ScrollToTop");
             StateHasChanged();
             return;
         }
@@ -289,7 +289,7 @@
         _requestMoneyModule._model.Money = 0;
         _requestMoneyModule._model.Text = "";
 
-        await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+        await _js.InvokeVoidAsync("uiUtilsModule", "ScrollToTop");
 
         StateHasChanged();
     }
@@ -304,7 +304,7 @@
         {
             TransferMoneyError = new ValidationMessageBlock("Дождитесь окончания загрузки предидущего действия...", "error");
             _sendMoneyModule.SetFielAllStatus(ValidationStatus.None);
-            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            await _js.InvokeVoidAsync("uiUtilsModule", "ScrollToTop");
             StateHasChanged();
             return;
         }
@@ -317,7 +317,7 @@
             TransferMoneyError = new ValidationMessageBlock("Недостаточно средств или введено неверное количество.", "error");
             _sendMoneyModule.SetFieldStatus("Money", ValidationStatus.Error);
             transferLoader = false;
-            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            await _js.InvokeVoidAsync("uiUtilsModule", "ScrollToTop");
             StateHasChanged();
             return;
         }
@@ -330,7 +330,7 @@
             _sendMoneyModule.SetFieldStatus("UserName", ValidationStatus.Error);
             TransferMoneyError = new ValidationMessageBlock("Пользователь для перевода не найден или пользователь не валиден.", "error");
             transferLoader = false;
-            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            await _js.InvokeVoidAsync("uiUtilsModule", "ScrollToTop");
             StateHasChanged();
             return;
         }
@@ -340,7 +340,9 @@
         TransferMoneyError = new ValidationMessageBlock("Перевод прошёл успешно!", "ok");
         transferLoader = false;
 
-        await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+        await _js.InvokeVoidAsync("uiUtilsModule", "ScrollToTop");
+
+        _sendMoneyModule._model.UserName = "";
 
         _sendMoneyModule.SetFielAllStatus(ValidationStatus.None);
         StateHasChanged();
@@ -351,7 +353,7 @@
         if (transferLoader)
         {
             TransferMoneyError = new ValidationMessageBlock("Дождитесь окончания загрузки предидущего действия...", "error");
-            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            await _js.InvokeVoidAsync("uiUtilsModule", "ScrollToTop");
             StateHasChanged();
             return;
         }
@@ -365,7 +367,7 @@
             addedClassTransfer = "is-invalid";
             TransferMoneyError = new ValidationMessageBlock("Недостаточно средств или введено неверное количество.", "error");
             transferLoader = false;
-            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            await _js.InvokeVoidAsync("uiUtilsModule", "ScrollToTop");
             StateHasChanged();
             return;
         }
@@ -378,7 +380,7 @@
             _autoCompleteBlock.SetAutoCompleteStatus("is-invalid");
             TransferMoneyError = new ValidationMessageBlock("Пользователь для перевода не найден или пользователь не валиден.", "error");
             transferLoader = false;
-            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            await _js.InvokeVoidAsync("uiUtilsModule", "ScrollToTop");
             StateHasChanged();
             return;
         }
@@ -388,7 +390,7 @@
         TransferMoneyError = new ValidationMessageBlock("Перевод прошёл успешно!", "ok");
         transferLoader = false;
 
-        await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+        await _js.InvokeVoidAsync("uiUtilsModule", "ScrollToTop");
 
         _autoCompleteBlock.SetAutoCompleteStatus("");
         addedClassTransfer = "";
@@ -396,7 +398,7 @@
     }
     */
 
-    protected override async Task OnInitializedAsync()
+    public override async Task OnInitializedComponent()
     {
         user = await _userServices.FindUserById(UserId);
         viewer = await _userServices.GetClient();
@@ -428,11 +430,11 @@
             await ChangePageLoadStatus(true);
             StateHasChanged();
 
-            await _js.InvokeVoidAsync("MaxHeightLoader");
+            await _js.InvokeVoidAsync("uiUtilsModule", "MaxHeightLoader");
 
-            await _js.InvokeVoidAsync("loadScript", "libs/tippy.js/tippy.min.js");
+            await _js.InvokeVoidAsync("loadSciptsModule", "loadScript", "libs/tippy.js/tippy.min.js");
 
-            await _js.InvokeVoidAsync("CreateTippyElement",
+            await _js.InvokeVoidAsync("tippyModule", "CreateTippyElement",
         new List<TooltipModel>() {
                 new TooltipModel(".-tp-transfer-money", "Перевод денег другому пользователю.", ToolTipStyles.DefaultStyle, width: 350),
                 new TooltipModel(".-tp-request-money", "Подать заявку на пополнение баланса.", ToolTipStyles.DefaultStyle, width: 350)
@@ -485,6 +487,6 @@
         }
 
         CurrentAction = action; // Означает окончание загрузки
-        await _js.InvokeVoidAsync("UrlHelper.SetHash", "/profile/" + UserId + "/actions", action); // set new hash
+        await _js.InvokeVoidAsync("navigationModule", "SetHash", "/profile/" + UserId + "/actions", action); // set new hash
     }
 }

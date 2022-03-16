@@ -18,11 +18,16 @@
                                         <div class="page">
                                             <RouteView RouteData="@routeData" />
                                             <!--<div class="_cl_application_page container">
-                                <div class="loading-template-auth" style="display: flex; padding: 60px;">
-                                    <i class="fal fa-ban"></i>
-                                    <p class="main-text">Доступ ограничен</p><p class="mini-text">Ваш аккаунт заблокирован. Обратитесь к администрации за дополнительной информацией.</p>
-                                </div>
-                            </div>-->
+        <div class="loading-template-auth" style="display: flex; padding: 60px;">
+            <i class="fal fa-ban"></i>
+            <p class="main-text">Доступ ограничен</p><p class="mini-text">Ваш аккаунт заблокирован. Обратитесь к администрации за дополнительной информацией.</p>
+        </div>
+    </div>-->
+                                            <div class="_cl_footer">
+                                                <p>@(RenewalTMLApplicationModule.ComplexRevision + " " + RenewalTMLApplicationModule.ComplexVersion + "-" + RenewalTMLApplicationModule.ComplexVersionRevision)</p>
+                                                <p>TML Renewal application</p>
+                                                <p>Build hashcode: @((RenewalTMLApplicationModule.ComplexRevision + " " + RenewalTMLApplicationModule.ComplexVersion + "-" + RenewalTMLApplicationModule.ComplexVersionRevision).GetHashCode())</p>
+                                            </div>
                                         </div>
                                     </div>
                                 }
@@ -107,14 +112,14 @@
     public async Task RedirectingStart(CompleteVirtualRedirect block, bool isPopState = false)
     {
         if(!isPopState)
-            await _js.InvokeVoidAsync("LoadingRepositry.startLoading");
+            await _js.InvokeVoidAsync("loadingModule", "startLoading");
 
         _currentRedirector = block;
     }
 
     public async Task RedirectingComplete()
     {
-        await _js.InvokeVoidAsync("setTitle", _currentRedirector.Title);
+        await _js.InvokeVoidAsync("logicUtils", "setTitle", _currentRedirector.Title);
 
         if (mainbar_ref != null)
             await mainbar_ref.SetFirstLoadNotificationTitle();
@@ -122,7 +127,7 @@
         if (navbar_ref != null)
             await navbar_ref.EventNavbarUpdate();
 
-        await _js.InvokeVoidAsync("LoadingRepositry.endLoading");
+        await _js.InvokeVoidAsync("loadingModule", "endLoading");
     }
 
     protected override async Task OnInitializedAsync()
@@ -130,7 +135,7 @@
         /* APPLICATION */
 
         var dotNetPtr = DotNetObjectReference.Create(this);
-        await _js.InvokeVoidAsync("GLOBAL.SetDotnetReference", dotNetPtr);
+        await _js.InvokeVoidAsync("blazorIntegration", "SetDotnetReference", dotNetPtr);
 
         _virtualNavigationManager.PageAddedServices(this, _clientAuthServices);
 

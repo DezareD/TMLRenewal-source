@@ -372,7 +372,7 @@ else
 
         var fileStatic = new VirtualFileStatic(_webhostManager, _fileManager);
 
-        var jsonStringify = await _js.InvokeAsync<string>("CropperConnector.GetDataCropper", ".-js-get-cropped"); // получаем данные с кропера
+        var jsonStringify = await _js.InvokeAsync<string>("cropperModule", "GetDataCropper", ".-js-get-cropped"); // получаем данные с кропера
         var editFileAvatar = JsonConvert.DeserializeObject<CroppedImageInfo>(jsonStringify); // преобразуем данные в класс.
 
         if (isImageUploaded)
@@ -487,7 +487,7 @@ else
 
         StateHasChanged();
 
-        await _js.InvokeVoidAsync("CropperConnector.InjectCropperToImage", ".-js-get-cropped"); // reinject
+        await _js.InvokeVoidAsync("cropperModule", "InjectCropperToImage", ".-js-get-cropped"); // reinject
     }
 
     private void HideEditImageModel()
@@ -510,7 +510,7 @@ else
             var croppedFile = await _fileManager.GetCroppedImageFile(User.UserAvatar_cropp);
             mainUserAvatarImage = await _fileManager.GetPhysicFileUrl(User.UserAvatar_main);
             StateHasChanged();
-            await _js.InvokeVoidAsync("CropperConnector.InjectCropperToImage", ".-js-get-cropped", croppedFile.x, croppedFile.y, croppedFile.width, croppedFile.height);
+            await _js.InvokeVoidAsync("cropperModule", "InjectCropperToImage", ".-js-get-cropped", croppedFile.x, croppedFile.y, croppedFile.width, croppedFile.height);
             isProgressBarImageLoader = true;
 
             modalRefEditImage.Show();
@@ -717,7 +717,7 @@ else
         await adminActionBlockRef.SHC();
     }
 
-    protected override async Task OnInitializedAsync()
+    public override async Task OnInitializedComponent()
     {
         Administrator = await _userServices.GetClient();
         var role = await _roleServices.GetRoleAsync(Administrator.RoleId);
@@ -744,8 +744,8 @@ else
             if (userRole.RequereName == RoleManager.defaultRoleName_banned)
                 isBanned = true;
 
-            await _js.InvokeVoidAsync("loadScript", "libs/cropper.js/cropper.min.js");
-            await _js.InvokeVoidAsync("loadScript", "libs/cropper.js/jquery-cropper.min.js");
+            await _js.InvokeVoidAsync("loadSciptsModule","loadScript", "libs/cropper.js/cropper.min.js");
+            await _js.InvokeVoidAsync("loadSciptsModule","loadScript", "libs/cropper.js/jquery-cropper.min.js");
 
             adminActions = await _adminActionServices.GetAdminActionForUser(User);
             allCountActions = await _adminActionServices.GetAdminActionForUserCount(User);

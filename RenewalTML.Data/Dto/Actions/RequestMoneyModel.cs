@@ -15,7 +15,6 @@ namespace RenewalTML.Data.Dto
         [Required(ErrorMessage = "Обязательное поле")]
         public string Text { get; set; }
 
-        [DisableModuleValidation]
         public List<FillTicketImage> FillTicketImage { get; set; }
     }
 }

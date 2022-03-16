@@ -114,12 +114,12 @@
                 await ChangePageLoadStatus(true);
                 StateHasChanged();
 
-                await _js.InvokeVoidAsync("MaxHeightLoader");
+                await _js.InvokeVoidAsync("uiUtilsModule", "MaxHeightLoader");
 
-                await _js.InvokeVoidAsync("Graphics.DestroyChart", "user-profile-balance");
-                await _js.InvokeVoidAsync("Graphics.GenerateChart", "userBalanceChart", "user-profile-balance", (int)((test.Max(m => m.Data) - test.Min(m => m.Data)) / 6));
+                await _js.InvokeVoidAsync("chartModule", "DestroyChart", "user-profile-balance");
+                await _js.InvokeVoidAsync("chartModule", "GenerateChart", "userBalanceChart", "user-profile-balance", (int)((test.Max(m => m.Data) - test.Min(m => m.Data)) / 6));
 
-                await _js.InvokeVoidAsync("Graphics.AddSingleData", "user-profile-balance", 0, test);
+                await _js.InvokeVoidAsync("chartModule", "AddSingleData", "user-profile-balance", 0, test);
 
                 StateHasChanged();
             }
@@ -130,7 +130,7 @@
 
     protected async override Task OnInitializedAsync()
     {
-        await _js.InvokeVoidAsync("loadScript", "libs/chart.js/chart.min.js");
+        await _js.InvokeVoidAsync("loadSciptsModule", "loadScript", "libs/chart.js/chart.min.js");
 
         _virtualNavigationServices.SetPageInformationForEnchantedNavigation(this);
 

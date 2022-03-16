@@ -21,9 +21,9 @@ namespace RenewalTML.Data
             _genericRepository = roleManager;
         }
 
-        public async Task<Role> FindByRequeryName(string req_name) => await AsyncExecuter.FirstOrDefaultAsync(_genericRepository.Where(m => m.RequereName == req_name));
-        public async Task<Role> GetDefaultRoleUser() => await AsyncExecuter.FirstOrDefaultAsync(_genericRepository.Where(m => m.RequereName == defaultRoleName_user));
-        public async Task<Role> GetDefaultRoleGuest() => await AsyncExecuter.FirstOrDefaultAsync(_genericRepository.Where(m => m.RequereName == defaultRoleName_guest));
-        public async Task<Role> GetDefaultRoleBanned() => await AsyncExecuter.FirstOrDefaultAsync(_genericRepository.Where(m => m.RequereName == defaultRoleName_banned));
+        public async Task<Role> FindByRequeryName(string req_name) => await AsyncExecuter.FirstOrDefaultAsync((await _genericRepository.GetQueryableAsync()).Where(m => m.RequereName == req_name));
+        public async Task<Role> GetDefaultRoleUser() => await AsyncExecuter.FirstOrDefaultAsync((await _genericRepository.GetQueryableAsync()).Where(m => m.RequereName == defaultRoleName_user));
+        public async Task<Role> GetDefaultRoleGuest() => await AsyncExecuter.FirstOrDefaultAsync((await _genericRepository.GetQueryableAsync()).Where(m => m.RequereName == defaultRoleName_guest));
+        public async Task<Role> GetDefaultRoleBanned() => await AsyncExecuter.FirstOrDefaultAsync((await _genericRepository.GetQueryableAsync()).Where(m => m.RequereName == defaultRoleName_banned));
     }
 }

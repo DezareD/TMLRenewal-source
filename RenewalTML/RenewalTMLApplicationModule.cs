@@ -17,10 +17,13 @@ using Blazorise.Bootstrap;
 using Microsoft.AspNetCore.ResponseCompression;
 using System.Linq;
 using RenewalTML.Hubs;
-using Volo.Abp.Validation;
 using RenewalTML.Data;
-using Volo.Abp.AspNetCore.SignalR;
 using Blazorise.Icons.FontAwesome;
+using Volo.Abp.BackgroundJobs.Hangfire;
+using Volo.Abp.BackgroundJobs;
+using Volo.Abp.BackgroundWorkers.Hangfire;
+using Newtonsoft.Json;
+using Volo.Abp.Auditing;
 
 namespace RenewalTML
 {
@@ -29,14 +32,28 @@ namespace RenewalTML
         typeof(AbpAutofacModule),
         typeof(AbpAspNetCoreMvcUiBundlingModule),
         typeof(AbpAspNetCoreMvcUiPackagesModule),
-        typeof(AbpSecurityModule)
+        typeof(AbpSecurityModule),
+        typeof(AbpBackgroundWorkersHangfireModule)
+        //typeof(AbpBackgroundJobsModule),
+        //typeof(AbpBackgroundJobsHangfireModule)
     )]
     public class RenewalTMLApplicationModule : AbpModule
     {
+        // Pre-alpha Candidate 0.1-r0.1
+        public static string ComplexVersion = "0.1";
+        public static string ComplexRevision = "Pre-alpha Candidate";
+        public static string ComplexVersionRevision = "r0.2";
+
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
             var configuration = context.Services.GetConfiguration();
             var hostingEnvironment = context.Services.GetHostingEnvironment();
+
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            };
 
             context.Services.AddRazorPages();
 
@@ -80,6 +97,16 @@ namespace RenewalTML
                 opts.InitVectorBytes = Encoding.UTF8.GetBytes("3tt09JNgs4W1hMtS");
                 opts.Keysize = 256;
             });
+
+            Configure<AbpAuditingOptions>(options =>
+            {
+                options.IsEnabled = false;
+            });
+        }
+
+        public override void OnPreApplicationInitialization(ApplicationInitializationContext context)
+        {
+            context.RegisterContainerJobsApplication();
         }
 
         public override void OnApplicationInitialization(ApplicationInitializationContext context)

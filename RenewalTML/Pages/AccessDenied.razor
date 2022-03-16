@@ -5,7 +5,7 @@
 <h1>Acces Denied</h1>
 
 @code {
-    protected override async Task OnInitializedAsync()
+    public override async Task OnInitializedComponent()
     {
         await ChangePageLoadStatus(true);
     }

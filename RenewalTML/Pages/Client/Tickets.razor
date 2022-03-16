@@ -3,7 +3,6 @@
 @inherits RenewalTMLComponentBase
 
 @inject ITicketServices _ticketServices
-@inject IClientAuthServices _userServices
 
 @if (_isComplete)
 {
@@ -60,7 +59,7 @@
     private Client user { get; set; }
     private List<Ticket> _tickets { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    public override async Task OnInitializedComponent()
     {
         user = await _userServices.GetClient();
 
@@ -81,7 +80,7 @@
 
             StateHasChanged();
 
-            await _js.InvokeVoidAsync("MaxHeightLoader");
+            await _js.InvokeVoidAsync("uiUtilsModule", "MaxHeightLoader");
         }
         else await _virtualNavigationServices.ReRedirectClient(VirtualNavigationServices.errorUrl + "404", hardLoad: true);
     }

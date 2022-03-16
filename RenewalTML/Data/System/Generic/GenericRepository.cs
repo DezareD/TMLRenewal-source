@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace RenewalTML.Data
     {
         public IRepository<T, int> _genericRepository;
 
-        public virtual async Task<T> GetAsync(int id) => await AsyncExecuter.FirstOrDefaultAsync(_genericRepository.Where(m => m.Id == id));
+        public virtual async Task<T> GetAsync(int id) => await AsyncExecuter.FirstOrDefaultAsync((await _genericRepository.GetQueryableAsync()).Where(m => m.Id == id));
         public virtual async Task AddAsync(T entity, bool autoSave = false) => await _genericRepository.InsertAsync(entity, autoSave);
         public virtual async Task AddManyAsync(IEnumerable<T> entities) => await _genericRepository.InsertManyAsync(entities);
         public virtual async Task UpdateAsync(T entity) => await _genericRepository.UpdateAsync(entity);

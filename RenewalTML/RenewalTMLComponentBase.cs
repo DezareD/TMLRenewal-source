@@ -6,15 +6,16 @@ using System.Threading.Tasks;
 
 namespace RenewalTML
 {
-    public class RenewalTMLComponentBase : ComponentBase
+    public abstract class RenewalTMLComponentBase : ComponentBase
     {
-        [Inject] protected IJSRuntime _js { get; set; }
+        [Inject] protected IJSModularityServices _js { get; set; }
         [Inject] protected IClientAuthServices _userServices { get; set; }
         [Inject] protected IRolePermissionServices _roleServices { get; set; }
         [CascadingParameter(Name = "_virtualNavigationServices")] protected IVirtualNavigationServices _virtualNavigationServices { get; set; }
         [CascadingParameter(Name = "_applicationContainer")] protected App _applicationContainer { get; set; }
 
         protected bool _isComplete { get; set; }
+
         public async Task ChangePageLoadStatus(bool isComplete)
         {
             if (isComplete) // is page complete 
@@ -25,7 +26,13 @@ namespace RenewalTML
             else _isComplete = false;
         }
 
-        public virtual async Task OnInitializedComponent() {}
+        protected override async Task OnInitializedAsync()
+        {
+            _virtualNavigationServices.SetPageInformationForEnchantedNavigation(this);
+            await OnInitializedComponent();
+        }
+
+        public abstract Task OnInitializedComponent();
 
         protected override void OnInitialized()
         {

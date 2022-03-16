@@ -24,10 +24,10 @@ namespace RenewalTML.Data
 
         public async Task<string> GetValue(string key)
         {
-            var item = await _genericRepository.Where(m => m.UniqId == key).FirstOrDefaultAsync();
+            var item = await (await _genericRepository.GetQueryableAsync()).Where(m => m.UniqId == key).FirstOrDefaultAsync();
             return item.Value;
         }
 
-        public async Task<SystemConfiguration> GetByKey(string key) => await _genericRepository.Where(m => m.UniqId == key).FirstOrDefaultAsync();
+        public async Task<SystemConfiguration> GetByKey(string key) => await (await _genericRepository.GetQueryableAsync()).Where(m => m.UniqId == key).FirstOrDefaultAsync();
     }
 }

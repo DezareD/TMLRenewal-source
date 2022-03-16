@@ -129,7 +129,7 @@
         if (isStartRequestMoney == true)
         {
             RequestMoneyError = new ValidationMessageBlock("Дождитесь окончания загрузки предидущего действия...", "error");
-            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            await _js.InvokeVoidAsync("uiUtilsModule", "ScrollToTop");
             StateHasChanged();
             return;
         }
@@ -138,7 +138,7 @@
         {
             RequestMoneyError = new ValidationMessageBlock("Вы обязаны выбрать результат заявки.", "error");
             _adminRequestTicketApprovalModule.SetFieldStatus("AdminApproval", ValidationStatus.Error);
-            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            await _js.InvokeVoidAsync("uiUtilsModule", "ScrollToTop");
             StateHasChanged();
             return;
         }
@@ -147,7 +147,7 @@
         {
             RequestMoneyError = new ValidationMessageBlock("Неверное количество денег.", "error");
             _adminRequestTicketApprovalModule.SetFieldStatus("Money", ValidationStatus.Error);
-            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            await _js.InvokeVoidAsync("uiUtilsModule", "ScrollToTop");
             StateHasChanged();
             return;
         }
@@ -156,7 +156,7 @@
         {
             RequestMoneyError = new ValidationMessageBlock("В случае отрицательного результата проверки заявки, должна быть указана причина.", "error");
             _adminRequestTicketApprovalModule.SetFieldStatus("AdminText", ValidationStatus.Error);
-            await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+            await _js.InvokeVoidAsync("uiUtilsModule", "ScrollToTop");
             StateHasChanged();
             return;
         }
@@ -188,16 +188,17 @@
 
             FillBalanceTickets_last.CountMoney = _adminRequestTicketApprovalModule._model.Money;
 
-            var client = await _userServices.FindUserById(FillBalanceTickets_last._ticket.UserCreateId);
+            await _economicsServices.CompleteRequest(_adminRequestTicketApprovalModule._model.AdminApproval == "ok",
+            FillBalanceTickets_last,
+            FillBalanceTickets_last._ticket.UserCreateId);
 
-            await _economicsServices.CompleteRequest(_adminRequestTicketApprovalModule._model.AdminApproval == "ok", FillBalanceTickets_last, client);
             RequestMoneyError = null;
         }
 
         await UpdateTicket();
 
         isStartRequestMoney = false;
-        await _js.InvokeVoidAsync("ScrollHelper.ScrollToTop");
+        await _js.InvokeVoidAsync("uiUtilsModule", "ScrollToTop");
 
         StateHasChanged();
     }
@@ -234,7 +235,7 @@
         }
     }
 
-    protected override async Task OnInitializedAsync()
+    public override async Task OnInitializedComponent()
     {
         adminViewer = await _userServices.GetClient();
         var role = await _roleServices.GetRoleAsync(adminViewer.RoleId);
@@ -248,4 +249,7 @@
         }
         else await _virtualNavigationServices.ReRedirectClient(VirtualNavigationServices.accessDeniedUrl, hardLoad: true);
     }
+
+
+    // TODO: Сделать админ-транзакции и запись в экономи файлик действий
 }

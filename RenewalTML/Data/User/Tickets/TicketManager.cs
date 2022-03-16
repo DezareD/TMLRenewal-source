@@ -22,20 +22,20 @@ namespace RenewalTML.Data
         // непросмотренные заявки на пополнение баланса
         public async Task<List<Ticket>> GetFillBalanceLastTickets()
         {
-            var list = await _genericRepository.Where(m => m.TicketType == "type_fillingBalance").Where(m => m.TicketStatus == "status_waiting").ToListAsync();
+            var list = await (await _genericRepository.GetQueryableAsync()).Where(m => m.TicketType == "type_fillingBalance").Where(m => m.TicketStatus == "status_waiting").ToListAsync();
             return list.OrderBy(m => DateTimeAddon.StringToDateTime(m.Date).Ticks).ToList();
         }
 
         // количество непросмотренных заявок на пополнеие баланса
         public async Task<int> GetFillBalanceLastTicketsCount()
         {
-            var list = await _genericRepository.Where(m => m.TicketType == "type_fillingBalance").Where(m => m.TicketStatus == "status_waiting").ToListAsync();
+            var list = await (await _genericRepository.GetQueryableAsync()).Where(m => m.TicketType == "type_fillingBalance").Where(m => m.TicketStatus == "status_waiting").ToListAsync();
             return list.OrderBy(m => DateTimeAddon.StringToDateTime(m.Date).Ticks).ToList().Count();
         }
 
         public async Task<List<Ticket>> GetLastUserTicket(Client user, int count)
         {
-            var list = await _genericRepository.Where(m => m.UserCreateId == user.Id).ToListAsync();
+            var list = await (await _genericRepository.GetQueryableAsync()).Where(m => m.UserCreateId == user.Id).ToListAsync();
             return list.OrderByDescending(m => DateTimeAddon.StringToDateTime(m.Date).Ticks).Take(count).ToList();
         }
     }

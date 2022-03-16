@@ -31,11 +31,11 @@ namespace RenewalTML.Data
             await _systemHub.SendUserNotification(client, entity);
         }
 
-        public async Task<List<Notification>> GetNonViewedAsync(Client client) => await _genericRepository.Where(m => m.ClientOwnerId == client.Id).Where(m => m.isViewed == false).ToListAsync();
-        public async Task<List<Notification>> GetUserNotificationViewedAsync(Client client, int limit) => await _genericRepository.Where(m => m.ClientOwnerId == client.Id).Where(m => m.isViewed == true).Take(limit).ToListAsync();
+        public async Task<List<Notification>> GetNonViewedAsync(Client client) => await (await _genericRepository.GetQueryableAsync()).Where(m => m.ClientOwnerId == client.Id).Where(m => m.isViewed == false).ToListAsync();
+        public async Task<List<Notification>> GetUserNotificationViewedAsync(Client client, int limit) => await (await _genericRepository.GetQueryableAsync()).Where(m => m.ClientOwnerId == client.Id).Where(m => m.isViewed == true).Take(limit).ToListAsync();
         public async Task SetNotificationClientViewed(Client client)
         {
-            var query = await _genericRepository.Where(m => m.ClientOwnerId == client.Id).Where(m => m.isViewed == false).ToListAsync();
+            var query = await (await _genericRepository.GetQueryableAsync()).Where(m => m.ClientOwnerId == client.Id).Where(m => m.isViewed == false).ToListAsync();
             query.ForEach(m => m.isViewed = true);
             await UpdateManyAsync(query);
         }

@@ -2385,3 +2385,12 @@ p.form-note.req:after {
     color: #d34646;
     margin-left: 3px;
 }
+
+._cl_footer {
+    display: flex;
+    justify-content: space-around;
+    font-size: 13px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    color: #d1d3d9;
+}

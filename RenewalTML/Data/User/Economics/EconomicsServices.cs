@@ -15,7 +15,7 @@ namespace RenewalTML.Data
     public interface IEconomicsServices
     {
         Task CompleteTransferPay(Client inTrans, Client toTrans, int spendMoney, int SentMoney);
-        Task CompleteRequest(bool isTransactionApproved, FillBalanceTicketModel model, Client toApproval);
+        Task CompleteRequest(bool isTransactionApproved, FillBalanceTicketModel model, int toApprovalId);
     }
 
     public class EconomicsServices : ApplicationService, IEconomicsServices
@@ -36,16 +36,17 @@ namespace RenewalTML.Data
 
         [UnitOfWork]
         [DisableValidation]
-        public async Task CompleteRequest(bool isTransactionApproved, FillBalanceTicketModel model, Client toApproval)
+        public async Task CompleteRequest(bool isTransactionApproved, FillBalanceTicketModel model, int toApprovalId)
         {
+            var toApproval = await _clientManager.GetAsync(toApprovalId);
+
             if (isTransactionApproved)
             {
                 await _transactionServices.CreateAndApplyTransaction(new Transaction()
                 {
                     Date = DateTimeAddon.NowDateTimeStrings(),
                     Name = "Одобренное пополнение счёта.",
-                    Information = "Администратор одобрил пополнение счёта {user:" + toApproval.Id + ":userImgName}" +
-                                    "</span>",
+                    Information = "Администратор одобрил пополнение счёта {user:" + toApproval.Id + ":userImgName}",
                     OutEntityId = 68, // TODO: fix to organization
                     ToEntityId = model._ticket.UserCreateId,
                     TransactionType = "{user:user}",

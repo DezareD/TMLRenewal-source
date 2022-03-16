@@ -1,5 +1,4 @@
 ﻿@inject NavigationManager UriHelper
-@inject IJSRuntime JS
 
 @code {
     [CascadingParameter(Name = "loyout_update")]
@@ -17,7 +16,6 @@
         UriHelper.NavigateTo(Url);
         //await JS.InvokeVoidAsync("Blazor._internal.navigationManager.navigateTo", Url, false, HardGo);
 
-        //await JS.InvokeVoidAsync("LoadingRepositry.changeUrl", Url);
         await loyout_update.InvokeAsync();
     }
 }

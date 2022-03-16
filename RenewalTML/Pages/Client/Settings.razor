@@ -232,7 +232,7 @@
 
     private ValidationMessageBlock EditImageValidationBlock { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    public override async Task OnInitializedComponent()
     {
         user = await _userServices.FindUserById(UserId);
         viewer = await _userServices.GetClient();
@@ -249,11 +249,11 @@
             editPasswordModel = new EditPasswordModel();
             _edcEditPassword = new EditContext(editPasswordModel);
 
-            await _js.InvokeVoidAsync("loadScript", "libs/cropper.js/cropper.min.js");
-            await _js.InvokeVoidAsync("loadScript", "libs/cropper.js/jquery-cropper.min.js");
-            await _js.InvokeVoidAsync("loadScript", "libs/tippy.js/tippy.min.js");
+            await _js.InvokeVoidAsync("loadSciptsModule", "loadScript", "libs/cropper.js/cropper.min.js");
+            await _js.InvokeVoidAsync("loadSciptsModule", "loadScript", "libs/cropper.js/jquery-cropper.min.js");
+            await _js.InvokeVoidAsync("loadSciptsModule", "loadScript", "libs/tippy.js/tippy.min.js");
 
-            await _js.InvokeVoidAsync("CreateTippyElement",
+            await _js.InvokeVoidAsync("tippyModule", "CreateTippyElement",
             new List<TooltipModel>() {
                 new TooltipModel(".-tp-autosave-info", "Данное поле автосохраняемое, просто вводите текст, а этот индикатор покажет статус изменения.", ToolTipStyles.DefaultStyle, width: 350)
                     });
@@ -262,10 +262,12 @@
 
             StateHasChanged();
 
-            await _js.InvokeVoidAsync("MaxHeightLoader");
+            await _js.InvokeVoidAsync("uiUtilsModule", "MaxHeightLoader");
         }
         else await _virtualNavigationServices.ReRedirectClient(VirtualNavigationServices.accessDeniedUrl, hardLoad: true);
     }
+
+    // TODO: recreate blazor.min.js file on .net6.0
 
     /* VALIDATORS */
 
@@ -363,7 +365,7 @@
 
         var fileStatic = new VirtualFileStatic(_webhostManager, _fileManager);
 
-        var jsonStringify = await _js.InvokeAsync<string>("CropperConnector.GetDataCropper", ".-js-get-cropped"); // получаем данные с кропера
+        var jsonStringify = await _js.InvokeAsync<string>("cropperModule", "GetDataCropper", ".-js-get-cropped"); // получаем данные с кропера
         var editFileAvatar = JsonConvert.DeserializeObject<CroppedImageInfo>(jsonStringify); // преобразуем данные в класс.
 
         if (isImageUploaded)
@@ -392,7 +394,7 @@
         var croppedFile = await _fileManager.GetCroppedImageFile(user.UserAvatar_cropp);
         mainUserAvatarImage = await _fileManager.GetPhysicFileUrl(user.UserAvatar_main);
         StateHasChanged();
-        await _js.InvokeVoidAsync("CropperConnector.InjectCropperToImage", ".-js-get-cropped", croppedFile.x, croppedFile.y, croppedFile.width, croppedFile.height);
+        await _js.InvokeVoidAsync("cropperModule", "InjectCropperToImage", ".-js-get-cropped", croppedFile.x, croppedFile.y, croppedFile.width, croppedFile.height);
         isProgressBarImageLoader = true;
 
         modalRefEditImage.Show();
@@ -458,6 +460,6 @@
 
         StateHasChanged();
 
-        await _js.InvokeVoidAsync("CropperConnector.InjectCropperToImage", ".-js-get-cropped"); // reinject
+        await _js.InvokeVoidAsync("cropperModule", "InjectCropperToImage", ".-js-get-cropped"); // reinject
     }
 }
