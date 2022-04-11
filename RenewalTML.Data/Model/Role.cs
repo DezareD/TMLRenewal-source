@@ -32,7 +32,6 @@ namespace RenewalTML.Data.Model
         public bool isHaveToAdministrateUserAccount { get; set; } // может ли администрировать аккаунты пользователей
         // блокировать, изменять экономику, изменять пароль, удалять и создавать новые аккаунты
 
-        public bool isHaveAccesToPremiumEditor { get; set; } // имеет ли доступ к большим настройкам в редакторе 
         public bool isHaveAccesToUltimateEditor { get; set; } // имеет ли доступ к админскому редактору текста.
 
         public bool isHaveAccesToViewSystemSettings { get; set; } // имеет ли доступ к просмотру списку настроек
@@ -40,5 +39,22 @@ namespace RenewalTML.Data.Model
         public bool isHaveAccesToEditSettings_Economic { get; set; } // изменять настройки экономики
 
         public bool isHaveAccesToOfflineSite { get; set; } // есть ли доступ к выключенному сайту?
+
+        /* premium zone */
+
+        public bool isHaveAccesToPremiumEditor { get; set; } // имеет ли доступ к большим настройкам в редакторе
+
+        public double OffToExchange { get; set; } // уменьшение процента на перевод между аккаунтами
+        public int AddMoneyLikesRequest { get; set; } // добавление денег за 1 лайк на посте
+
+        /* TODO:
+         * + 1. Добавить поля OffToExchange и AddMoneyLikesRequest
+         * + 2. Сделать проверку не равна ли скидка OffToExchange больше чем процент за перевод
+         * + 3. При изменении процента за перевод, проверить не является ли ставка ниже чем скидка у одной из роли
+         * + 4. Сделать логику уменшьшения процента и сделать визуализацию этого ( в информации и зачеркнутость в панельке )
+         * 5. Сделать информацию о количестве денег за лайки в Action а так же добавочную стоимость AddMoneyLikesRequest, а так же
+         * 6. показывать админу сколько пользователь может получить за этот пост денег ( показывать админу ставку с учётом премиума )
+         * 7. Добавить в SystemSettings ставку по лайкам
+         */
     }
 }

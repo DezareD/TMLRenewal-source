@@ -1,0 +1,380 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\Fearp\\source\\repos\\RenewalTML\\RenewalTML\\RenewalTML.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\Fearp\\source\\repos\\RenewalTML\\RenewalTML.Data\\RenewalTML.Data.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Fearp\\source\\repos\\RenewalTML\\RenewalTML.Data\\RenewalTML.Data.csproj",
+        "projectName": "RenewalTML.Data",
+        "projectPath": "C:\\Users\\Fearp\\source\\repos\\RenewalTML\\RenewalTML.Data\\RenewalTML.Data.csproj",
+        "packagesPath": "C:\\Users\\Fearp\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Fearp\\source\\repos\\RenewalTML\\RenewalTML.Data\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Fearp\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {},
+          "https://www.myget.org/F/vknet": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[6.0.3, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[6.0.3, )"
+            },
+            "Volo.Abp.Ddd.Domain": {
+              "target": "Package",
+              "version": "[5.1.4, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\Fearp\\source\\repos\\RenewalTML\\RenewalTML.EFCore\\RenewalTML.EFCore.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Fearp\\source\\repos\\RenewalTML\\RenewalTML.EFCore\\RenewalTML.EFCore.csproj",
+        "projectName": "RenewalTML.EFCore",
+        "projectPath": "C:\\Users\\Fearp\\source\\repos\\RenewalTML\\RenewalTML.EFCore\\RenewalTML.EFCore.csproj",
+        "packagesPath": "C:\\Users\\Fearp\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Fearp\\source\\repos\\RenewalTML\\RenewalTML.EFCore\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Fearp\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {},
+          "https://www.myget.org/F/vknet": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "C:\\Users\\Fearp\\source\\repos\\RenewalTML\\RenewalTML.Data\\RenewalTML.Data.csproj": {
+                "projectPath": "C:\\Users\\Fearp\\source\\repos\\RenewalTML\\RenewalTML.Data\\RenewalTML.Data.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Hangfire.MySqlStorage": {
+              "target": "Package",
+              "version": "[2.0.3, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[6.0.3, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[6.0.3, )"
+            },
+            "Volo.Abp.AspNetCore": {
+              "target": "Package",
+              "version": "[5.1.4, )"
+            },
+            "Volo.Abp.BackgroundJobs": {
+              "target": "Package",
+              "version": "[5.1.4, )"
+            },
+            "Volo.Abp.BackgroundJobs.Abstractions": {
+              "target": "Package",
+              "version": "[5.1.4, )"
+            },
+            "Volo.Abp.BackgroundJobs.HangFire": {
+              "target": "Package",
+              "version": "[5.1.4, )"
+            },
+            "Volo.Abp.Data": {
+              "target": "Package",
+              "version": "[5.1.4, )"
+            },
+            "Volo.Abp.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[5.1.4, )"
+            },
+            "Volo.Abp.EntityFrameworkCore.MySQL": {
+              "target": "Package",
+              "version": "[5.1.4, )"
+            },
+            "Volo.Abp.FeatureManagement.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[5.1.4, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\Fearp\\source\\repos\\RenewalTML\\RenewalTML\\RenewalTML.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Fearp\\source\\repos\\RenewalTML\\RenewalTML\\RenewalTML.csproj",
+        "projectName": "RenewalTML",
+        "projectPath": "C:\\Users\\Fearp\\source\\repos\\RenewalTML\\RenewalTML\\RenewalTML.csproj",
+        "packagesPath": "C:\\Users\\Fearp\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Fearp\\source\\repos\\RenewalTML\\RenewalTML\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Fearp\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {},
+          "https://www.myget.org/F/vknet": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "C:\\Users\\Fearp\\source\\repos\\RenewalTML\\RenewalTML.EFCore\\RenewalTML.EFCore.csproj": {
+                "projectPath": "C:\\Users\\Fearp\\source\\repos\\RenewalTML\\RenewalTML.EFCore\\RenewalTML.EFCore.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Blazorise": {
+              "target": "Package",
+              "version": "[0.9.4.1, )"
+            },
+            "Blazorise.Bootstrap": {
+              "target": "Package",
+              "version": "[0.9.4.1, )"
+            },
+            "Blazorise.Components": {
+              "target": "Package",
+              "version": "[0.9.4.1, )"
+            },
+            "Blazorise.Icons.FontAwesome": {
+              "target": "Package",
+              "version": "[0.9.4.1, )"
+            },
+            "BuildWebCompiler": {
+              "target": "Package",
+              "version": "[1.12.405, )"
+            },
+            "ImageProcessor": {
+              "target": "Package",
+              "version": "[2.9.1, )"
+            },
+            "ImageProcessor.Plugins.WebP": {
+              "target": "Package",
+              "version": "[1.3.0, )"
+            },
+            "Microsoft.AspNetCore.SignalR.Client": {
+              "target": "Package",
+              "version": "[6.0.3, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[6.0.3, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[6.0.3, )"
+            },
+            "Microsoft.TypeScript.MSBuild": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[4.6.2, )"
+            },
+            "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
+              "target": "Package",
+              "version": "[1.14.0, )"
+            },
+            "Serilog": {
+              "target": "Package",
+              "version": "[2.10.0, )"
+            },
+            "Serilog.Extensions.Hosting": {
+              "target": "Package",
+              "version": "[4.2.0, )"
+            },
+            "Serilog.Sinks.Async": {
+              "target": "Package",
+              "version": "[1.5.0, )"
+            },
+            "Serilog.Sinks.Console": {
+              "target": "Package",
+              "version": "[4.0.1, )"
+            },
+            "Serilog.Sinks.File": {
+              "target": "Package",
+              "version": "[5.0.0, )"
+            },
+            "System.Drawing.Common": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "Volo.Abp.AspNetCore": {
+              "target": "Package",
+              "version": "[5.1.4, )"
+            },
+            "Volo.Abp.AspNetCore.Mvc.UI.Bundling": {
+              "target": "Package",
+              "version": "[5.1.4, )"
+            },
+            "Volo.Abp.AspNetCore.Mvc.UI.Packages": {
+              "target": "Package",
+              "version": "[5.1.4, )"
+            },
+            "Volo.Abp.AspNetCore.SignalR": {
+              "target": "Package",
+              "version": "[5.1.4, )"
+            },
+            "Volo.Abp.Autofac": {
+              "target": "Package",
+              "version": "[5.1.4, )"
+            },
+            "Volo.Abp.BackgroundJobs.HangFire": {
+              "target": "Package",
+              "version": "[5.1.4, )"
+            },
+            "Volo.Abp.BackgroundWorkers.Hangfire": {
+              "target": "Package",
+              "version": "[5.1.4, )"
+            },
+            "Volo.Abp.Ddd.Application": {
+              "target": "Package",
+              "version": "[5.1.4, )"
+            },
+            "Volo.Abp.Security": {
+              "target": "Package",
+              "version": "[5.1.4, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

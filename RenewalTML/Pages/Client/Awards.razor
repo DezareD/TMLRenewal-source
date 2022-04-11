@@ -25,8 +25,8 @@
                         <p class="award-info">@((MarkupString)award.HTMLText)</p>
                     </div>
                     <div class="award-progress">
-                        <Progress Style="flex: 1;" Color="@(((award.Progress/award.ProgressFinal)*100) >= 100? Color.Success : Color.Primary)" Value="((award.Progress/award.ProgressFinal)*100)" />
-                        <p class="award-progress-info">@CurrencyAddon.Format(award.ProgressFinal) / @CurrencyAddon.Format(award.Progress)</p>
+                        <Progress Style="flex: 1;" Color="@(((award.Progress/award.ProgressFinal)*100) >= 100? Color.Success : Color.Primary)" Value="Convert.ToInt32((((double)(award.Progress)/(double)(award.ProgressFinal))*100))" />
+                        <p class="award-progress-info">@CurrencyAddon.Format(award.Progress) / @CurrencyAddon.Format(award.ProgressFinal)</p>
                     </div>
                 </div>
             }

@@ -19,11 +19,10 @@ using System.Linq;
 using RenewalTML.Hubs;
 using RenewalTML.Data;
 using Blazorise.Icons.FontAwesome;
-using Volo.Abp.BackgroundJobs.Hangfire;
-using Volo.Abp.BackgroundJobs;
 using Volo.Abp.BackgroundWorkers.Hangfire;
 using Newtonsoft.Json;
 using Volo.Abp.Auditing;
+using System;
 
 namespace RenewalTML
 {
@@ -33,9 +32,9 @@ namespace RenewalTML
         typeof(AbpAspNetCoreMvcUiBundlingModule),
         typeof(AbpAspNetCoreMvcUiPackagesModule),
         typeof(AbpSecurityModule),
-        typeof(AbpBackgroundWorkersHangfireModule)
-        //typeof(AbpBackgroundJobsModule),
-        //typeof(AbpBackgroundJobsHangfireModule)
+        typeof(AbpBackgroundWorkersHangfireModule),
+        typeof(VKBotModule)
+    //typeof(AbpBackgroundJobsHangfireModule)
     )]
     public class RenewalTMLApplicationModule : AbpModule
     {
@@ -43,6 +42,8 @@ namespace RenewalTML
         public static string ComplexVersion = "0.1";
         public static string ComplexRevision = "Pre-alpha Candidate";
         public static string ComplexVersionRevision = "r0.2";
+
+        // Application event
 
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
@@ -144,5 +145,10 @@ namespace RenewalTML
             var srvc = (IDataSeederServices)app.ApplicationServices.GetRequiredService(typeof(IDataSeederServices));
             srvc.SeedData();
         }
+    }
+
+    public class ApplicationReachedEventArgs : EventArgs
+    {
+        public IApplicationBuilder _applicationBuilder { get; set; }
     }
 }

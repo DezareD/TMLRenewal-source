@@ -1,6 +1,7 @@
 ﻿@page "/profile/{userId:int}/actions"
 
 @using RenewalTML.Data.Dto.Admin;
+@using System.Globalization
 
 @inject ITransactionServices _transactionServices
 @inject IRawTextHtmlizer _rawHtmlizer
@@ -191,6 +192,7 @@
 
     private Client user { get; set; }
     private Client viewer { get; set; }
+    private Role viewerRole { get; set; }
 
     private string CurrentAction { get; set; }
     private bool isEconomicBlocked { get; set; }
@@ -302,7 +304,7 @@
     {
         if (transferLoader)
         {
-            TransferMoneyError = new ValidationMessageBlock("Дождитесь окончания загрузки предидущего действия...", "error");
+            TransferMoneyError = new ValidationMessageBlock("Дождитесь окончания загрузки предыдущего действия...", "error");
             _sendMoneyModule.SetFielAllStatus(ValidationStatus.None);
             await _js.InvokeVoidAsync("uiUtilsModule", "ScrollToTop");
             StateHasChanged();
@@ -402,7 +404,7 @@
     {
         user = await _userServices.FindUserById(UserId);
         viewer = await _userServices.GetClient();
-        var role = await _roleServices.GetRoleAsync(user.RoleId);
+        viewerRole = await _roleServices.GetRoleAsync(user.RoleId);
 
         if (user != null)
         {
@@ -423,7 +425,7 @@
             }
             else await ActionHub(ActionId);
 
-            if (role.isBlockedEconomic)
+            if (viewerRole.isBlockedEconomic)
                 isEconomicBlocked = true;
 
 
@@ -460,19 +462,24 @@
 
                 TransferMoneyInformation = new ValidationMessageBlock("Вы находитесь на странице перевода денег. В окне ниже начните вводить никнейм пользователя. Вам выдаст варианты пользователей. Нажмите на один из них. Перевод осуществляется по логину пользователя. Логин у каждого пользователя разный и используется при входе. Вам не обязательно искать пользователя, вы можете ввести его логин сразу, если вы его знаете. Информация по переводам:" +
     "<ul>" +
-    "<li>Налоговая ставка за перевод: <bold>" + tax + "%</bold></li>" +
+    "<li>Налоговая ставка за перевод: <bold>" + (viewerRole.OffToExchange > 0? "<s>": "") + tax + (viewerRole.OffToExchange > 0? "</s>": "") + "%</bold></li>" +
+    (viewerRole.OffToExchange > 0? "<li>С учётом вашего уменьшения процента за перевод, налоговая ставка: <bold>" + (Convert.ToDouble(tax, CultureInfo.InvariantCulture) - viewerRole.OffToExchange) + "</bold></li>": "") +
     "<li>Минимальная сумма для перевода: <bold>100</bold></li>" +
     "</ul>", "info");
 
                 _sendMoneyModule = new ContextValidationModule<SendMoneyUserToUser>(new SendMoneyUserToUser());
-                _sendMoneyModule._model.Tax = Convert.ToDouble(await _systemConfiguration.Get("economic_transfer.tax"));
+                _sendMoneyModule._model.Tax = Convert.ToDouble(tax, CultureInfo.InvariantCulture) - viewerRole.OffToExchange;
 
                 break;
 
             case "requestMoney":
 
+            var requestMoneyCount = await _systemConfiguration.Get("economic_request.count");
+
                 RequestMoneyInformation = new ValidationMessageBlock("Вы можете пополнить счёт вашего аккаунта. Если вы активно создаете контент в какой либо из стран или группе, за свое творчество и актив вы можете получить воознаграждение:" +
     "<ul>" +
+    "<li>Количество денег за один лайк: " + (viewerRole.AddMoneyLikesRequest > 0? "<s>": "") + requestMoneyCount + (viewerRole.AddMoneyLikesRequest > 0? "</s>": "") + "</li>" +
+    (viewerRole.OffToExchange > 0? ("<li>С учётом вашего увелечения количества денег за один лайк, ваше количество денег за лайк: " + (Convert.ToInt32(requestMoneyCount)+ viewerRole.AddMoneyLikesRequest)  + "</li>" ) : "" ) +
     "<li>Страна\\группа\\организация в который вы создаете контент обязана входить в состав ММ как такогого.</li>" +
     "</ul>", "info");
 

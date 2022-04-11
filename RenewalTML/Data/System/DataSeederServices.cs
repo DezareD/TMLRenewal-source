@@ -43,6 +43,11 @@ namespace RenewalTML.Data
             {
                 RoleName = "Забаненный",
                 RequereName = RoleManager.defaultRoleName_banned
+            },
+            new Role()
+            {
+                RoleName = "Премиум",
+                RequereName = RoleManager.defaultRoleName_premium_default
             }
         };
 
@@ -76,7 +81,7 @@ namespace RenewalTML.Data
                 y = 0,
                 width = 240,
                 height = 240,
-                ImageId = seedDataFiledList[0].Id,
+                ImageId = 1,
             },
             new CroppedImageFile()
             {
@@ -84,7 +89,7 @@ namespace RenewalTML.Data
                 y = 0,
                 width = 64,
                 height = 64,
-                ImageId = seedDataFiledList[1].Id,
+                ImageId = 2,
             }
         };
 
@@ -99,6 +104,16 @@ namespace RenewalTML.Data
                 Value = 500,
                 Text = "Добро пожаловать в TML Renewal! За успешную регистрацию на нашем сайте вы получаете эту ачивку, а так же символическое вознаграждение в виде 500 Кеклар.",
                 requereName = "achievement_register"
+            },
+            new Award()
+            {
+                AwardType = "type_money",
+                Icon = "<i class=\"fad fa-browser\"></i>",
+                ProgressFinal = 10,
+                Name = "Актив, актив и ещё раз актив...",
+                Value = 10000,
+                Text = "Сделайте 10 успешных заявок на пополнение счёта и получите 10.000 Валюты.",
+                requereName = "achievement_request"
             }
         };
 
@@ -143,6 +158,30 @@ namespace RenewalTML.Data
                 Type = "type_system",
                 UniqId = "system_main.registerison",
                 Value = "True"
+            },
+            new SystemConfiguration()
+            {
+                Information = "Тик рейт бота",
+                RequeredType = "int",
+                Type = "type_system",
+                UniqId = "system_main.bottickrate",
+                Value = "2000"
+            },
+            new SystemConfiguration()
+            {
+                Information = "Минимальная стоимость доната VK Donuts",
+                RequeredType = "int",
+                Type = "type_system",
+                UniqId = "system_main.costsubscrive",
+                Value = "200"
+            },
+            new SystemConfiguration()
+            {
+                Information = "Количество денег за лайки ( дефолтно )",
+                RequeredType = "int",
+                Type = "type_economic",
+                UniqId = "economic_request.count",
+                Value = "100"
             }
         };
     }
@@ -210,7 +249,7 @@ namespace RenewalTML.Data
                 }
 
 
-                Log.Information("Phase 4. Entity: 'Files");
+                Log.Information("Phase 4. Entity: 'Files'");
 
                 foreach (var file in DataSeedStaticElements.seedDataFiledList)
                 {
@@ -221,6 +260,14 @@ namespace RenewalTML.Data
                         await _fileManager.AddAsync(file);
                         Log.Information($"Phase 4. Entity: 'SystemConfiguration'. Entity '{file.Name}' has been added by data seed process.");
                     }
+                }
+
+                var croppedFilesCount = (await _virtualCroopedFileManager.GetAllAsync()).Count();
+                if(croppedFilesCount < 2)
+                {
+                    Log.Information("\tPhase 4.1. Entity: 'Files.CroppedFiles'");
+                    await _virtualCroopedFileManager.AddAsync(DataSeedStaticElements.croppedSeedDataList[0]);
+                    await _virtualCroopedFileManager.AddAsync(DataSeedStaticElements.croppedSeedDataList[1]);
                 }
 
                 Log.Information("Data seed process success finally completed.");

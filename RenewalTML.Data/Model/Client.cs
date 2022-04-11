@@ -44,5 +44,8 @@ namespace RenewalTML.Data.Model
 
         /* ticket's */
         public int TicketsNonViewCount { get; set; }
+
+        /* premium */
+        public bool IsHavePremiumBefore { get; set; } // имел ли пользователь премиум до этого?
     }
 }

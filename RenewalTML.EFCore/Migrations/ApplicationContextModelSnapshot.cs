@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RenewalTML.EFCore;
 using Volo.Abp.EntityFrameworkCore;
 
+#nullable disable
+
 namespace RenewalTML.EFCore.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
@@ -15,8 +17,8 @@ namespace RenewalTML.EFCore.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("_Abp_DatabaseProvider", EfCoreDatabaseProvider.MySql)
-                .HasAnnotation("Relational:MaxIdentifierLength", 64)
-                .HasAnnotation("ProductVersion", "5.0.7");
+                .HasAnnotation("ProductVersion", "6.0.3")
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("RenewalTML.Data.Model.AdminAction", b =>
                 {
@@ -28,19 +30,19 @@ namespace RenewalTML.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Date")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("HtmlText")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Icon")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("Priority")
                         .HasColumnType("int");
 
                     b.Property<string>("Type")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -54,25 +56,25 @@ namespace RenewalTML.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("AwardType")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Icon")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("ProgressFinal")
                         .HasColumnType("int");
 
                     b.Property<string>("Text")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("Value")
                         .HasColumnType("int");
 
                     b.Property<string>("requereName")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -94,20 +96,23 @@ namespace RenewalTML.EFCore.Migrations
                     b.Property<int>("GeneralExp")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsHavePremiumBefore")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<int>("Level")
                         .HasColumnType("int");
 
                     b.Property<string>("PasswordHash")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("PasswordSalt")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
 
                     b.Property<string>("ScreenName")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("TicketsNonViewCount")
                         .HasColumnType("int");
@@ -122,10 +127,10 @@ namespace RenewalTML.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("UserName")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("VkId")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -185,16 +190,16 @@ namespace RenewalTML.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Extension")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Path")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("SitePath")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<double>("Size")
                         .HasColumnType("double");
@@ -217,16 +222,16 @@ namespace RenewalTML.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Date")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Information")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("LogoType")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Text")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("isViewed")
                         .HasColumnType("tinyint(1)");
@@ -242,14 +247,20 @@ namespace RenewalTML.EFCore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<int>("AddMoneyLikesRequest")
+                        .HasColumnType("int");
+
+                    b.Property<double>("OffToExchange")
+                        .HasColumnType("double");
+
                     b.Property<string>("RequereName")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("RoleName")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("RoleStyle")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("isBlockedEconomic")
                         .HasColumnType("tinyint(1)");
@@ -305,19 +316,19 @@ namespace RenewalTML.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Information")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("RequeredType")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Type")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("UniqId")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Value")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -331,31 +342,31 @@ namespace RenewalTML.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("AdminInformation")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("AdminViewdId")
                         .HasColumnType("int");
 
                     b.Property<string>("DataView")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Date")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("JsonObject")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("SystemInformation")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("SystemName")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("TicketStatus")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("TicketType")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("UserCreateId")
                         .HasColumnType("int");
@@ -372,13 +383,13 @@ namespace RenewalTML.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Date")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Information")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("OutEntityId")
                         .HasColumnType("int");
@@ -387,7 +398,7 @@ namespace RenewalTML.EFCore.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("TransactionType")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("Value")
                         .HasColumnType("int");

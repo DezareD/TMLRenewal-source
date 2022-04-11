@@ -6,7 +6,9 @@
 
 @inject ITicketServices _ticketServices
 @inject IVirtualFileServices _fileManager
+@inject ISystemConfigurationServices _systemConfiguration
 @inject IEconomicsServices _economicsServices
+@inject IAwardServices _awardServices
 
 <div class="block p-normal">
     <div class="admin-header">
@@ -29,6 +31,8 @@
                         <ValidationBlock block="RequestMoneyError" />
                     </div>
                 }
+
+                <p class="note-form form-row">Количество денег за один лайк для пользователя: @(requestMoneyCount + userRequestMoney)</p>
 
     <div class="user-form-factor-action-panel">
         <Validations @ref="_adminRequestTicketApprovalModule._validationContext" Model="@_adminRequestTicketApprovalModule._model" Mode="ValidationMode.Auto" ValidateOnLoad="false">
@@ -121,8 +125,9 @@
     private MultiImageForm _refMultiImageForm { get; set; }
 
     private Client adminViewer { get; set; }
-
+    private int requestMoneyCount { get; set; }
     private bool isStartRequestMoney { get; set; }
+    private int userRequestMoney { get; set; }
 
     private async Task CheckRequest()
     {
@@ -188,6 +193,10 @@
 
             FillBalanceTickets_last.CountMoney = _adminRequestTicketApprovalModule._model.Money;
 
+            var user = await _userServices.FindUserById(FillBalanceTickets_last._ticket.UserCreateId);
+
+            await _awardServices.AddProgressToAward("achievement_request", user, 1);
+
             await _economicsServices.CompleteRequest(_adminRequestTicketApprovalModule._model.AdminApproval == "ok",
             FillBalanceTickets_last,
             FillBalanceTickets_last._ticket.UserCreateId);
@@ -217,6 +226,11 @@
             _adminRequestTicketApprovalModule._model.Text = FillBalanceTickets_last.TextInformation;
             _adminRequestTicketApprovalModule._model.AdminText = "";
 
+            var user = await _userServices.FindUserById(FillBalanceTickets_last._ticket.UserCreateId);
+            var role = await _roleServices.GetClientRole(user);
+
+            userRequestMoney = role.AddMoneyLikesRequest;
+
             _adminRequestTicketApprovalModule._model.FillTicketImages = ComponentUtils.MultiImageFormRecreate(isReadOnly: true);
 
             int index = 0;
@@ -242,6 +256,8 @@
 
         if (role.isHaveAccesToAdminPanel && role.isHaveToModerateUserAccount)
         {
+            requestMoneyCount = Convert.ToInt32(await _systemConfiguration.Get("economic_request.count"));
+
             _adminRequestTicketApprovalModule = new ContextValidationModule<AdminRequestTicketModel>(new AdminRequestTicketModel());
             await UpdateTicket();
 

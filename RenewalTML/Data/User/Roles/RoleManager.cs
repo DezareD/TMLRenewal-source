@@ -15,6 +15,7 @@ namespace RenewalTML.Data
         public static readonly string defaultRoleName_user = "default";
         public static readonly string defaultRoleName_guest = "guest";
         public static readonly string defaultRoleName_banned = "banned";
+        public static readonly string defaultRoleName_premium_default = "premium_default";
 
         public RoleManager(IRepository<Role, int> roleManager)
         {
@@ -25,5 +26,7 @@ namespace RenewalTML.Data
         public async Task<Role> GetDefaultRoleUser() => await AsyncExecuter.FirstOrDefaultAsync((await _genericRepository.GetQueryableAsync()).Where(m => m.RequereName == defaultRoleName_user));
         public async Task<Role> GetDefaultRoleGuest() => await AsyncExecuter.FirstOrDefaultAsync((await _genericRepository.GetQueryableAsync()).Where(m => m.RequereName == defaultRoleName_guest));
         public async Task<Role> GetDefaultRoleBanned() => await AsyncExecuter.FirstOrDefaultAsync((await _genericRepository.GetQueryableAsync()).Where(m => m.RequereName == defaultRoleName_banned));
+        public async Task<Role> GetDefaultPremiumDefault() => await AsyncExecuter.FirstOrDefaultAsync((await _genericRepository.GetQueryableAsync()).Where(m => m.RequereName == defaultRoleName_premium_default));
+
     }
 }

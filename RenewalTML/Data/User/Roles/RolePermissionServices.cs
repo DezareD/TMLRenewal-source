@@ -24,6 +24,7 @@ namespace RenewalTML.Data
         Task<Role> GetRoleAsync(int id);
         Task CreateRole(Role role);
         Task DeleteRole(Role role);
+        Task<Role> GetRoleByUniqId(string uniqId);
 
         Task RebaseBeforeDelete(int deleteRoleId);
     }
@@ -87,6 +88,7 @@ namespace RenewalTML.Data
 
         public async Task<List<Role>> GetAllRoles() => (await _roleManager.GetAllAsync()).ToList();
         public async Task<Role> GetRoleAsync(int id) => await _roleManager.GetAsync(id);
+        public async Task<Role> GetRoleByUniqId(string uniqId) => (await _roleManager.GetAllAsync()).Where(m => m.RequereName == uniqId).FirstOrDefault();
         public async Task CreateRole(Role role) => await _roleManager.AddAsync(role);
         public async Task DeleteRole(Role role) => await _roleManager.DeleteAsync(role);
     }

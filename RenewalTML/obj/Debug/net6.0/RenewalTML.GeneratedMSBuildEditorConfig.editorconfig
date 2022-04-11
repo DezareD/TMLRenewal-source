@@ -1,0 +1,184 @@
+is_global = true
+build_property.TargetFramework = net6.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = RenewalTML
+build_property.RootNamespace = RenewalTML
+build_property.ProjectDir = C:\Users\Fearp\source\repos\RenewalTML\RenewalTML\
+build_property.RazorLangVersion = 6.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = true
+build_property.MSBuildProjectDirectory = C:\Users\Fearp\source\repos\RenewalTML\RenewalTML
+build_property._RazorSourceGeneratorDebug = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Pages/AccessDenied.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjZXNzRGVuaWVkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Pages/Admin/Apanel.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cQXBhbmVsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Pages/Admin/RequestMoneyTicket.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cUmVxdWVzdE1vbmV5VGlja2V0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Pages/Admin/Roles.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cUm9sZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Pages/Admin/SystemSettings.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cU3lzdGVtU2V0dGluZ3MucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Pages/Admin/UserList.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cVXNlckxpc3QucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Pages/Admin/UserSingle.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cVXNlclNpbmdsZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Pages/Client/Action.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2xpZW50XEFjdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Pages/Client/Authorization.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2xpZW50XEF1dGhvcml6YXRpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Pages/Client/Awards.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2xpZW50XEF3YXJkcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Pages/Client/Leveling.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2xpZW50XExldmVsaW5nLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Pages/Client/Profile.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2xpZW50XFByb2ZpbGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Pages/Client/Settings.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2xpZW50XFNldHRpbmdzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Pages/Client/Tickets.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2xpZW50XFRpY2tldHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Pages/Error.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Pages/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/Admin/AdminActionBlock.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXEFkbWluXEFkbWluQWN0aW9uQmxvY2sucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/Clients/ClientAvatar.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXENsaWVudHNcQ2xpZW50QXZhdGFyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/Clients/ClientFormatter.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXENsaWVudHNcQ2xpZW50Rm9ybWF0dGVyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/Clients/ClientRoleFormat.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXENsaWVudHNcQ2xpZW50Um9sZUZvcm1hdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/Designing/DoWorkBlock.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXERlc2lnbmluZ1xEb1dvcmtCbG9jay5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/Designing/MoneyLogotype.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXERlc2lnbmluZ1xNb25leUxvZ290eXBlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/Designing/SiteLogotype.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXERlc2lnbmluZ1xTaXRlTG9nb3R5cGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/Designing/VKLogotype.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXERlc2lnbmluZ1xWS0xvZ290eXBlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/Forms/InputLoader.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXEZvcm1zXElucHV0TG9hZGVyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/Forms/MarkDownEditor.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXEZvcm1zXE1hcmtEb3duRWRpdG9yLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/Forms/MultiImageForm.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXEZvcm1zXE11bHRpSW1hZ2VGb3JtLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/Forms/UserAutoComplete.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXEZvcm1zXFVzZXJBdXRvQ29tcGxldGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/MainBar.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5CYXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/Navigation/NavigationBlock.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdmlnYXRpb25cTmF2aWdhdGlvbkJsb2NrLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/Navigation/PagingBlock.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdmlnYXRpb25cUGFnaW5nQmxvY2sucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/Navigation/ToLink.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdmlnYXRpb25cVG9MaW5rLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/Navigation/ToPage.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdmlnYXRpb25cVG9QYWdlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/Notifications/NotificationItem.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5vdGlmaWNhdGlvbnNcTm90aWZpY2F0aW9uSXRlbS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/Transactions/TransactionModuleBlock.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFRyYW5zYWN0aW9uc1xUcmFuc2FjdGlvbk1vZHVsZUJsb2NrLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/Validation/ValidationBlock.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFZhbGlkYXRpb25cVmFsaWRhdGlvbkJsb2NrLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Shared/Validation/ValidatorEnchanted.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFZhbGlkYXRpb25cVmFsaWRhdG9yRW5jaGFudGVkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/Pages/_Host.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0hvc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = X1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 

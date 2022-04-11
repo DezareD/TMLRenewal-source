@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <_PublishTargetUrl>C:\Users\Fearp\Desktop\_tml_renewal_publish</_PublishTargetUrl>
+    <History>True|2022-03-08T09:27:53.8880418Z;True|2022-03-08T12:22:08.8714161+03:00;True|2022-03-08T11:43:36.1265292+03:00;True|2022-03-08T11:37:21.3593557+03:00;True|2022-03-08T11:34:52.4586130+03:00;True|2022-03-08T11:32:19.9416753+03:00;True|2022-03-08T11:23:08.3034946+03:00;True|2022-03-08T11:19:57.0135294+03:00;True|2022-03-08T11:15:46.3870028+03:00;True|2022-03-08T11:11:02.7267573+03:00;True|2022-03-08T11:09:10.2589597+03:00;True|2022-03-08T00:26:48.9602011+03:00;True|2022-02-28T00:04:58.6011978+03:00;</History>
+  </PropertyGroup>
+</Project>

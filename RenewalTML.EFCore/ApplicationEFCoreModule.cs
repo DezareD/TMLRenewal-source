@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
+using System.Threading;
 using Volo.Abp;
 using Volo.Abp.BackgroundJobs.Hangfire;
 using Volo.Abp.EntityFrameworkCore;
@@ -23,22 +24,35 @@ namespace RenewalTML.EFCore
          * Add-Migration, Update-Database и т.д */
         public ApplicationContext CreateDbContext(string[] args)
         {
-            var configuration = BuildConfiguration();
+            var connString = GetConnectionString();
 
             var builder = new DbContextOptionsBuilder<ApplicationContext>()
                 .UseMySql(
-                        configuration.GetConnectionString("Default"),
-                        ServerVersion.AutoDetect(configuration.GetConnectionString("Default"))
+                        connString,
+                        ServerVersion.AutoDetect(connString)
                         );
 
 
             return new ApplicationContext(builder.Options);
+        }
 
+        public static string GetConnectionString()
+        {
+            var host = Environment.GetEnvironmentVariable("DBHOST") ?? "host.docker.internal";
+            var port = Environment.GetEnvironmentVariable("DBPORT") ?? "3306";
+            var password = Environment.GetEnvironmentVariable("MYSQL_PASSWORD") ?? "N1vs1nq12";
+            var userid = Environment.GetEnvironmentVariable("MYSQL_USER") ?? "DezareD";
+            var usersDataBase = Environment.GetEnvironmentVariable("MYSQL_DATABASE") ?? "tradeleague_test";
+
+            Console.WriteLine($"server={host};userid={userid};pwd={password};port={port};database={usersDataBase};Allow User Variables=true");
+
+            return $"server={host};userid={userid};pwd={password};port={port};database={usersDataBase};Allow User Variables=true";
         }
 
         public override void ConfigureServices(ServiceConfigurationContext context)
         {
-            var configuration = BuildConfiguration();
+            var connString = GetConnectionString();
+
 
             context.Services.AddAbpDbContext<ApplicationContext>(options =>
             {
@@ -47,7 +61,7 @@ namespace RenewalTML.EFCore
 
             context.Services.AddHangfire(config =>
             {
-                config.UseStorage(new MySqlStorage(configuration.GetConnectionString("Default"), new MySqlStorageOptions
+                config.UseStorage(new MySqlStorage(connString, new MySqlStorageOptions
                 {
                     TablesPrefix = "hfg."
                 }));
@@ -64,8 +78,8 @@ namespace RenewalTML.EFCore
                 options.Configure(ctx =>
                 {
                     ctx.DbContextOptions.UseMySql(
-                        configuration.GetConnectionString("Default"),
-                        ServerVersion.AutoDetect(configuration.GetConnectionString("Default")));
+                        connString,
+                        ServerVersion.AutoDetect(connString));
                 });
             });
         }
@@ -80,15 +94,6 @@ namespace RenewalTML.EFCore
             {
                 Authorization = new[] { new HangfireAuthorizationFilter() }
             });
-        }
-
-        private static IConfigurationRoot BuildConfiguration()
-        {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../RenewalTML/Properties/"))
-                .AddJsonFile("appsettings.json", optional: false);
-
-            return builder.Build();
         }
     }
 }

@@ -32,6 +32,8 @@ namespace RenewalTML.Data
         Task<Client> FindUserById(int id);
         Task UpdateUserScreenName(Client user, string screename);
 
+        Task<Client> FindClientWithVKID(long id);
+
         Task<bool> UserPasswordIsOk(Client client, string password);
         Task UpdateUserPassword(Client user, string password);
 
@@ -191,6 +193,9 @@ namespace RenewalTML.Data
         {
             return await _clientManager.FindClientWithVKID(Convert.ToString(model.session.mid));
         }
+
+        public async Task<Client> FindClientWithVKID(long id) => await _clientManager.FindClientWithVKID(Convert.ToString(id));
+
 
         public static string GenerateRandomString(int length, bool withSpecialChars = true)
         {

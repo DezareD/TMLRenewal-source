@@ -29,32 +29,36 @@ namespace RenewalTML.Data
         [UnitOfWork]
         public async Task CreateAndApplyTransaction(Transaction model)
         {
-            switch(model.TransactionType)
+            try
             {
-                case "{user:user}":
-                    var userOut = await _clientManager.GetAsync(model.OutEntityId);
-                    var userTo = await _clientManager.GetAsync(model.ToEntityId);
+                switch (model.TransactionType)
+                {
+                    case "{user:user}":
+                        var userOut = await _clientManager.GetAsync(model.OutEntityId);
+                        var userTo = await _clientManager.GetAsync(model.ToEntityId);
 
-                    userOut.Balance -= model.Value;
-                    // TODO: user balancd changed
-                    await _clientManager.UpdateAsync(userOut);
+                        userOut.Balance -= model.Value;
+                        // TODO: user balancd changed
+                        await _clientManager.UpdateAsync(userOut);
 
-                    userTo.Balance += model.Value;
-                    // TODO: user balancd changed
-                    await _clientManager.UpdateAsync(userTo);
+                        userTo.Balance += model.Value;
+                        // TODO: user balancd changed
+                        await _clientManager.UpdateAsync(userTo);
 
-                    await _transactionManager.AddAsync(model);
+                        await _transactionManager.AddAsync(model);
 
-                    break;
+                        break;
 
-                // TODO: Первоначальные операции будут идти от пользователя главный админ как от системы. 
-                // Потом все будет перенесено в главную и другие организации!
-                // TODO: Other...
+                    // TODO: Первоначальные операции будут идти от пользователя главный админ как от системы. 
+                    // Потом все будет перенесено в главную и другие организации!
+                    // TODO: Other...
 
 
-                default:
-                    throw new ArgumentException("TransactionModelType is invalid.", nameof(model));
+                    default:
+                        throw new ArgumentException("TransactionModelType is invalid.", nameof(model));
+                }
             }
+            catch (Exception) { } // TODO: Exceptions :0
         }
 
         public async Task<TransactionModule> GetEntityTransaction(Client client, IRawTextHtmlizer rawTextHtmlizer, int limit = 16, int skipped = 0)

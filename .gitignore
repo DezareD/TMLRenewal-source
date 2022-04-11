@@ -1,8 +1,0 @@
-**/.vs
-appsettings.json
-**/PublishProfiles
-**/obj
-**/Logs
-**/bin
-**/userImages/**
-#compilerconfig.json

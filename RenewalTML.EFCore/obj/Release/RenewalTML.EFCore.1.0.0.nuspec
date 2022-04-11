@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>RenewalTML.EFCore</id>
+    <version>1.0.0</version>
+    <authors>RenewalTML.EFCore</authors>
+    <description>Package Description</description>
+    <dependencies>
+      <group targetFramework="net5.0">
+        <dependency id="RenewalTML.Data" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="Volo.Abp.Data" version="4.3.3" exclude="Build,Analyzers" />
+        <dependency id="Volo.Abp.EntityFrameworkCore" version="4.3.3" exclude="Build,Analyzers" />
+        <dependency id="Volo.Abp.EntityFrameworkCore.MySQL" version="4.3.3" exclude="Build,Analyzers" />
+        <dependency id="Volo.Abp.FeatureManagement.EntityFrameworkCore" version="4.3.3" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="C:\Users\Fearp\source\repos\RenewalTML\RenewalTML.EFCore\bin\Release\net5.0\RenewalTML.EFCore.runtimeconfig.json" target="lib\net5.0\RenewalTML.EFCore.runtimeconfig.json" />
+    <file src="C:\Users\Fearp\source\repos\RenewalTML\RenewalTML.EFCore\bin\Release\net5.0\RenewalTML.EFCore.dll" target="lib\net5.0\RenewalTML.EFCore.dll" />
+  </files>
+</package>

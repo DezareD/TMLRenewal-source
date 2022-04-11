@@ -6,45 +6,51 @@
 
 @if (_isComplete)
 {
-<div class="block block-page-information" style="background: url(/imgs/application/page_banner.png)">
-    <p class="title">Ваши заявки</p>
-    <p class="info">Тут вы можете просмотреть список всех ваших заявок и их статусы</p>
- </div>
+    <div class="block block-page-information" style="background: url(/imgs/application/page_banner.png)">
+        <p class="title">Ваши заявки</p>
+        <p class="info">Тут вы можете просмотреть список всех ваших заявок и их статусы</p>
+    </div>
 }
 <div class="block p-normal -js-page-maxheight-relaod" style="@(_isComplete? "max-height:900px;":"max-height:90px;")">
     @if (_isComplete)
     {
-    <div class="outoftable">
-        <Table>
-            <TableHeader>
-                <TableRow>
-                    <TableHeaderCell>#</TableHeaderCell>
-                    <TableHeaderCell>Дата создания</TableHeaderCell>
-                    <TableHeaderCell>Название</TableHeaderCell>
-                    <TableHeaderCell>Системная информация</TableHeaderCell>
-                    <TableHeaderCell>Дополнительная админ информация</TableHeaderCell>
-                    <TableHeaderCell>Просмотревший администратор</TableHeaderCell>
-                    <TableHeaderCell>Дата просмотра</TableHeaderCell>
-                    <TableHeaderCell>Вердикт</TableHeaderCell>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                @foreach (var item in _tickets)
-                {
+        <div class="outoftable">
+            <Table>
+                <TableHeader>
                     <TableRow>
-                        <TableRowCell>@item.Id</TableRowCell>
-                        <TableRowCell>@DateTimeAddon.StringToDateTimeFormat(item.Date)</TableRowCell>
-                        <TableRowCell>@item.SystemName</TableRowCell>
-                        <TableRowCell>@item.SystemInformation</TableRowCell>
-                        <TableRowCell>@item.AdminInformation</TableRowCell>
-                        <TableRowCell><ClientFormatter ClientId="@item.AdminViewdId"/></TableRowCell>
-                        <TableRowCell>@DateTimeAddon.StringToDateTimeFormat(item.DataView)</TableRowCell>
-                        <TableRowCell><span class="status @item.TicketStatus">@item.TicketStatus</span></TableRowCell>
+                        <TableHeaderCell>#</TableHeaderCell>
+                        <TableHeaderCell>Дата создания</TableHeaderCell>
+                        <TableHeaderCell>Название</TableHeaderCell>
+                        <TableHeaderCell>Системная информация</TableHeaderCell>
+                        <TableHeaderCell>Дополнительная админ информация</TableHeaderCell>
+                        <TableHeaderCell>Просмотревший администратор</TableHeaderCell>
+                        <TableHeaderCell>Дата просмотра</TableHeaderCell>
+                        <TableHeaderCell>Вердикт</TableHeaderCell>
                     </TableRow>
-                }
-            </TableBody>
-        </Table>
-    </div>
+                </TableHeader>
+                <TableBody>
+                    @{
+                        var k = 1;
+                    }
+
+                    @foreach (var item in _tickets)
+                    {
+                        <TableRow Class="@getClassToRow(preOpenedNonViewTransacation, k)">
+                            <TableRowCell>@item.Id</TableRowCell>
+                            <TableRowCell>@DateTimeAddon.StringToDateTimeFormat(item.Date)</TableRowCell>
+                            <TableRowCell>@item.SystemName</TableRowCell>
+                            <TableRowCell>@item.SystemInformation</TableRowCell>
+                            <TableRowCell>@item.AdminInformation</TableRowCell>
+                            <TableRowCell><ClientFormatter ClientId="@item.AdminViewdId" /></TableRowCell>
+                            <TableRowCell>@DateTimeAddon.StringToDateTimeFormat(item.DataView)</TableRowCell>
+                            <TableRowCell><span class="status @item.TicketStatus">@item.TicketStatus</span></TableRowCell>
+                        </TableRow>
+
+                        k++;
+                    }
+                </TableBody>
+            </Table>
+        </div>
     }
     else
     {
@@ -58,6 +64,9 @@
 
     private Client user { get; set; }
     private List<Ticket> _tickets { get; set; }
+    private int preOpenedNonViewTransacation { get; set; }
+
+    private string getClassToRow(int pr, int curr) => pr >= curr ? "active-table-row" : "";
 
     public override async Task OnInitializedComponent()
     {
@@ -71,6 +80,7 @@
                 return;
             }
 
+            preOpenedNonViewTransacation = user.TicketsNonViewCount;
             user.TicketsNonViewCount = 0;
             await _userServices.UpdateUser(user);
 

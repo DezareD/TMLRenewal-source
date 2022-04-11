@@ -1,0 +1,31 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "af4b16c4-4c9a-4097-8818-6d096d744bc4": {
+      "ProjectGuid": "af4b16c4-4c9a-4097-8818-6d096d744bc4",
+      "DisplayName": "RenewalTML",
+      "ColorIndex": 0
+    },
+    "2355fb07-54fe-45cc-a759-79a31cf52b2e": {
+      "ProjectGuid": "2355fb07-54fe-45cc-a759-79a31cf52b2e",
+      "DisplayName": "RenewalTML.Data",
+      "ColorIndex": 1
+    },
+    "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3": {
+      "ProjectGuid": "a2fe74e1-b743-11d0-ae1a-00a0c90fffc3",
+      "DisplayName": "Прочие файлы",
+      "ColorIndex": -1
+    },
+    "957f798f-9da8-4462-af42-816e242483b7": {
+      "ProjectGuid": "957f798f-9da8-4462-af42-816e242483b7",
+      "DisplayName": "RenewalTML.EFCore",
+      "ColorIndex": 2
+    },
+    "e52ed9e6-849b-4db6-8289-1fa1d3c63e3d": {
+      "ProjectGuid": "e52ed9e6-849b-4db6-8289-1fa1d3c63e3d",
+      "DisplayName": "Solution Items",
+      "ColorIndex": 3
+    }
+  },
+  "NextColorIndex": 4
+}

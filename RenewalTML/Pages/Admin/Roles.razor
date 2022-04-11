@@ -3,6 +3,7 @@
 @inherits RenewalTMLComponentBase
 
 @inject IAdminActionServices _adminActionServices
+@inject ISystemConfigurationServices _systemConfiguration
 
     <div class="block p-normal">
         <div class="admin-header">
@@ -36,6 +37,8 @@
                                 <TableHeaderCell>Можно ли менять системные настройки сайта?</TableHeaderCell>
                                 <TableHeaderCell>Можно ли менять экономические настройки сайта?</TableHeaderCell>
                                 <TableHeaderCell>Есть ли доступ к выключенному сайту?</TableHeaderCell>
+                                <TableHeaderCell>Скидка на процент перевода</TableHeaderCell>
+                                <TableHeaderCell>Дополнительные деньги за лайк</TableHeaderCell>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -71,6 +74,8 @@
                                 <TableRowCell><div class="disabled-cb centred-table"><Check Class="disabled" @bind-Checked="item.role.isHaveAccesToEditSettings_System" Disabled="true" TValue="bool"></Check></div></TableRowCell>
                                 <TableRowCell><div class="disabled-cb centred-table"><Check Class="disabled" @bind-Checked="item.role.isHaveAccesToEditSettings_Economic" Disabled="true" TValue="bool"></Check></div></TableRowCell>
                                 <TableRowCell><div class="disabled-cb centred-table"><Check Class="disabled" @bind-Checked="item.role.isHaveAccesToOfflineSite" Disabled="true" TValue="bool"></Check></div></TableRowCell>
+                                <TableRowCell>@item.role.OffToExchange%</TableRowCell>
+                                <TableRowCell>@item.role.AddMoneyLikesRequest</TableRowCell>
 
                             </TableRow>
                             }
@@ -94,7 +99,7 @@
                 <i class="modal_x fal fa-times" @onclick="HideRoleEditModal"></i>
             </ModalHeader>
             <ModalBody>
-                @if (editRoleModel != null)
+                @if (_editRoleModule != null)
                 {
                     @if (EditRoleValidationBlock != null && EditRoleValidationBlock.isShow)
                     {
@@ -102,78 +107,99 @@
                             <ValidationBlock block="EditRoleValidationBlock" />
                         </div>
                     }
-                    <EditForm Model="@editRoleModel">
-                        <Validations @ref="editRoleValidation" Mode="ValidationMode.Auto" ValidateOnLoad="false" EditContext="@_edcEditrole">
+                        <Validations @ref="_editRoleModule._validationContext" Model="@_editRoleModule._model" Mode="ValidationMode.Auto" ValidateOnLoad="false">
                             <Fields Class="modal-form-wrapper">
                                 <Field>
-                                    <Validation>
-                                        <TextEdit @bind-Text="@editRoleModel.Name" Placeholder="Имя роли">
+                                    <Validation @ref="@_editRoleModule._fieldValidationStatus["Name"]">
+                                        <TextEdit @bind-Text="_editRoleModule._model.Name" Placeholder="Имя роли">
                                             <Feedback>
                                                 <ValidationError />
                                             </Feedback>
                                         </TextEdit>
-                                        <ValidationMessage For="() => editRoleModel.Name" />
                                     </Validation>
                                 </Field>
                                 <Field>
-                                    <Validation>
-                                        <TextEdit @bind-Text="@editRoleModel.Class" Placeholder="Стиль роли">
+                                    <Validation @ref="@_editRoleModule._fieldValidationStatus["Class"]">
+                                        <TextEdit @bind-Text="_editRoleModule._model.Class" Placeholder="Стиль роли">
                                             <Feedback>
                                                 <ValidationError />
                                             </Feedback>
                                         </TextEdit>
-                                        <ValidationMessage For="() => editRoleModel.Class" />
                                     </Validation>
                                 </Field>
                                 <p class="modal-fields-separator-text">Основное:</p>
                                 <Field>
-                                    <Check @bind-Checked="editRoleModel.isHaveAccessToSite" TValue="bool">Есть ли доступ к сайту?</Check>
+                                    <Check @bind-Checked="_editRoleModule._model.isHaveAccessToSite" TValue="bool">Есть ли доступ к сайту?</Check>
                                 </Field>
                                 <Field>
-                                    <Check @bind-Checked="editRoleModel.isHaveAccesToPremiumEditor" TValue="bool">Есть ли доступ к премиуальному редактору?</Check>
+                                    <Check @bind-Checked="_editRoleModule._model.isHaveAccesToPremiumEditor" TValue="bool">Есть ли доступ к премиуальному редактору?</Check>
                                 </Field>
                                 <Field>
-                                    <Check @bind-Checked="editRoleModel.isHaveAccesToUltimateEditor" TValue="bool">Есть ли доступ к административному редактору?</Check>
+                                    <Check @bind-Checked="_editRoleModule._model.isHaveAccesToUltimateEditor" TValue="bool">Есть ли доступ к административному редактору?</Check>
                                 </Field>
                                 <Field>
-                                    <Check @bind-Checked="editRoleModel.isHaveAccesToOfflineSite" TValue="bool">Есть ли доступ к выключенному сайту?</Check>
+                                    <Check @bind-Checked="_editRoleModule._model.isHaveAccesToOfflineSite" TValue="bool">Есть ли доступ к выключенному сайту?</Check>
                                 </Field>
                                 <p class="modal-fields-separator-text">Админ-панель:</p>
                                 <Field>
-                                    <Check @bind-Checked="editRoleModel.isHaveAccesToAdminPanel" TValue="bool">Есть ли доступ к админ-панеле? ( Видна ли возможность зайти в админ-панель, но при этом все админ-функции могут быть отключены ).</Check>
+                                    <Check @bind-Checked="_editRoleModule._model.isHaveAccesToAdminPanel" TValue="bool">Есть ли доступ к админ-панеле? ( Видна ли возможность зайти в админ-панель, но при этом все админ-функции могут быть отключены ).</Check>
                                 </Field>
                                 <Field>
-                                    <Check @bind-Checked="editRoleModel.isHaveAccesToEditRoles" TValue="bool">Есть ли доступ к редактированию ролей?</Check>
+                                    <Check @bind-Checked="_editRoleModule._model.isHaveAccesToEditRoles" TValue="bool">Есть ли доступ к редактированию ролей?</Check>
                                 </Field>
                                 <Field>
-                                    <Check @bind-Checked="editRoleModel.isHaveToViewUserList" TValue="bool">Есть ли доступ к просмотру списку пользователей?</Check>
+                                    <Check @bind-Checked="_editRoleModule._model.isHaveToViewUserList" TValue="bool">Есть ли доступ к просмотру списку пользователей?</Check>
                                 </Field>
                                 <Field>
-                                    <Check @bind-Checked="editRoleModel.isHaveToModerateUserAccount" TValue="bool">Есть ли доступ к модерированию пользователей?</Check>
+                                    <Check @bind-Checked="_editRoleModule._model.isHaveToModerateUserAccount" TValue="bool">Есть ли доступ к модерированию пользователей?</Check>
                                 </Field>
                                 <Field>
-                                    <Check @bind-Checked="editRoleModel.isHaveToAdministrateUserAccount" TValue="bool">Есть ли доступ к администрированию пользователей?</Check>
+                                    <Check @bind-Checked="_editRoleModule._model.isHaveToAdministrateUserAccount" TValue="bool">Есть ли доступ к администрированию пользователей?</Check>
                                 </Field>
                                 <p class="modal-fields-separator-text">Экономика и системы:</p>
                                 <Field>
-                                    <Check @bind-Checked="editRoleModel.isHaveToModerateTransaction" TValue="bool">Есть ли доступ к модерированию транзакций.</Check>
+                                    <Check @bind-Checked="_editRoleModule._model.isHaveToModerateTransaction" TValue="bool">Есть ли доступ к модерированию транзакций.</Check>
                                 </Field>
                                 <Field>
-                                    <Check @bind-Checked="editRoleModel.isBlockedEconomic" TValue="bool">Заблокированы ли эконом. действия?.</Check>
+                                    <Check @bind-Checked="_editRoleModule._model.isBlockedEconomic" TValue="bool">Заблокированы ли эконом. действия?.</Check>
                                 </Field>
                                 <p class="modal-fields-separator-text">Настройки сайта:</p>
                                 <Field>
-                                    <Check @bind-Checked="editRoleModel.isHaveAccesToViewSystemSettings" TValue="bool">Можно ли смотреть настройки сайта.</Check>
+                                    <Check @bind-Checked="_editRoleModule._model.isHaveAccesToViewSystemSettings" TValue="bool">Можно ли смотреть настройки сайта.</Check>
                                 </Field>
                                 <Field>
-                                    <Check @bind-Checked="editRoleModel.isHaveAccesToEditSettings_System" TValue="bool">Есть ли возможность редактировать системные настройки сайта.</Check>
+                                    <Check @bind-Checked="_editRoleModule._model.isHaveAccesToEditSettings_System" TValue="bool">Есть ли возможность редактировать системные настройки сайта.</Check>
                                 </Field>
                                 <Field>
-                                    <Check @bind-Checked="editRoleModel.isHaveAccesToEditSettings_Economic" TValue="bool">Есть ли возможность редактировать экономические настройки сайта.</Check>
+                                    <Check @bind-Checked="_editRoleModule._model.isHaveAccesToEditSettings_Economic" TValue="bool">Есть ли возможность редактировать экономические настройки сайта.</Check>
                                 </Field>
+                                @if(_createRoleModule._model.isBlockedEconomic == false)
+                                {
+                                    <p class="modal-fields-separator-text">Премиум:</p>
+                                    <Field>
+                                    <Validation @ref="@_editRoleModule._fieldValidationStatus["OffToExchange"]">
+                                        <p class="form-note mdl req">Уменьшение процентов при переводе:</p>
+                                        <NumericEdit @bind-Value="_editRoleModule._model.OffToExchange" Placeholder="Введите количество" TValue="double">
+                                            <Feedback>
+                                                <ValidationError />
+                                            </Feedback>
+                                        </NumericEdit>
+                                        <span class="secondary-text-modal">Налоговая ставка на перевод на сайте: @MainTaxTransfer%.</span>
+                                    </Validation>
+                                    </Field>
+                                    <Field>
+                                    <Validation @ref="@_editRoleModule._fieldValidationStatus["AddMoneyLikesRequest"]">
+                                        <p class="form-note mdl req">Дополнительный деньги при запросе за лайки:</p>
+                                        <NumericEdit @bind-Value="_editRoleModule._model.AddMoneyLikesRequest" Placeholder="Введите количество" TValue="int">
+                                            <Feedback>
+                                                <ValidationError />
+                                            </Feedback>
+                                        </NumericEdit>
+                                    </Validation>
+                                    </Field>
+                                }
                             </Fields>
                         </Validations>
-                    </EditForm>
                 }
             </ModalBody>
             <ModalFooter>
@@ -197,7 +223,7 @@
                 <i class="modal_x fal fa-times" @onclick="HideRoleAddModal"></i>
             </ModalHeader>
             <ModalBody>
-                @if (addRoleModel != null)
+                @if (_createRoleModule != null)
                 {
                     @if (AddRoleValidationBlock != null && AddRoleValidationBlock.isShow)
                     {
@@ -205,78 +231,99 @@
                             <ValidationBlock block="AddRoleValidationBlock" />
                         </div>
                     }
-                    <EditForm Model="@addRoleModel">
-                        <Validations @ref="addRoleValidation" Mode="ValidationMode.Auto" ValidateOnLoad="false" EditContext="@_edcAddrole">
+                        <Validations @ref="_createRoleModule._validationContext" Model="_createRoleModule._model" Mode="ValidationMode.Auto" ValidateOnLoad="false">
                             <Fields Class="modal-form-wrapper">
                                 <Field>
-                                    <Validation>
-                                        <TextEdit @bind-Text="@addRoleModel.Name" Placeholder="Имя роли">
+                                    <Validation @ref="@_createRoleModule._fieldValidationStatus["Name"]">
+                                        <TextEdit @bind-Text="_createRoleModule._model.Name" Placeholder="Имя роли">
                                             <Feedback>
                                                 <ValidationError />
                                             </Feedback>
                                         </TextEdit>
-                                        <ValidationMessage For="() => addRoleModel.Name" />
                                     </Validation>
                                 </Field>
                                 <Field>
-                                    <Validation>
-                                        <TextEdit @bind-Text="@addRoleModel.Class" Placeholder="Стиль роли">
+                                    <Validation @ref="@_createRoleModule._fieldValidationStatus["Class"]">
+                                        <TextEdit @bind-Text="_createRoleModule._model.Class" Placeholder="Стиль роли">
                                             <Feedback>
                                                 <ValidationError />
                                             </Feedback>
                                         </TextEdit>
-                                        <ValidationMessage For="() => addRoleModel.Class" />
                                     </Validation>
                                 </Field>
                                 <p class="modal-fields-separator-text">Основное:</p>
                                 <Field>
-                                    <Check @bind-Checked="addRoleModel.isHaveAccessToSite" TValue="bool">Есть ли доступ к сайту?</Check>
+                                    <Check @bind-Checked="_createRoleModule._model.isHaveAccessToSite" TValue="bool">Есть ли доступ к сайту?</Check>
                                 </Field>
                                 <Field>
-                                    <Check @bind-Checked="addRoleModel.isHaveAccesToPremiumEditor" TValue="bool">Есть ли доступ к премиуальному редактору?</Check>
+                                    <Check @bind-Checked="_createRoleModule._model.isHaveAccesToPremiumEditor" TValue="bool">Есть ли доступ к премиуальному редактору?</Check>
                                 </Field>
                                 <Field>
-                                    <Check @bind-Checked="addRoleModel.isHaveAccesToUltimateEditor" TValue="bool">Есть ли доступ к административному редактору?</Check>
+                                    <Check @bind-Checked="_createRoleModule._model.isHaveAccesToUltimateEditor" TValue="bool">Есть ли доступ к административному редактору?</Check>
                                 </Field>
                                 <Field>
-                                    <Check @bind-Checked="addRoleModel.isHaveAccesToOfflineSite" TValue="bool">Есть ли доступ к выключенному сайту?</Check>
+                                    <Check @bind-Checked="_createRoleModule._model.isHaveAccesToOfflineSite" TValue="bool">Есть ли доступ к выключенному сайту?</Check>
                                 </Field>
                                 <p class="modal-fields-separator-text">Админ-панель:</p>
                                 <Field>
-                                    <Check @bind-Checked="addRoleModel.isHaveAccesToAdminPanel" TValue="bool">Есть ли доступ к админ-панеле? ( Видна ли возможность зайти в админ-панель, но при этом все админ-функции могут быть отключены ).</Check>
+                                    <Check @bind-Checked="_createRoleModule._model.isHaveAccesToAdminPanel" TValue="bool">Есть ли доступ к админ-панеле? ( Видна ли возможность зайти в админ-панель, но при этом все админ-функции могут быть отключены ).</Check>
                                 </Field>
                                 <Field>
-                                    <Check @bind-Checked="addRoleModel.isHaveAccesToEditRoles" TValue="bool">Есть ли доступ к редактированию ролей?</Check>
+                                    <Check @bind-Checked="_createRoleModule._model.isHaveAccesToEditRoles" TValue="bool">Есть ли доступ к редактированию ролей?</Check>
                                 </Field>
                                 <Field>
-                                    <Check @bind-Checked="addRoleModel.isHaveToViewUserList" TValue="bool">Есть ли доступ к просмотру списку пользователей?</Check>
+                                    <Check @bind-Checked="_createRoleModule._model.isHaveToViewUserList" TValue="bool">Есть ли доступ к просмотру списку пользователей?</Check>
                                 </Field>
                                 <Field>
-                                    <Check @bind-Checked="addRoleModel.isHaveToModerateUserAccount" TValue="bool">Есть ли доступ к модерированию пользователей?</Check>
+                                    <Check @bind-Checked="_createRoleModule._model.isHaveToModerateUserAccount" TValue="bool">Есть ли доступ к модерированию пользователей?</Check>
                                 </Field>
                                 <Field>
-                                    <Check @bind-Checked="addRoleModel.isHaveToAdministrateUserAccount" TValue="bool">Есть ли доступ к администрированию пользователей?</Check>
+                                    <Check @bind-Checked="_createRoleModule._model.isHaveToAdministrateUserAccount" TValue="bool">Есть ли доступ к администрированию пользователей?</Check>
                                 </Field>
                                 <p class="modal-fields-separator-text">Экономика и системы:</p>
                                 <Field>
-                                    <Check @bind-Checked="addRoleModel.isHaveToModerateTransaction" TValue="bool">Есть ли доступ к модерированию транзакций.</Check>
+                                    <Check @bind-Checked="_createRoleModule._model.isHaveToModerateTransaction" TValue="bool">Есть ли доступ к модерированию транзакций.</Check>
                                 </Field>
                                 <Field>
-                                    <Check @bind-Checked="addRoleModel.isBlockedEconomic" TValue="bool">Заблокированы ли эконом. действия?.</Check>
+                                    <Check @bind-Checked="_createRoleModule._model.isBlockedEconomic" TValue="bool">Заблокированы ли эконом. действия?.</Check>
                                 </Field>
                                 <p class="modal-fields-separator-text">Настройки сайта:</p>
                                 <Field>
-                                    <Check @bind-Checked="addRoleModel.isHaveAccesToViewSystemSettings" TValue="bool">Можно ли смотреть настройки сайта.</Check>
+                                    <Check @bind-Checked="_createRoleModule._model.isHaveAccesToViewSystemSettings" TValue="bool">Можно ли смотреть настройки сайта.</Check>
                                 </Field>
                                 <Field>
-                                    <Check @bind-Checked="addRoleModel.isHaveAccesToEditSettings_System" TValue="bool">Есть ли возможность редактировать системные настройки сайта.</Check>
+                                    <Check @bind-Checked="_createRoleModule._model.isHaveAccesToEditSettings_System" TValue="bool">Есть ли возможность редактировать системные настройки сайта.</Check>
                                 </Field>
                                 <Field>
-                                    <Check @bind-Checked="addRoleModel.isHaveAccesToEditSettings_Economic" TValue="bool">Есть ли возможность редактировать экономические настройки сайта.</Check>
+                                    <Check @bind-Checked="_createRoleModule._model.isHaveAccesToEditSettings_Economic" TValue="bool">Есть ли возможность редактировать экономические настройки сайта.</Check>
                                 </Field>
+                                @if(_createRoleModule._model.isBlockedEconomic == false)
+                                {
+                                    <p class="modal-fields-separator-text">Премиум:</p>
+                                    <Field>
+                                    <Validation @ref="@_createRoleModule._fieldValidationStatus["OffToExchange"]">
+                                        <p class="form-note mdl req">Уменьшение процентов при переводе:</p>
+                                        <NumericEdit @bind-Value="_createRoleModule._model.OffToExchange" Placeholder="Введите количество" TValue="double">
+                                            <Feedback>
+                                                <ValidationError />
+                                            </Feedback>
+                                        </NumericEdit>
+                                        <span class="secondary-text-modal">Налоговая ставка на перевод на сайте: @MainTaxTransfer%.</span>
+                                    </Validation>
+                                    </Field>
+                                    <Field>
+                                    <Validation @ref="@_createRoleModule._fieldValidationStatus["AddMoneyLikesRequest"]">
+                                        <p class="form-note mdl req">Дополнительный деньги при запросе за лайки:</p>
+                                        <NumericEdit @bind-Value="_createRoleModule._model.AddMoneyLikesRequest" Placeholder="Введите количество" TValue="int">
+                                            <Feedback>
+                                                <ValidationError />
+                                            </Feedback>
+                                        </NumericEdit>
+                                    </Validation>
+                                    </Field>
+                                }
                             </Fields>
                         </Validations>
-                    </EditForm>
                 }
             </ModalBody>
             <ModalFooter>
@@ -337,16 +384,14 @@
     private Modal modalRefDeleteRole { get; set; }
 
     /* Create role */
-    private RoleModel addRoleModel { get; set; }
-    private EditContext _edcAddrole { get; set; }
-    private Validations addRoleValidation { get; set; }
+    private ContextValidationModule<RoleModel> _createRoleModule { get; set; }
+
     private bool isAddLoading { get; set; }
     private ValidationMessageBlock AddRoleValidationBlock { get; set; }
 
     /* Edit Role */
-    private RoleModel editRoleModel { get; set; }
-    private EditContext _edcEditrole { get; set; }
-    private Validations editRoleValidation { get; set; }
+    private ContextValidationModule<RoleModel> _editRoleModule { get; set; }
+
     private bool isEditLoading { get; set; }
     private ValidationMessageBlock EditRoleValidationBlock { get; set; }
 
@@ -356,6 +401,7 @@
     private ValidationMessageBlock DeleteRoleValidationBlock { get; set; }
 
     private Client adminView { get; set; }
+    private double MainTaxTransfer { get; set; }
 
     public override async Task OnInitializedComponent()
     {
@@ -367,13 +413,12 @@
         {
             RoleList = await _roleServices.GetAllEnchantedRoles();
 
-            editRoleModel = new RoleModel();
-            _edcEditrole = new EditContext(editRoleModel);
-
-            addRoleModel = new RoleModel();
-            _edcAddrole = new EditContext(addRoleModel);
+            _createRoleModule = new ContextValidationModule<RoleModel>(new RoleModel());
+            _editRoleModule = new ContextValidationModule<RoleModel>(new RoleModel());
 
             deleteRole = new RoleEnchantedModel();
+
+            MainTaxTransfer = Convert.ToDouble(await _systemConfiguration.Get("economic_transfer.tax"));
 
             await ChangePageLoadStatus(true);
         }
@@ -385,31 +430,50 @@
     private async Task EditModelExecuted()
     {
         isEditLoading = true;
-        if (editRoleValidation.ValidateAll())
+        if (_editRoleModule._validationContext.ValidateAll())
         {
             try
             {
-                var role = await _roleServices.GetRoleAsync(editRoleModel.Id);
+                _editRoleModule.SetFielAllStatus(ValidationStatus.None);
+                StateHasChanged();
 
-                role.RoleName = editRoleModel.Name;
-                role.RoleStyle = editRoleModel.Class;
-                role.isHaveAccessToSite = editRoleModel.isHaveAccessToSite;
-                role.isHaveAccesToAdminPanel = editRoleModel.isHaveAccesToAdminPanel;
-                role.isHaveAccesToEditRoles = editRoleModel.isHaveAccesToEditRoles;
-                role.isHaveToModerateTransactions = editRoleModel.isHaveToModerateTransaction;
+                var role = await _roleServices.GetRoleAsync(_editRoleModule._model.Id);
 
-                role.isHaveToViewUserList = editRoleModel.isHaveToViewUserList;
-                role.isHaveToModerateUserAccount = editRoleModel.isHaveToViewUserList;
-                role.isHaveToAdministrateUserAccount = editRoleModel.isHaveToAdministrateUserAccount;
-                role.isHaveAccesToPremiumEditor = editRoleModel.isHaveAccesToPremiumEditor;
-                role.isHaveAccesToUltimateEditor = editRoleModel.isHaveAccesToUltimateEditor;
-                role.isBlockedEconomic = editRoleModel.isBlockedEconomic;
+                role.RoleName = _editRoleModule._model.Name;
+                role.RoleStyle = _editRoleModule._model.Class;
+                role.isHaveAccessToSite = _editRoleModule._model.isHaveAccessToSite;
+                role.isHaveAccesToAdminPanel = _editRoleModule._model.isHaveAccesToAdminPanel;
+                role.isHaveAccesToEditRoles = _editRoleModule._model.isHaveAccesToEditRoles;
+                role.isHaveToModerateTransactions = _editRoleModule._model.isHaveToModerateTransaction;
 
-                role.isHaveAccesToViewSystemSettings = editRoleModel.isHaveAccesToViewSystemSettings;
-                role.isHaveAccesToEditSettings_System = editRoleModel.isHaveAccesToEditSettings_System;
-                role.isHaveAccesToEditSettings_Economic = editRoleModel.isHaveAccesToEditSettings_Economic;
+                role.isHaveToViewUserList = _editRoleModule._model.isHaveToViewUserList;
+                role.isHaveToModerateUserAccount = _editRoleModule._model.isHaveToViewUserList;
+                role.isHaveToAdministrateUserAccount = _editRoleModule._model.isHaveToAdministrateUserAccount;
+                role.isHaveAccesToPremiumEditor = _editRoleModule._model.isHaveAccesToPremiumEditor;
+                role.isHaveAccesToUltimateEditor = _editRoleModule._model.isHaveAccesToUltimateEditor;
+                role.isBlockedEconomic = _editRoleModule._model.isBlockedEconomic;
 
-                role.isHaveAccesToOfflineSite = editRoleModel.isHaveAccesToOfflineSite;
+                role.isHaveAccesToViewSystemSettings = _editRoleModule._model.isHaveAccesToViewSystemSettings;
+                role.isHaveAccesToEditSettings_System = _editRoleModule._model.isHaveAccesToEditSettings_System;
+                role.isHaveAccesToEditSettings_Economic = _editRoleModule._model.isHaveAccesToEditSettings_Economic;
+
+                role.isHaveAccesToOfflineSite = _editRoleModule._model.isHaveAccesToOfflineSite;
+
+                if(role.isBlockedEconomic != true)
+                {
+                    role.OffToExchange = _editRoleModule._model.OffToExchange;
+                    role.AddMoneyLikesRequest = _editRoleModule._model.AddMoneyLikesRequest;
+
+                    var percemtal = await _systemConfiguration.GetByKey("economic_transfer.tax");
+
+                    if(Convert.ToDouble(percemtal.Value) < _editRoleModule._model.OffToExchange)
+                    {
+                        EditRoleValidationBlock = new ValidationMessageBlock("Системный процент на перевод ниже скидки на процнт.", "error");
+                        _editRoleModule.SetFieldStatus("OffToExchange", ValidationStatus.Error);
+                        isEditLoading = false;
+                        return;
+                    }
+                }
 
                 if ((role.isHaveToViewUserList || role.isHaveAccesToEditRoles
                     || role.isHaveToModerateUserAccount || role.isHaveToAdministrateUserAccount
@@ -456,7 +520,7 @@
     {
         var role = await _roleServices.GetRoleAsync(id);
 
-        editRoleModel = new RoleModel()
+        _editRoleModule._model = new RoleModel()
         {
             Id = role.Id,
             isHaveAccessToSite = role.isHaveAccessToSite,
@@ -474,6 +538,8 @@
             isHaveAccesToViewSystemSettings = role.isHaveAccesToViewSystemSettings,
             Name = role.RoleName,
             isHaveAccesToOfflineSite = role.isHaveAccesToOfflineSite,
+            OffToExchange = role.OffToExchange,
+            AddMoneyLikesRequest = role.AddMoneyLikesRequest,
             Class = role.RoleStyle
         };
 
@@ -482,7 +548,8 @@
 
     private void HideRoleEditModal()
     {
-        editRoleModel = new RoleModel();
+        _editRoleModule.SetFielAllStatus(ValidationStatus.None);
+        _editRoleModule._model = new RoleModel();
         EditRoleValidationBlock = null;
         modalRef.Hide();
     }
@@ -493,14 +560,30 @@
     {
         isAddLoading = true;
 
-        if (addRoleValidation.ValidateAll())
+        if (_createRoleModule._validationContext.ValidateAll())
         {
             try
             {
-                if ((addRoleModel.isHaveToViewUserList || addRoleModel.isHaveAccesToEditRoles
-                    || addRoleModel.isHaveToModerateUserAccount || addRoleModel.isHaveToAdministrateUserAccount
-                    || addRoleModel.isHaveAccesToViewSystemSettings || addRoleModel.isHaveAccesToEditSettings_System
-                    || addRoleModel.isHaveAccesToEditSettings_Economic) && !addRoleModel.isHaveAccesToAdminPanel)
+                _createRoleModule.SetFielAllStatus(ValidationStatus.None);
+                StateHasChanged();
+
+                if(_createRoleModule._model.isBlockedEconomic == false)
+                {
+                    var percemtal = await _systemConfiguration.GetByKey("economic_transfer.tax");
+
+                    if(Convert.ToDouble(percemtal.Value) < _createRoleModule._model.OffToExchange)
+                    {
+                        AddRoleValidationBlock = new ValidationMessageBlock("Системный процент на перевод ниже скидки на процнт.", "error");
+                        _createRoleModule.SetFieldStatus("OffToExchange", ValidationStatus.Error);
+                        isAddLoading = false;
+                        return;
+                    }
+                }
+
+                if ((_createRoleModule._model.isHaveToViewUserList || _createRoleModule._model.isHaveAccesToEditRoles
+                    || _createRoleModule._model.isHaveToModerateUserAccount || _createRoleModule._model.isHaveToAdministrateUserAccount
+                    || _createRoleModule._model.isHaveAccesToViewSystemSettings || _createRoleModule._model.isHaveAccesToEditSettings_System
+                    || _createRoleModule._model.isHaveAccesToEditSettings_Economic) && !_createRoleModule._model.isHaveAccesToAdminPanel)
                 {
                     AddRoleValidationBlock = new ValidationMessageBlock("Вы дали админ-привилегии, но не дали доступ в админ-панель.", "error");
                     isAddLoading = false;
@@ -508,7 +591,7 @@
                 }
 
 
-                if (!addRoleModel.isHaveAccesToViewSystemSettings && (addRoleModel.isHaveAccesToEditSettings_Economic || addRoleModel.isHaveAccesToEditSettings_System))
+                if (!_createRoleModule._model.isHaveAccesToViewSystemSettings && (_createRoleModule._model.isHaveAccesToEditSettings_Economic || _createRoleModule._model.isHaveAccesToEditSettings_System))
                 {
                     AddRoleValidationBlock = new ValidationMessageBlock("Вы дали возможность просмотра настроек, но ни одна из категорий не выбрана.", "error");
                     isEditLoading = false;
@@ -518,22 +601,24 @@
                 var role = new Role()
                 {
                     RequereName = "",
-                    isHaveAccessToSite = addRoleModel.isHaveAccessToSite,
-                    isHaveAccesToAdminPanel = addRoleModel.isHaveAccesToAdminPanel,
-                    isHaveAccesToEditRoles = addRoleModel.isHaveAccesToEditRoles,
-                    isHaveToModerateTransactions = addRoleModel.isHaveToModerateTransaction,
-                    isHaveAccesToPremiumEditor = addRoleModel.isHaveAccesToPremiumEditor,
-                    isHaveAccesToUltimateEditor = addRoleModel.isHaveAccesToUltimateEditor,
-                    isHaveToAdministrateUserAccount = addRoleModel.isHaveToAdministrateUserAccount,
-                    isHaveToModerateUserAccount = addRoleModel.isHaveToModerateUserAccount,
-                    isHaveToViewUserList = addRoleModel.isHaveToViewUserList,
-                    isBlockedEconomic = addRoleModel.isBlockedEconomic,
-                    isHaveAccesToEditSettings_Economic = addRoleModel.isHaveAccesToEditSettings_Economic,
-                    isHaveAccesToEditSettings_System = addRoleModel.isHaveAccesToEditSettings_System,
-                    isHaveAccesToViewSystemSettings = addRoleModel.isHaveAccesToViewSystemSettings,
-                    isHaveAccesToOfflineSite = addRoleModel.isHaveAccesToOfflineSite,
-                    RoleName = addRoleModel.Name,
-                    RoleStyle = addRoleModel.Class
+                    isHaveAccessToSite = _createRoleModule._model.isHaveAccessToSite,
+                    isHaveAccesToAdminPanel = _createRoleModule._model.isHaveAccesToAdminPanel,
+                    isHaveAccesToEditRoles = _createRoleModule._model.isHaveAccesToEditRoles,
+                    isHaveToModerateTransactions = _createRoleModule._model.isHaveToModerateTransaction,
+                    isHaveAccesToPremiumEditor = _createRoleModule._model.isHaveAccesToPremiumEditor,
+                    isHaveAccesToUltimateEditor = _createRoleModule._model.isHaveAccesToUltimateEditor,
+                    isHaveToAdministrateUserAccount = _createRoleModule._model.isHaveToAdministrateUserAccount,
+                    isHaveToModerateUserAccount = _createRoleModule._model.isHaveToModerateUserAccount,
+                    isHaveToViewUserList = _createRoleModule._model.isHaveToViewUserList,
+                    isBlockedEconomic = _createRoleModule._model.isBlockedEconomic,
+                    isHaveAccesToEditSettings_Economic = _createRoleModule._model.isHaveAccesToEditSettings_Economic,
+                    isHaveAccesToEditSettings_System = _createRoleModule._model.isHaveAccesToEditSettings_System,
+                    isHaveAccesToViewSystemSettings = _createRoleModule._model.isHaveAccesToViewSystemSettings,
+                    isHaveAccesToOfflineSite = _createRoleModule._model.isHaveAccesToOfflineSite,
+                    RoleName = _createRoleModule._model.Name,
+                    RoleStyle = _createRoleModule._model.Class,
+                    AddMoneyLikesRequest = _createRoleModule._model.AddMoneyLikesRequest,
+                    OffToExchange = _createRoleModule._model.OffToExchange
                 };
 
                 await _roleServices.CreateRole(role);
@@ -563,14 +648,15 @@
 
     private void ShowRoleAddModal()
     {
-        addRoleModel = new RoleModel() { };
+        _createRoleModule._model = new RoleModel() { };
 
         modalRefAddRole.Show();
     }
 
     private void HideRoleAddModal()
     {
-        addRoleModel = new RoleModel();
+        _createRoleModule.SetFielAllStatus(ValidationStatus.None);
+        _createRoleModule._model = new RoleModel();
         AddRoleValidationBlock = null;
         modalRefAddRole.Hide();
     }
@@ -602,7 +688,7 @@
         }
         catch (Exception)
         {
-            AddRoleValidationBlock = new ValidationMessageBlock("Ошибка создания роли.", "error");
+            AddRoleValidationBlock = new ValidationMessageBlock("Ошибка удаления роли.", "error");
         }
 
         isDeleterLoading = false;
