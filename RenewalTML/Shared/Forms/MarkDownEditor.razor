@@ -193,14 +193,14 @@
         imageUploaded = file;
         isImageUploaded = true;
 
-        var fileStatic = new VirtualFileStatic(_webhostManager, _fileManager);
+        var fileStatic = new VirtualUserFileStatic(_webhostManager, _fileManager);
 
-        var megafile = await fileStatic.GenerateWebpFile(imageUploaded, Convert.ToDouble(imageUploaded.Size) / (1024.0 * 1024.0));
+        var megafileId = await fileStatic.GenerateWebpImage(imageUploaded, Convert.ToDouble(imageUploaded.Size) / (1024.0 * 1024.0));
         // файл загрузили
 
         progressBarImageLoader = 100;
 
-        var retImage = await _fileManager.GetPhysicFileUrl(megafile.MainImageId);
+        var retImage = await _fileManager.GetPhysicFileUrl(megafileId);
         await _js.InvokeVoidAsync("markDownModule", "AddImageToEditor", "#markdownEditor-" + InputCode, retImage);
 
         // js add image url to edtior

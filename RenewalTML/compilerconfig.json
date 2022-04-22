@@ -26,5 +26,13 @@
   {
     "outputFile": "wwwroot/libs/easymde.js/easymde.css",
     "inputFile": "wwwroot/libs/easymde.js/easymde.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/layouts/bar.css",
+    "inputFile": "wwwroot/css/layouts/bar.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/layouts/authorize.css",
+    "inputFile": "wwwroot/css/layouts/authorize.scss"
   }
 ]

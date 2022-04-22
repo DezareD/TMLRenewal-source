@@ -1,11 +1,50 @@
 ﻿/* MAIN.COLOR.CONSTS */
 
-$-text-focus-color: #1f2127; // Темный фокусный цвет
-$-text-demifocus-color: #A4ACB6; // Светлый разфокус
-$-text-minifocus-color: #333333; // Темный фокусный цвет, но светлее
+$-text-focus-color: #1f2127;        // Темный фокусный цвет
+$-text-demifocus-color: #A4ACB6;    // Светлый разфокус
+$-text-minifocus-color: #333333;    // Темный фокусный цвет, но светлее
 
-$-main-color-ok: #28a745; // цвет правильности, зеленый
-$-main-color-err: #dc3545; // цвет ошибки, че то не правлиьно
+$-main-color-ok: #28a745;           // цвет правильности, зеленый
+$-main-color-err: #dc3545;          // цвет ошибки, че то не правлиьно
 
-$main-border-color: #e7e8ec; // Основной цвет границ
-$main-orange-color: #f05a28; // Оранджевый основной
+$main-border-color: #e7e8ec;        // Основной цвет границ
+$main-orange-color: #f05a28;        // Оранджевый основной
+
+/* MAIN.COLORS.BUTTONS */
+
+$btn-hover-bg-opacity: 4%;
+
+$btn-bg-primary: #DE8651;
+$btn-color-primary: white;
+
+$btn-bg-secondary: #e5ebf1;
+$btn-color-secondary: #000000;
+
+$btn-color-tertiary: #DE8651;
+
+$btn-bordercolor-outline: #DE8651;
+$btn-color-outline: #E18F5E;
+
+$btn-bordercolor-outline-destruct: #e64646;
+$btn-color-outline-destruct: #e64646;
+
+$btn-bg-commerce: #4bb34b;
+$btn-color-commerce: white;
+
+$btn-bg-destruct: #e64646;
+$btn-color-destruct: white;
+
+$btn-bg-overlay-primary: white;
+$btn-color-overlay-primary: #333333;
+
+$btn-bg-overlay-secondary: #4f4f4f;
+$btn-color-overlay-secondary: white;
+
+$btn-bordercolor-overlay-outline: white;
+$btn-color-overlay-outline: white;
+
+$btn-spin-width: 2px;
+
+/* MAIN.COLOR.CHECKBOX */
+
+$checkbox-bg-maincolor: #DE8651;

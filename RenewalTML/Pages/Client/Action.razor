@@ -35,7 +35,7 @@
                 {
                     @if (!isEconomicBlocked || user.Level >= 2)
                     {
-                        <p class="auth-name">Перевод с счёта на счёт</p>
+                        <p class="form-name-title">Перевод с счёта на счёт</p>
                         @if (TransferMoneyInformation != null && TransferMoneyInformation.isShow)
                         {
                             <div style="margin: 0 35px 0 35px; margin-top:10px">
@@ -110,7 +110,7 @@
                 {
                     @if (!isEconomicBlocked || user.Level >= 2)
                     {
-                        <p class="auth-name">Пополнить счёт</p>
+                        <p class="form-name-title">Пополнить счёт</p>
 
                         @if (RequestMoneyInformation != null && RequestMoneyInformation.isShow)
                         {

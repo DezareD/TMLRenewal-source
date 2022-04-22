@@ -1,0 +1,394 @@
+﻿/* fonts */
+/* main */
+/* MAIN.COLOR.CONSTS */
+/* MAIN.COLORS.BUTTONS */
+/* MAIN.COLOR.CHECKBOX */
+/* fonts */
+/* main */
+/* MAIN.COLOR.CONSTS */
+/* MAIN.COLORS.BUTTONS */
+/* MAIN.COLOR.CHECKBOX */
+.title-1-semibold {
+  font-family: "VK Sans Display";
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 28px;
+  letter-spacing: 0.326451px;
+  font-style: normal;
+  color: black;
+}
+
+.title-1-bold {
+  font-family: "VK Sans Display";
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 28px;
+  letter-spacing: 0.326451px;
+  font-style: normal;
+  color: black;
+}
+
+.title-1-heavy {
+  font-family: "VK Sans Display";
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 28px;
+  letter-spacing: 0.326451px;
+  font-style: normal;
+  color: black;
+}
+
+.title-2-regular {
+  font-family: "VK Sans Display";
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: 0.38px;
+  font-style: normal;
+  color: black;
+}
+
+.title-2-semibold {
+  font-family: "VK Sans Display";
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: 0.38px;
+  font-style: normal;
+  color: black;
+}
+
+.title-2-heavy {
+  font-family: "VK Sans Display";
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 24px;
+  letter-spacing: 0.38px;
+  font-style: normal;
+  color: black;
+}
+
+.title-3-regular {
+  font-family: "SF UI Display";
+  font-size: 1.063rem;
+  font-weight: 400;
+  line-height: 22px;
+  letter-spacing: -0.408px;
+  font-style: normal;
+  color: black;
+}
+
+.title-3-medium {
+  font-family: "SF UI Display";
+  font-size: 1.063rem;
+  font-weight: 500;
+  line-height: 22px;
+  letter-spacing: -0.408px;
+  font-style: normal;
+  color: black;
+}
+
+.title-3-semibold {
+  font-family: "SF UI Display";
+  font-size: 1.063rem;
+  font-weight: 500;
+  line-height: 22px;
+  letter-spacing: -0.408px;
+  font-style: normal;
+  color: black;
+}
+
+.headline-regular {
+  font-family: "SF UI Display";
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: -0.32px;
+  font-style: normal;
+  color: black;
+}
+
+.headline-medium {
+  font-family: "SF UI Display";
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: -0.32px;
+  font-style: normal;
+  color: black;
+}
+
+.headline-semibold {
+  font-family: "SF UI Display";
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.32px;
+  font-style: normal;
+  color: black;
+}
+
+.text-regular {
+  font-family: "SF UI Display";
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: -0.24px;
+  font-style: normal;
+  color: #333333;
+}
+
+.text-medium {
+  font-family: "SF UI Display";
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: -0.24px;
+  font-style: normal;
+  color: #333333;
+}
+
+.text-semibold {
+  font-family: "SF UI Display";
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.24px;
+  font-style: normal;
+  color: #333333;
+}
+
+.subhead-regular {
+  font-family: "SF UI Display";
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: -0.154px;
+  font-style: normal;
+  color: #333333;
+}
+
+.subhead-medium {
+  font-family: "SF UI Display";
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: -0.154px;
+  font-style: normal;
+  color: #333333;
+}
+
+.subhead-semibold {
+  font-family: "SF UI Display";
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 18px;
+  letter-spacing: -0.154px;
+  font-style: normal;
+  color: #333333;
+}
+
+.subhead-bold {
+  font-family: "SF UI Display";
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 18px;
+  letter-spacing: -0.154px;
+  font-style: normal;
+  color: #333333;
+}
+
+.caption-1-regular {
+  font-family: "SF UI Display";
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: -0.078px;
+  font-style: normal;
+  color: #333333;
+}
+
+.caption-1-medium {
+  font-family: "SF UI Display";
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: -0.078px;
+  font-style: normal;
+  color: #333333;
+}
+
+.caption-1-semibold {
+  font-family: "SF UI Display";
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: -0.078px;
+  font-style: normal;
+  color: #333333;
+}
+
+.caption-1-caps-semibold {
+  font-family: "SF UI Display";
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: -0.078px;
+  text-transform: uppercase;
+  font-style: normal;
+  color: #333333;
+}
+
+.caption-2-regular {
+  font-family: "SF UI Display";
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 14px;
+  font-style: normal;
+  color: #333333;
+}
+
+.caption-2-medium {
+  font-family: "SF UI Display";
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 14px;
+  font-style: normal;
+  color: #333333;
+}
+
+.caption-2-semibold {
+  font-family: "SF UI Display";
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 14px;
+  font-style: normal;
+  color: #333333;
+}
+
+.caption-2-caps-semibold {
+  font-family: "SF UI Display";
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 14px;
+  font-style: normal;
+  color: #333;
+  text-transform: uppercase;
+}
+
+.caption-3-regular {
+  font-family: "SF UI Display";
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 14px;
+  font-style: normal;
+  letter-spacing: 0.06px;
+  color: #333333;
+}
+
+.caption-3-caps-semibold {
+  font-family: "SF UI Display";
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 14px;
+  font-style: normal;
+  color: #333333;
+  letter-spacing: 0.06px;
+}
+
+.caption-4-regular {
+  font-family: "SF UI Display";
+  font-size: 0.56rem;
+  font-weight: 400;
+  line-height: 12px;
+  font-style: normal;
+  color: #333333;
+  letter-spacing: 0.171px;
+}
+
+.caption-4-caps-bold {
+  font-family: "SF UI Display";
+  font-size: 0.56rem;
+  font-weight: 700;
+  line-height: 12px;
+  font-style: normal;
+  color: #333333;
+  letter-spacing: 0.171px;
+  text-transform: uppercase;
+}
+
+/* MAIN.BAR */
+.main-bar {
+  width: 100%;
+  height: 56px;
+  background: white;
+  border-bottom: 1px solid #e7e8ec;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 85;
+}
+
+.bar-inner {
+  display: flex;
+  height: inherit;
+}
+.bar-inner .bar-item {
+  display: flex;
+  align-items: center;
+}
+.bar-inner .bar-item.icons-bar-outer {
+  gap: 19px;
+}
+.bar-inner .bar-item.right {
+  margin-left: auto;
+}
+
+.logotype32x32-outer {
+  width: 32px;
+  height: 32px;
+}
+
+.logotype-outer {
+  margin-right: 10px;
+}
+
+.bar-site-naming {
+  font-family: "VK Sans Display";
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: 0.38px;
+  font-style: normal;
+  color: black;
+}
+
+.bar-site-naming-postfix {
+  color: #A4ACB6 !important;
+  position: relative;
+  top: -12px;
+  left: 1px;
+  font-family: "SF UI Display";
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 14px;
+  font-style: normal;
+  color: #333333;
+}
+
+.bar-icon-item {
+  color: #A4ACB6 !important;
+  transition: 0.2s;
+  font-family: "SF UI Display";
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: -0.154px;
+  font-style: normal;
+  color: #333333;
+}
+.bar-icon-item:hover {
+  color: #f9f9fa;
+}
+
+/*# sourceMappingURL=data:application/json;charset=utf-8,%7B%22version%22:3,%22sourceRoot%22:%22%22,%22sources%22:%5B%22file:///C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/wwwroot/css/mixins/_consts.scss%22,%22file:///C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/wwwroot/css/mixins/_colors.scss%22,%22file:///C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/wwwroot/css/mixins/_typography.scss%22,%22file:///C:/Users/Fearp/source/repos/RenewalTML/RenewalTML/wwwroot/css/layouts/bar.scss%22%5D,%22names%22:%5B%5D,%22mappings%22:%22AAAC;AAKD;ACLC;AAYD;AAmCA;AD/CC;AAKD;ACLC;AAYD;AAmCA;ACjCA;EAVI,aFFa;EEGb;EACA;EACA;EACA;EACA;EAEA;;;AAiBJ;EATI,aFjBa;EEkBb;EACA;EACA;EACA;EACA;EACA;;;AAiBJ;EATI,aF/Ba;EEgCb;EACA;EACA;EACA;EACA;EACA;;;AAiBJ;EATI,aF7Ca;EE8Cb;EACA;EACA;EACA;EACA;EACA;;;AAiBJ;EATI,aF3Da;EE4Db;EACA;EACA;EACA;EACA;EACA;;;AAiBJ;EATI,aFzEa;EE0Eb;EACA;EACA;EACA;EACA;EACA;;;AAiBJ;EATI,aFtFQ;EEuFR;EACA;EACA;EACA;EACA;EACA;;;AAiBJ;EATI,aFpGQ;EEqGR;EACA;EACA;EACA;EACA;EACA;;;AAiBJ;EATI,aFlHQ;EEmHR;EACA;EACA;EACA;EACA;EACA;;;AAiBJ;EATI,aFhIQ;EEiIR;EACA;EACA;EACA;EACA;EACA;;;AAiBJ;EATI,aF9IQ;EE+IR;EACA;EACA;EACA;EACA;EACA;;;AAiBJ;EATI,aF5JQ;EE6JR;EACA;EACA;EACA;EACA;EACA;;;AAiBJ;EATI,aF1KQ;EE2KR;EACA;EACA;EACA;EACA;EACA,OD/KoB;;;ACgMxB;EATI,aFxLQ;EEyLR;EACA;EACA;EACA;EACA;EACA,OD7LoB;;;AC8MxB;EATI,aFtMQ;EEuMR;EACA;EACA;EACA;EACA;EACA,OD3MoB;;;AC4NxB;EATI,aFpNQ;EEqNR;EACA;EACA;EACA;EACA;EACA,ODzNoB;;;AC2OxB;EATI,aFnOQ;EEoOR;EACA;EACA;EACA;EACA;EACA,ODxOoB;;;ACyPxB;EATI,aFjPQ;EEkPR;EACA;EACA;EACA;EACA;EACA,ODtPoB;;;ACuQxB;EATI,aF/PQ;EEgQR;EACA;EACA;EACA;EACA;EACA,ODpQoB;;;ACqRxB;EATI,aF7QQ;EE8QR;EACA;EACA;EACA;EACA;EACA,ODlRoB;;;ACmSxB;EATI,aF3RQ;EE4RR;EACA;EACA;EACA;EACA;EACA,ODhSoB;;;ACiTxB;EATI,aFzSQ;EE0SR;EACA;EACA;EACA;EACA;EACA,OD9SoB;;;ACiUxB;EAVI,aFxTQ;EEyTR;EACA;EACA;EACA;EACA;EACA;EACA,OD9ToB;;;AC+UxB;EARI,aFxUQ;EEyUR;EACA;EACA;EACA;EACA,OD5UoB;;;AC4VxB;EARI,aFrVQ;EEsVR;EACA;EACA;EACA;EACA,ODzVoB;;;ACyWxB;EARI,aFlWQ;EEmWR;EACA;EACA;EACA;EACA,ODtWoB;;;ACuXxB;EATI,aF/WQ;EEgXR;EACA;EACA;EACA;EACA;EACA;;;AAiBJ;EATI,aF7XQ;EE8XR;EACA;EACA;EACA;EACA;EACA,ODlYoB;;;ACmZxB;EATI,aF3YQ;EE4YR;EACA;EACA;EACA;EACA,OD/YoB;ECgZpB;;;AAkBJ;EATI,aF1ZQ;EE2ZR;EACA;EACA;EACA;EACA,OD9ZoB;EC+ZpB;;;AAmBJ;EAVI,aFzaQ;EE0aR;EACA;EACA;EACA;EACA,OD7aoB;EC8apB;EACA;;;AC9aJ;AAEA;EACI;EACA;EACA;EACA;EACA;EACA;EACA;EACA;;;AAGJ;EACI;EACA;;AAEA;EACI;EACA;;AAEA;EACI;;AAGJ;EACI;;;AAKZ;EACI,OHpBY;EGqBZ,QHrBY;;;AGwBhB;EACI;;;AAIJ;EDeI,aF3Da;EE4Db;EACA;EACA;EACA;EACA;EACA;;;ACjBJ;EACI;EACA;EACA;EACA;ED+SA,aFlWQ;EEmWR;EACA;EACA;EACA;EACA,ODtWoB;;;AEuDxB;EACI;EACA;EDyKA,aFnOQ;EEoOR;EACA;EACA;EACA;EACA;EACA,ODxOoB;;AE6DpB;EACI%22%7D */

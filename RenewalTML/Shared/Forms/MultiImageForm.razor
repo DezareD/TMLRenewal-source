@@ -66,7 +66,7 @@ else
 
     protected override List<FillTicketImage> InternalValue { get => fillTicketImages; set => fillTicketImages = value; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         _isComplete = true;
     }
@@ -97,7 +97,7 @@ else
         StateHasChanged();
 
         var emptyList = fillTicketImages.Where(m => !m.isFilled).ToList();
-        var fileStatic = new VirtualFileStatic(_webhostManager, _fileManager);
+        var fileStatic = new VirtualUserFileStatic(_webhostManager, _fileManager);
         var emptyImages = emptyList.Count();
 
         foreach (var k in emptyList.Take(e.Files.Count()).ToList())
@@ -141,12 +141,12 @@ else
             }
 
             // TODO: СНАЧАЛА ЗАГРУЗИТЬ ТОЛЬКО НА ЧАС, ПОТОМ ИСПРАВИТЬ НА БОЛЬШОЙ СРОК
-            var megafile = await fileStatic.GenerateWebpFile(file, Convert.ToDouble(file.Size) / (1024.0 * 1024.0),
+            var megafileId = await fileStatic.GenerateWebpImage(file, Convert.ToDouble(file.Size) / (1024.0 * 1024.0),
                 hourseToDelete: 1); // delete 1 hourse later
 
             currentImageBlock.isFilled = true;
-            currentImageBlock.ImageUrl = await _fileManager.GetPhysicFileUrl(megafile.MainImageId);
-            currentImageBlock.ImageId = megafile.MainImageId;
+            currentImageBlock.ImageUrl = await _fileManager.GetPhysicFileUrl(megafileId);
+            currentImageBlock.ImageId = megafileId;
             currentImageBlock.isLoading = false;
         }
 

@@ -279,24 +279,6 @@
           "lib/netstandard2.0/Humanizer.dll": {}
         }
       },
-      "ImageProcessor/2.9.1": {
-        "type": "package",
-        "compile": {
-          "lib/net452/ImageProcessor.dll": {}
-        },
-        "runtime": {
-          "lib/net452/ImageProcessor.dll": {}
-        }
-      },
-      "ImageProcessor.Plugins.WebP/1.3.0": {
-        "type": "package",
-        "compile": {
-          "lib/net452/ImageProcessor.Plugins.WebP.dll": {}
-        },
-        "runtime": {
-          "lib/net452/ImageProcessor.Plugins.WebP.dll": {}
-        }
-      },
       "JetBrains.Annotations/2021.2.0": {
         "type": "package",
         "compile": {
@@ -1168,7 +1150,7 @@
           "lib/net6.0/Microsoft.JSInterop.dll": {}
         }
       },
-      "Microsoft.NETCore.Platforms/2.1.2": {
+      "Microsoft.NETCore.Platforms/5.0.0": {
         "type": "package",
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -1691,6 +1673,19 @@
         },
         "runtime": {
           "lib/net5.0/Serilog.Sinks.File.dll": {}
+        }
+      },
+      "SixLabors.ImageSharp/2.1.1": {
+        "type": "package",
+        "dependencies": {
+          "System.Runtime.CompilerServices.Unsafe": "5.0.0",
+          "System.Text.Encoding.CodePages": "5.0.0"
+        },
+        "compile": {
+          "lib/netcoreapp3.1/SixLabors.ImageSharp.dll": {}
+        },
+        "runtime": {
+          "lib/netcoreapp3.1/SixLabors.ImageSharp.dll": {}
         }
       },
       "System.AppContext/4.3.0": {
@@ -2831,11 +2826,10 @@
           "ref/netstandard1.3/System.Text.Encoding.dll": {}
         }
       },
-      "System.Text.Encoding.CodePages/4.5.1": {
+      "System.Text.Encoding.CodePages/5.0.0": {
         "type": "package",
         "dependencies": {
-          "Microsoft.NETCore.Platforms": "2.1.2",
-          "System.Runtime.CompilerServices.Unsafe": "4.5.2"
+          "Microsoft.NETCore.Platforms": "5.0.0"
         },
         "compile": {
           "lib/netstandard2.0/System.Text.Encoding.CodePages.dll": {}
@@ -4326,33 +4320,6 @@
         "logo.png"
       ]
     },
-    "ImageProcessor/2.9.1": {
-      "sha512": "QzYXsKGBdgAcxneFucxPcsMnCFr3VwZKZ09cPwVH6TzcgA2JWskfDPr3u6IyDsHRgX+Ju1rgQr+I2I5/wRbcog==",
-      "type": "package",
-      "path": "imageprocessor/2.9.1",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "imageprocessor.2.9.1.nupkg.sha512",
-        "imageprocessor.nuspec",
-        "lib/net452/ImageProcessor.dll",
-        "lib/net452/ImageProcessor.xml"
-      ]
-    },
-    "ImageProcessor.Plugins.WebP/1.3.0": {
-      "sha512": "b/XezEJDaiEp9bUhoPMXbPPSes7ugA+z97sRu5CnpOkGnbbJZJtgaz16uSp63/7DHqNuaL+g/Tr9mPmS0HzjVA==",
-      "type": "package",
-      "path": "imageprocessor.plugins.webp/1.3.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "content/web.config.transform",
-        "imageprocessor.plugins.webp.1.3.0.nupkg.sha512",
-        "imageprocessor.plugins.webp.nuspec",
-        "lib/net452/ImageProcessor.Plugins.WebP.dll",
-        "lib/net452/ImageProcessor.Plugins.WebP.xml"
-      ]
-    },
     "JetBrains.Annotations/2021.2.0": {
       "sha512": "kKSyoVfndMriKHLfYGmr0uzQuI4jcc3TKGyww7buJFCYeHb/X0kodYBPL7n9454q7v6ASiRmDgpPGaDGerg/Hg==",
       "type": "package",
@@ -5715,17 +5682,18 @@
         "microsoft.jsinterop.nuspec"
       ]
     },
-    "Microsoft.NETCore.Platforms/2.1.2": {
-      "sha512": "mOJy3M0UN+LUG21dLGMxaWZEP6xYpQEpLuvuEQBaownaX4YuhH6NmNUlN9si+vNkAS6dwJ//N1O4DmLf2CikVg==",
+    "Microsoft.NETCore.Platforms/5.0.0": {
+      "sha512": "VyPlqzH2wavqquTcYpkIIAQ6WdenuKoFN0BdYBbCWsclXacSOHNQn66Gt4z5NBqEYW0FAPm5rlvki9ZiCij5xQ==",
       "type": "package",
-      "path": "microsoft.netcore.platforms/2.1.2",
+      "path": "microsoft.netcore.platforms/5.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
+        "Icon.png",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "lib/netstandard1.0/_._",
-        "microsoft.netcore.platforms.2.1.2.nupkg.sha512",
+        "microsoft.netcore.platforms.5.0.0.nupkg.sha512",
         "microsoft.netcore.platforms.nuspec",
         "runtime.json",
         "useSharedDesignerContext.txt",
@@ -6667,6 +6635,28 @@
         "lib/netstandard2.1/Serilog.Sinks.File.xml",
         "serilog.sinks.file.5.0.0.nupkg.sha512",
         "serilog.sinks.file.nuspec"
+      ]
+    },
+    "SixLabors.ImageSharp/2.1.1": {
+      "sha512": "oNHMT8+yUR9dyuU2r7fwsXvvS4OnfCs9N5i2y2p9iBxp3nvEZbe/hZWrOGfD7MX2lxOAlWzlhzj0q2uFwP8avg==",
+      "type": "package",
+      "path": "sixlabors.imagesharp/2.1.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net472/SixLabors.ImageSharp.dll",
+        "lib/net472/SixLabors.ImageSharp.xml",
+        "lib/netcoreapp2.1/SixLabors.ImageSharp.dll",
+        "lib/netcoreapp2.1/SixLabors.ImageSharp.xml",
+        "lib/netcoreapp3.1/SixLabors.ImageSharp.dll",
+        "lib/netcoreapp3.1/SixLabors.ImageSharp.xml",
+        "lib/netstandard2.0/SixLabors.ImageSharp.dll",
+        "lib/netstandard2.0/SixLabors.ImageSharp.xml",
+        "lib/netstandard2.1/SixLabors.ImageSharp.dll",
+        "lib/netstandard2.1/SixLabors.ImageSharp.xml",
+        "sixlabors.imagesharp.128.png",
+        "sixlabors.imagesharp.2.1.1.nupkg.sha512",
+        "sixlabors.imagesharp.nuspec"
       ]
     },
     "System.AppContext/4.3.0": {
@@ -9877,7 +9867,9 @@
       "path": "system.text.encoding/4.3.0",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
+        "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
         "lib/MonoTouch10/_._",
         "lib/net45/_._",
@@ -9937,21 +9929,24 @@
         "system.text.encoding.nuspec"
       ]
     },
-    "System.Text.Encoding.CodePages/4.5.1": {
-      "sha512": "4J2JQXbftjPMppIHJ7IC+VXQ9XfEagN92vZZNoG12i+zReYlim5dMoXFC1Zzg7tsnKDM7JPo5bYfFK4Jheq44w==",
+    "System.Text.Encoding.CodePages/5.0.0": {
+      "sha512": "NyscU59xX6Uo91qvhOs2Ccho3AR2TnZPomo1Z0K6YpyztBPM/A5VbkzOO19sy3A3i1TtEnTxA7bCe3Us+r5MWg==",
       "type": "package",
-      "path": "system.text.encoding.codepages/4.5.1",
+      "path": "system.text.encoding.codepages/5.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
+        "Icon.png",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "lib/MonoAndroid10/_._",
         "lib/MonoTouch10/_._",
         "lib/net46/System.Text.Encoding.CodePages.dll",
         "lib/net461/System.Text.Encoding.CodePages.dll",
+        "lib/net461/System.Text.Encoding.CodePages.xml",
         "lib/netstandard1.3/System.Text.Encoding.CodePages.dll",
         "lib/netstandard2.0/System.Text.Encoding.CodePages.dll",
+        "lib/netstandard2.0/System.Text.Encoding.CodePages.xml",
         "lib/xamarinios10/_._",
         "lib/xamarinmac20/_._",
         "lib/xamarintvos10/_._",
@@ -9963,10 +9958,13 @@
         "ref/xamarintvos10/_._",
         "ref/xamarinwatchos10/_._",
         "runtimes/win/lib/net461/System.Text.Encoding.CodePages.dll",
+        "runtimes/win/lib/net461/System.Text.Encoding.CodePages.xml",
         "runtimes/win/lib/netcoreapp2.0/System.Text.Encoding.CodePages.dll",
+        "runtimes/win/lib/netcoreapp2.0/System.Text.Encoding.CodePages.xml",
         "runtimes/win/lib/netstandard1.3/System.Text.Encoding.CodePages.dll",
         "runtimes/win/lib/netstandard2.0/System.Text.Encoding.CodePages.dll",
-        "system.text.encoding.codepages.4.5.1.nupkg.sha512",
+        "runtimes/win/lib/netstandard2.0/System.Text.Encoding.CodePages.xml",
+        "system.text.encoding.codepages.5.0.0.nupkg.sha512",
         "system.text.encoding.codepages.nuspec",
         "useSharedDesignerContext.txt",
         "version.txt"
@@ -11543,8 +11541,6 @@
       "Blazorise.Components >= 0.9.4.1",
       "Blazorise.Icons.FontAwesome >= 0.9.4.1",
       "BuildWebCompiler >= 1.12.405",
-      "ImageProcessor >= 2.9.1",
-      "ImageProcessor.Plugins.WebP >= 1.3.0",
       "Microsoft.AspNetCore.SignalR.Client >= 6.0.3",
       "Microsoft.EntityFrameworkCore.Design >= 6.0.3",
       "Microsoft.EntityFrameworkCore.Tools >= 6.0.3",
@@ -11556,6 +11552,7 @@
       "Serilog.Sinks.Async >= 1.5.0",
       "Serilog.Sinks.Console >= 4.0.1",
       "Serilog.Sinks.File >= 5.0.0",
+      "SixLabors.ImageSharp >= 2.1.1",
       "System.Drawing.Common >= 6.0.0",
       "Volo.Abp.AspNetCore >= 5.1.4",
       "Volo.Abp.AspNetCore.Mvc.UI.Bundling >= 5.1.4",
@@ -11637,14 +11634,6 @@
             "target": "Package",
             "version": "[1.12.405, )"
           },
-          "ImageProcessor": {
-            "target": "Package",
-            "version": "[2.9.1, )"
-          },
-          "ImageProcessor.Plugins.WebP": {
-            "target": "Package",
-            "version": "[1.3.0, )"
-          },
           "Microsoft.AspNetCore.SignalR.Client": {
             "target": "Package",
             "version": "[6.0.3, )"
@@ -11690,6 +11679,10 @@
           "Serilog.Sinks.File": {
             "target": "Package",
             "version": "[5.0.0, )"
+          },
+          "SixLabors.ImageSharp": {
+            "target": "Package",
+            "version": "[2.1.1, )"
           },
           "System.Drawing.Common": {
             "target": "Package",
@@ -11753,27 +11746,5 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1701",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Пакет \"ImageProcessor 2.9.1\" был восстановлен с помощью \".NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8\", а не целевой платформы проекта \"net6.0\". Этот пакет может быть не полностью совместим с вашим проектом.",
-      "libraryId": "ImageProcessor",
-      "targetGraphs": [
-        "net6.0"
-      ]
-    },
-    {
-      "code": "NU1701",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Пакет \"ImageProcessor.Plugins.WebP 1.3.0\" был восстановлен с помощью \".NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8\", а не целевой платформы проекта \"net6.0\". Этот пакет может быть не полностью совместим с вашим проектом.",
-      "libraryId": "ImageProcessor.Plugins.WebP",
-      "targetGraphs": [
-        "net6.0"
-      ]
-    }
-  ]
+  }
 }

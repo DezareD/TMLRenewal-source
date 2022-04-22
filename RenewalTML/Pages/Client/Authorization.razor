@@ -39,14 +39,15 @@
     <div style="flex: 6; @(_isComplete? "": "display: flex; justify-content: center; align-items: center;")">
         @if (_isComplete)
         {
-            <div class="loading-template-auth" style="display:@(authVKIsLoading ? "flex" : "none" )">
+            <div style="display:@(authVKIsLoading ? "flex" : "none" )" class="loading-template-auth">
                 <i class="fal fa-clock"></i>
                 <p class="main-text">Авторизуйтесь через ВК</p><p class="mini-text">Приложение ожидает авторизации через Вконтакте для предоставления данных.</p>
             </div>
+
             @if (isStartedTwoPhaseVKRegister)
             {
-                <div class="auth-outer">
-                    <p class="auth-name">Вторая стадия регистрации</p>
+                <div class="form-outer">
+                    <p class="form-name-title">Вторая стадия регистрации</p>
                     @if (AuthErrorMessage != null && AuthErrorMessage.isShow)
                     {
                         <div style="margin: 0 35px 0 35px; margin-top:25px">
@@ -57,7 +58,7 @@
                         <ValidationBlock block="TwoPhaseInfo" />
                     </div>
                         <Validations @ref="_twoPhaseRegistrationModule._validationContext" Mode="ValidationMode.Auto" Model="_twoPhaseRegistrationModule._model" ValidateOnLoad="false">
-                            <Fields Class="login-wrapper" Style="height: auto;">
+                            <Fields>
                                 <Field>
                                     <Validation @ref="@_twoPhaseRegistrationModule._fieldValidationStatus["Name"]">
                                         <Addons>
@@ -106,8 +107,8 @@
             }
             else
             {
-                <div class="auth-outer">
-                    <p class="auth-name">Авторизация</p>
+                <div class="form-outer">
+                    <p class="form-name-title">Авторизация</p>
                     @if (AuthErrorMessage != null && AuthErrorMessage.isShow)
                     {
                         <div style="margin: 0 35px 0 35px; margin-top:25px">
@@ -116,7 +117,7 @@
                     }
 
                 <Validations @ref="_userLoginModule._validationContext" Model="@_userLoginModule._model" Mode="ValidationMode.Auto" ValidateOnLoad="false">
-                    <Fields Class="login-wrapper">
+                    <Fields>
                         <Field>
                             <Validation @ref="@_userLoginModule._fieldValidationStatus["Name"]">
                                 <Addons>

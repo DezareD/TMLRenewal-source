@@ -363,17 +363,17 @@
 
         StateHasChanged();
 
-        var fileStatic = new VirtualFileStatic(_webhostManager, _fileManager);
+        var fileStatic = new VirtualUserFileStatic(_webhostManager, _fileManager);
 
         var jsonStringify = await _js.InvokeAsync<string>("cropperModule", "GetDataCropper", ".-js-get-cropped"); // получаем данные с кропера
         var editFileAvatar = JsonConvert.DeserializeObject<CroppedImageInfo>(jsonStringify); // преобразуем данные в класс.
 
         if (isImageUploaded)
         {
-            var megafile = await fileStatic.GenerateWebpFile(imageUploaded, Convert.ToDouble(imageUploaded.Size) / (1024.0 * 1024.0));
-            await fileStatic.RecroppedImage(user.UserAvatar_cropp, megafile.MainImageId, editFileAvatar);
+            var megafileId = await fileStatic.GenerateWebpImage(imageUploaded, Convert.ToDouble(imageUploaded.Size) / (1024.0 * 1024.0));
+            await fileStatic.RecroppedImage(user.UserAvatar_cropp, megafileId, editFileAvatar);
 
-            user.UserAvatar_main = megafile.MainImageId;
+            user.UserAvatar_main = megafileId;
             await _userServices.UpdateUser(user);
         }
         else
@@ -448,13 +448,14 @@
         imageUploaded = file;
         isImageUploaded = true;
 
-        var fileStatic = new VirtualFileStatic(_webhostManager, _fileManager);
+        var fileStatic = new VirtualUserFileStatic(_webhostManager, _fileManager);
 
 
         // TODO: DAY TO DELETE THIS IMAGE: 1
-        var megafile = await fileStatic.GenerateWebpFile(imageUploaded, Convert.ToDouble(imageUploaded.Size) / (1024.0 * 1024.0),
+        var megafileId = await fileStatic.GenerateWebpImage(imageUploaded, Convert.ToDouble(imageUploaded.Size) / (1024.0 * 1024.0),
             hourseToDelete: 1); // delete 1 hourse later
-        mainUserAvatarImage = await _fileManager.GetPhysicFileUrl(megafile.MainImageId);
+
+        mainUserAvatarImage = await _fileManager.GetPhysicFileUrl(megafileId);
 
         progressBarImageLoader = 100;
 

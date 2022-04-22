@@ -1,0 +1,14 @@
+﻿@import "../mixins/_colors.scss";
+@import "../mixins/_consts.scss";
+
+.block {
+    background: white;
+    border: 1px solid $main-border-color;
+    border-radius: $main-block-border-radius;
+    transition: max-height .5s ease-out;
+    overflow: auto;
+
+    &.p-normal {
+        padding: 25px 35px 25px 35px;
+    }
+}

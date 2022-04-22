@@ -14,13 +14,10 @@ namespace RenewalTML
         public static int Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Information()
+                .MinimumLevel.Error()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
-#if !DEBUG
-                .WriteTo.Async(c => c.File("Logs/_log_application.txt"))
-#endif
                 .WriteTo.Async(c => c.Console())
                 .CreateLogger();
 

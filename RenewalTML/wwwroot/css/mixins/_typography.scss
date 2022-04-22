@@ -1,0 +1,454 @@
+﻿@import "../mixins/_consts.scss";
+@import "../mixins/_colors.scss";
+
+@mixin title-1-semibold {
+    font-family: $font-vkdisplay;
+    font-size: 1.5rem;
+    font-weight: 500;
+    line-height: 28px;
+    letter-spacing: 0.326451px;
+    font-style: normal;
+
+    color: black;
+}
+
+.title-1-semibold {
+    @include title-1-semibold;
+}
+
+@mixin title-1-bold {
+    font-family: $font-vkdisplay;
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 28px;
+    letter-spacing: 0.326451px;
+    font-style: normal;
+    color: black;
+}
+
+.title-1-bold {
+    @include title-1-bold;
+}
+
+@mixin title-1-heavy {
+    font-family: $font-vkdisplay;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 28px;
+    letter-spacing: 0.326451px;
+    font-style: normal;
+    color: black;
+}
+
+.title-1-heavy {
+    @include title-1-heavy;
+}
+
+@mixin title-2-regular {
+    font-family: $font-vkdisplay;
+    font-size: 1.25rem;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: 0.38px;
+    font-style: normal;
+    color: black;
+}
+
+.title-2-regular {
+    @include title-2-regular;
+}
+
+@mixin title-2-semibold {
+    font-family: $font-vkdisplay;
+    font-size: 1.25rem;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: 0.38px;
+    font-style: normal;
+    color: black;
+}
+
+.title-2-semibold {
+    @include title-2-semibold;
+}
+
+@mixin title-2-heavy {
+    font-family: $font-vkdisplay;
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 24px;
+    letter-spacing: 0.38px;
+    font-style: normal;
+    color: black;
+}
+
+.title-2-heavy {
+    @include title-2-heavy;
+}
+
+@mixin title-3-regular {
+    font-family: $font-sfui;
+    font-size: 1.063rem;
+    font-weight: 400;
+    line-height: 22px;
+    letter-spacing: -0.408px;
+    font-style: normal;
+    color: black;
+}
+
+.title-3-regular {
+    @include title-3-regular;
+}
+
+@mixin title-3-medium {
+    font-family: $font-sfui;
+    font-size: 1.063rem;
+    font-weight: 500;
+    line-height: 22px;
+    letter-spacing: -0.408px;
+    font-style: normal;
+    color: black;
+}
+
+.title-3-medium {
+    @include title-3-medium;
+}
+
+@mixin title-3-semibold {
+    font-family: $font-sfui;
+    font-size: 1.063rem;
+    font-weight: 500;
+    line-height: 22px;
+    letter-spacing: -0.408px;
+    font-style: normal;
+    color: black;
+}
+
+.title-3-semibold {
+    @include title-3-semibold;
+}
+
+@mixin headline-regular {
+    font-family: $font-sfui;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 20px;
+    letter-spacing: -0.32px;
+    font-style: normal;
+    color: black;
+}
+
+.headline-regular {
+    @include headline-regular;
+}
+
+@mixin headline-medium {
+    font-family: $font-sfui;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: -0.32px;
+    font-style: normal;
+    color: black;
+}
+
+.headline-medium {
+    @include headline-medium;
+}
+
+@mixin headline-semibold {
+    font-family: $font-sfui;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 20px;
+    letter-spacing: -0.32px;
+    font-style: normal;
+    color: black;
+}
+
+.headline-semibold {
+    @include headline-semibold;
+}
+
+@mixin text-regular {
+    font-family: $font-sfui;
+    font-size: 0.9375rem;
+    font-weight: 400;
+    line-height: 20px;
+    letter-spacing: -0.24px;
+    font-style: normal;
+    color: $-text-minifocus-color;
+}
+
+.text-regular {
+    @include text-regular;
+}
+
+@mixin text-medium {
+    font-family: $font-sfui;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: -0.24px;
+    font-style: normal;
+    color: $-text-minifocus-color;
+}
+
+.text-medium {
+    @include text-medium;
+}
+
+@mixin text-semibold {
+    font-family: $font-sfui;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 20px;
+    letter-spacing: -0.24px;
+    font-style: normal;
+    color: $-text-minifocus-color;
+}
+
+.text-semibold {
+    @include text-semibold;
+}
+
+@mixin subhead-regular {
+    font-family: $font-sfui;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: -0.154px;
+    font-style: normal;
+    color: $-text-minifocus-color;
+}
+
+.subhead-regular {
+    @include subhead-regular;
+}
+
+
+@mixin subhead-medium {
+    font-family: $font-sfui;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 18px;
+    letter-spacing: -0.154px;
+    font-style: normal;
+    color: $-text-minifocus-color;
+}
+
+.subhead-medium {
+    @include subhead-medium;
+}
+
+@mixin subhead-semibold {
+    font-family: $font-sfui;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 18px;
+    letter-spacing: -0.154px;
+    font-style: normal;
+    color: $-text-minifocus-color;
+}
+
+.subhead-semibold {
+    @include subhead-semibold;
+}
+
+@mixin subhead-bold {
+    font-family: $font-sfui;
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 18px;
+    letter-spacing: -0.154px;
+    font-style: normal;
+    color: $-text-minifocus-color;
+}
+
+.subhead-bold {
+    @include subhead-bold;
+}
+
+@mixin caption-1-regular {
+    font-family: $font-sfui;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: -0.078px;
+    font-style: normal;
+    color: $-text-minifocus-color;
+}
+
+.caption-1-regular {
+    @include caption-1-regular;
+}
+
+@mixin caption-1-medium {
+    font-family: $font-sfui;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 16px;
+    letter-spacing: -0.078px;
+    font-style: normal;
+    color: $-text-minifocus-color;
+}
+
+.caption-1-medium {
+    @include caption-1-medium;
+}
+
+@mixin caption-1-semibold {
+    font-family: $font-sfui;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 16px;
+    letter-spacing: -0.078px;
+    font-style: normal;
+    color: $-text-minifocus-color;
+}
+
+.caption-1-semibold {
+    @include caption-1-semibold;
+}
+
+
+@mixin caption-1-caps-semibold {
+    font-family: $font-sfui;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 16px;
+    letter-spacing: -0.078px;
+    text-transform: uppercase;
+    font-style: normal;
+    color: $-text-minifocus-color;
+}
+
+.caption-1-caps-semibold {
+    @include caption-1-caps-semibold;
+}
+
+
+@mixin caption-2-regular {
+    font-family: $font-sfui;
+    font-size: 0.75rem;
+    font-weight: 400;
+    line-height: 14px;
+    font-style: normal;
+    color: $-text-minifocus-color;
+}
+
+.caption-2-regular {
+    @include caption-2-regular;
+}
+
+@mixin caption-2-medium {
+    font-family: $font-sfui;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 14px;
+    font-style: normal;
+    color: $-text-minifocus-color;
+}
+
+.caption-2-medium {
+    @include caption-2-medium;
+}
+
+@mixin caption-2-semibold {
+    font-family: $font-sfui;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 14px;
+    font-style: normal;
+    color: $-text-minifocus-color;
+}
+
+.caption-2-semibold {
+    @include caption-2-semibold;
+}
+
+@mixin caption-2-caps-semibold {
+    font-family: $font-sfui;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 14px;
+    font-style: normal;
+    color: #333;
+    text-transform: uppercase;
+}
+
+.caption-2-caps-semibold {
+    @include caption-2-caps-semibold;
+}
+
+@mixin caption-3-regular {
+    font-family: $font-sfui;
+    font-size: 0.6875rem;
+    font-weight: 400;
+    line-height: 14px;
+    font-style: normal;
+    letter-spacing: 0.06px;
+    color: $-text-minifocus-color;
+}
+
+.caption-3-regular {
+    @include caption-3-regular;
+}
+
+@mixin caption-3-caps-semibold {
+    font-family: $font-sfui;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 14px;
+    font-style: normal;
+    color: $-text-minifocus-color;
+    letter-spacing: 0.06px;
+}
+
+.caption-3-caps-semibold {
+    @include caption-3-caps-semibold;
+}
+
+
+@mixin caption-4-regular {
+    font-family: $font-sfui;
+    font-size: 0.56rem;
+    font-weight: 400;
+    line-height: 12px;
+    font-style: normal;
+    color: $-text-minifocus-color;
+    letter-spacing: 0.171px;
+}
+
+.caption-4-regular {
+    @include caption-4-regular;
+}
+
+
+@mixin caption-4-caps-bold {
+    font-family: $font-sfui;
+    font-size: 0.56rem;
+    font-weight: 700;
+    line-height: 12px;
+    font-style: normal;
+    color: $-text-minifocus-color;
+    letter-spacing: 0.171px;
+    text-transform: uppercase;
+}
+
+.caption-4-caps-bold {
+    @include caption-4-caps-bold;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

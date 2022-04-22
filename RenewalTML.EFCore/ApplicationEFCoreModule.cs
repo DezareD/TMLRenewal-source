@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RenewalTML.EFCore.Extenstion;
 using System;
 using System.IO;
 using System.Threading;
@@ -38,13 +39,18 @@ namespace RenewalTML.EFCore
 
         public static string GetConnectionString()
         {
-            var host = Environment.GetEnvironmentVariable("DBHOST") ?? "host.docker.internal";
-            var port = Environment.GetEnvironmentVariable("DBPORT") ?? "3306";
-            var password = Environment.GetEnvironmentVariable("MYSQL_PASSWORD") ?? "N1vs1nq12";
-            var userid = Environment.GetEnvironmentVariable("MYSQL_USER") ?? "DezareD";
-            var usersDataBase = Environment.GetEnvironmentVariable("MYSQL_DATABASE") ?? "tradeleague_test";
+            var root = Directory.GetParent(Environment.CurrentDirectory).FullName;
+            Console.WriteLine("trusted connection .env root: " + root);
+            var dotenv = Path.Combine(root, ".env");
+            EnvFileLoader.Load(dotenv);
 
-            Console.WriteLine($"server={host};userid={userid};pwd={password};port={port};database={usersDataBase};Allow User Variables=true");
+            var host = Environment.GetEnvironmentVariable("DBHOST");
+            var port = Environment.GetEnvironmentVariable("DBPORT");
+            var password = Environment.GetEnvironmentVariable("MYSQL_PASSWORD");
+            var userid = Environment.GetEnvironmentVariable("MYSQL_USER");
+            var usersDataBase = Environment.GetEnvironmentVariable("MYSQL_DATABASE");
+
+            Console.WriteLine($"connection string: server={host};userid={userid};pwd={password};port={port};database={usersDataBase};Allow User Variables=true");
 
             return $"server={host};userid={userid};pwd={password};port={port};database={usersDataBase};Allow User Variables=true";
         }

@@ -222,7 +222,7 @@ namespace RenewalTML.Data
 
             var defaultRole = await _rm.GetDefaultRoleUser(); // Делаем пользователя - пользователем.
 
-            var vfs = new VirtualFileStatic(_webHostEnvironment, _virtualFileServices);
+            var vfs = new VirtualUserFileStatic(_webHostEnvironment, _virtualFileServices);
 
             var cropper = await vfs.CreateCopyDefaultCropperAvatarToUser();
 

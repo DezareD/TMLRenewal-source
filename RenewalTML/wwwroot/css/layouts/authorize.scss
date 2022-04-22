@@ -1,0 +1,119 @@
+﻿@import "../mixins/_adaptive_bp.scss";
+@import "../mixins/_other_consts.scss";
+@import "../mixins/_consts.scss";
+
+@import "../mixins/_typography.scss";
+
+.auth-panel {
+    margin: 0 auto;
+    width: 68%;
+    height: 550px;
+    overflow: hidden;
+    display: flex;
+
+    .custom-control {
+        width: 100px;
+    }
+
+    .left-block {
+        background: $auth-bg;
+        background-size: cover;
+        display: flex;
+        align-items: center;
+
+        .auth-info-block {
+            height: 82%;
+            width: 75%;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+            .auth-info-bar {
+                display: flex;
+                height: 110px;
+
+                .auth-left-logo {
+                    align-items: center;
+                    flex: 1;
+                    justify-content: center;
+                    display: flex;
+
+                    i {
+                        background: #ffffff29;
+                        border-radius: 5px;
+                        padding: 15px;
+                        color: white;
+                        font-size: 30px;
+                    }
+                }
+
+                .auth-right-info {
+                    flex: 3;
+                    display: flex;
+                    flex-direction: column;
+                    margin-left: 20px;
+                    justify-content: center;
+
+                    .main-text {
+                        color: white !important;
+                        margin-bottom: 3px;
+
+                        @include subhead-bold;
+                    }
+
+                    .secondary-text {
+                        color: #ffffffbd !important;
+
+                        @include caption-2-regular;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.separator-wrapper {
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+
+    .separator {
+        width: 100%;
+        height: 2px;
+        flex: 1;
+
+        &.primary {
+            background-color: #de8651;
+        }
+    }
+
+    .separator-text {
+        padding: 0 15px 0 15px;
+        flex: 2;
+        text-align: center;
+
+        @include caption-2-regular;
+    }
+}
+
+.vk-icon-block {
+    width: 200px;
+    height: 40px;
+    margin: 0 auto;
+    background: #4288ee;
+    border-radius: 0.35rem;
+    cursor: pointer;
+    transition: .2s;
+    text-align: center;
+
+    &:hover {
+        background: #3577d6;
+    }
+
+    svg {
+        width: 40px;
+        height: 40px;
+        fill: white;
+    }
+}

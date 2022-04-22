@@ -1,6 +1,7 @@
 C:\Users\Fearp\source\repos\RenewalTML\RenewalTML.Data\bin\Debug\net6.0\RenewalTML.Data.deps.json
 C:\Users\Fearp\source\repos\RenewalTML\RenewalTML.Data\bin\Debug\net6.0\RenewalTML.Data.runtimeconfig.json
 C:\Users\Fearp\source\repos\RenewalTML\RenewalTML.Data\bin\Debug\net6.0\RenewalTML.Data.dll
+C:\Users\Fearp\source\repos\RenewalTML\RenewalTML.Data\bin\Debug\net6.0\ref\RenewalTML.Data.dll
 C:\Users\Fearp\source\repos\RenewalTML\RenewalTML.Data\bin\Debug\net6.0\RenewalTML.Data.pdb
 C:\Users\Fearp\source\repos\RenewalTML\RenewalTML.Data\obj\Debug\net6.0\RenewalTML.Data.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\Fearp\source\repos\RenewalTML\RenewalTML.Data\obj\Debug\net6.0\RenewalTML.Data.AssemblyInfoInputs.cache
@@ -10,4 +11,4 @@ C:\Users\Fearp\source\repos\RenewalTML\RenewalTML.Data\obj\Debug\net6.0\RenewalT
 C:\Users\Fearp\source\repos\RenewalTML\RenewalTML.Data\obj\Debug\net6.0\ref\RenewalTML.Data.dll
 C:\Users\Fearp\source\repos\RenewalTML\RenewalTML.Data\obj\Debug\net6.0\RenewalTML.Data.pdb
 C:\Users\Fearp\source\repos\RenewalTML\RenewalTML.Data\obj\Debug\net6.0\RenewalTML.Data.genruntimeconfig.cache
-C:\Users\Fearp\source\repos\RenewalTML\RenewalTML.Data\bin\Debug\net6.0\ref\RenewalTML.Data.dll
+C:\Users\Fearp\source\repos\RenewalTML\RenewalTML.Data\obj\Debug\net6.0\RenewalTML.Data.csproj.AssemblyReference.cache

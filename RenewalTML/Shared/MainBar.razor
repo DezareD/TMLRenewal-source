@@ -26,10 +26,10 @@
             </ToLink>
             @if (RtBlock != null && RtBlock.isShowBar)
             {
-        <div class="bar-item right">
+        <div class="bar-item right icons-bar-outer">
             @if (user != null && BlockShowMoney == false)
             {
-                <div style="font-size: 13.5px;" class="js-blinked-text-balance @(AdminTheme(RtBlock) ? "bar-icon-item admin" : "bar-icon-item")">@CurrencyAddon.Format(Balance) <i style="margin-left: 5px;" class="fas fa-coins"></i></div>
+                <div class="js-blinked-text-balance @(AdminTheme(RtBlock) ? "bar-icon-item admin" : "bar-icon-item")">@CurrencyAddon.Format(Balance) <i style="margin-left: 5px;" class="fas fa-coins"></i></div>
             }
 
             <ToLink IsActive="false" Class="@("-tp-mainbar-continental disablde-bar-icon " + (AdminTheme(RtBlock) ? "bar-icon-item admin" : "bar-icon-item"))">
@@ -96,7 +96,7 @@
                     </DropdownMenu>
                 </Dropdown>
                 <Dropdown Direction="Direction.Down" RightAligned="true" @ref="usermainmenuBar" Style="display: flex;">
-                    <DropdownToggle Class="clear-btn bar-image -tp-mainbar-userbutton" Style="margin-left: 16px;">
+                    <DropdownToggle Class="clear-btn bar-image -tp-mainbar-userbutton">
                         <ClientAvatar @ref="clientAvatar" AvatarSize="AvatarSize.mini" Client="user"></ClientAvatar>
                     </DropdownToggle>
                     <DropdownMenu>

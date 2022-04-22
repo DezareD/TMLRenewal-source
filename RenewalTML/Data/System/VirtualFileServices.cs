@@ -1,57 +1,30 @@
 ﻿using Blazorise;
-using ImageProcessor;
-using ImageProcessor.Imaging;
-using ImageProcessor.Plugins.WebP.Imaging.Formats;
 using Microsoft.AspNetCore.Hosting;
 using RenewalTML.Data.Dto;
 using RenewalTML.Data.JSInteropHelper;
 using RenewalTML.Data.Model;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Webp;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Validation;
 using File = RenewalTML.Data.Model.File;
+using Image = SixLabors.ImageSharp.Image;
 
 namespace RenewalTML.Data
 {
-    public interface IVirtualFileServices
-    {
-        Task CreateFile(File file);
-        Task<string> GetPhysicFileUrl(int id);
-        Task<File> GetFileById(int id);
-        Task CreateCropperFile(CroppedImageFile file);
-        Task<string> GetPhysicCroppedFile(int id);
-        Task<CroppedImageFile> GetCroppedImageFile(int id);
-        Task UpdateFileCrooped(CroppedImageFile file);
-        Task DeleteFile(File file);
-    }
-
-    public class VirtualFileStatic
+    public class VirtualUserFileStatic : VirtualFileStatic
     {
         public static string defaultAvatarName = "_img_defaultavatar";
         public static string defaultAvatarNamex64 = "x64__img_defaultavatar";
         public static string x64imagePrefix = "x64_";
 
-        public VirtualFileStatic(IWebHostEnvironment hostingEnvironment, IVirtualFileServices fileServices)
-        {
-            this.hostingEnvironment = hostingEnvironment;
-            this.fileServices = fileServices;
-        }
-
-        public IWebHostEnvironment hostingEnvironment { get; set; }
-        public IVirtualFileServices fileServices { get; set; }
-
-        public async Task DeleteFile(int id)
-        {
-            var mainFile = await fileServices.GetFileById(id);
-            var filePathMain = Path.Combine(mainFile.Path, mainFile.Name + mainFile.Extension);
-            System.IO.File.Delete(filePathMain); // удаляем старый файл
-            await fileServices.DeleteFile(mainFile);
-        }
+        public VirtualUserFileStatic(IWebHostEnvironment hostingEnvironment, IVirtualFileServices fileServices) : base(hostingEnvironment, fileServices) { }
 
         public async Task RecroppedImage(int croppedDataId, int mainImageId, CroppedImageInfo newInfo, int quality = 70)
         {
@@ -78,13 +51,14 @@ namespace RenewalTML.Data
                 {
                     instream.Seek(0, SeekOrigin.Begin);
 
-                    using (var imageFactory = new ImageFactory(preserveExifData: false))
+                    using (var image = await Image.LoadAsync(instream))
                     {
-                        imageFactory.Load(instream)
-                                    .Format(new WebPFormat())
-                                    .Quality(quality)
-                                    .Crop(Rectangle.Round(new RectangleF((float)newInfo.X, (float)newInfo.Y, (float)newInfo.Width, (float)newInfo.Height)))
-                                    .Save(filePathCropped);
+                        image.Mutate(i => i.Crop(Rectangle.Round(new RectangleF((float)newInfo.X, (float)newInfo.Y, (float)newInfo.Width, (float)newInfo.Height))));
+
+                        await image.SaveAsWebpAsync(filePathCropped, encoder: new WebpEncoder()
+                        {
+                            Quality = quality
+                        });
                     }
                 }
 
@@ -92,14 +66,14 @@ namespace RenewalTML.Data
                 {
                     instream.Seek(0, SeekOrigin.Begin);
 
-                    using (var imageFactory = new ImageFactory(preserveExifData: false))
+                    using (var image = await Image.LoadAsync(instream))
                     {
-                        imageFactory.Load(instream)
-                                    .Format(new WebPFormat())
-                                    .Quality(quality)
-                                    .Crop(Rectangle.Round(new RectangleF((float)newInfo.X, (float)newInfo.Y, (float)newInfo.Width, (float)newInfo.Height)))
-                                    .Resize(new ResizeLayer(new System.Drawing.Size(64, 71), resizeMode: ResizeMode.Stretch))
-                                    .Save(filePathCroppedx64);
+                        image.Mutate(i => i.Crop(Rectangle.Round(new RectangleF((float)newInfo.X, (float)newInfo.Y, (float)newInfo.Width, (float)newInfo.Height))));
+
+                        await image.SaveAsWebpAsync(filePathCroppedx64, encoder: new WebpEncoder()
+                        {
+                            Quality = quality
+                        });
                     }
                 }
 
@@ -129,22 +103,23 @@ namespace RenewalTML.Data
 
             var filename = imagePrefix + ClientAuthServices.GenerateRandomString(15, false);
 
-            var path = Path.Combine(pathAbsolute,
-                filename + ".webp");
+            var path = Path.Combine(pathAbsolute, filename + ".webp");
 
-            var pathx64 = Path.Combine(pathAbsolute,
-                VirtualFileStatic.x64imagePrefix + filename + ".webp");
+            var pathx64 = Path.Combine(pathAbsolute, x64imagePrefix + filename + ".webp");
+
+            if (!Directory.Exists(pathAbsolute))
+                Directory.CreateDirectory(pathAbsolute);
 
             using (var instream = new FileStream(Path.Combine(filehmain.Path, filehmain.Name + filehmain.Extension), FileMode.Open)) // перезаписываем на новый
             {
                 instream.Seek(0, SeekOrigin.Begin);
 
-                using (var imageFactory = new ImageFactory(preserveExifData: false))
+                using (var image = await Image.LoadAsync(instream))
                 {
-                    imageFactory.Load(instream)
-                                .Format(new WebPFormat())
-                                .Quality(quality)
-                                .Save(path);
+                    await image.SaveAsWebpAsync(path, encoder: new WebpEncoder()
+                    {
+                        Quality = quality
+                    });
                 }
             }
 
@@ -152,12 +127,12 @@ namespace RenewalTML.Data
             {
                 instream.Seek(0, SeekOrigin.Begin);
 
-                using (var imageFactory = new ImageFactory(preserveExifData: false))
+                using (var image = await Image.LoadAsync(instream))
                 {
-                    imageFactory.Load(instream)
-                                .Format(new WebPFormat())
-                                .Quality(quality)
-                                .Save(pathx64);
+                    await image.SaveAsWebpAsync(pathx64, encoder: new WebpEncoder()
+                    {
+                        Quality = quality
+                    });
                 }
             }
 
@@ -174,7 +149,7 @@ namespace RenewalTML.Data
             var x64File = new File()
             {
                 Extension = ".webp",
-                Name = VirtualFileStatic.x64imagePrefix + filename,
+                Name = x64imagePrefix + filename,
                 Path = pathAbsolute,
                 Size = Convert.ToDouble(String.Format("{0:0.000}", filex64.Size)),
                 SitePath = pathSite
@@ -207,8 +182,7 @@ namespace RenewalTML.Data
             return new UserImageInfo() { MainImageId = croppedFile.Id, x64CroppedImageId = croppedFilex64.Id };
         }
 
-        public async Task<UserImageInfo> GenerateWebpFile(IFileEntry file, double MBsize, string imagePrefix = "img", int quality = 70,
-            CroppedImageInfo croppedImageInfo = null, int hourseToDelete = -1)
+        public async Task<UserImageInfo> GenerateAvatarWebpFile(IFileEntry file, double MBsize, CroppedImageInfo croppedImageInfo, string imagePrefix = "img", int quality = 70, int hourseToDelete = -1)
         {
             var filename = imagePrefix + ClientAuthServices.GenerateRandomString(15, false);
 
@@ -219,11 +193,14 @@ namespace RenewalTML.Data
 
             var pathAbsolute = Path.Combine(hostingEnvironment.WebRootPath, "imgs", "userImages", level1, level2);
 
+            if (!Directory.Exists(pathAbsolute))
+                Directory.CreateDirectory(pathAbsolute);
+
             var path = Path.Combine(pathAbsolute,
                 filename + ".webp");
 
             var pathx64 = Path.Combine(pathAbsolute,
-                VirtualFileStatic.x64imagePrefix + filename + ".webp");
+                x64imagePrefix + filename + ".webp");
 
             // Создаем основной файл 
             var virtualFile = new File()
@@ -240,7 +217,7 @@ namespace RenewalTML.Data
             var x64File = new File()
             {
                 Extension = ".webp",
-                Name = VirtualFileStatic.x64imagePrefix + filename,
+                Name = x64imagePrefix + filename,
                 Path = pathAbsolute,
                 Size = Convert.ToDouble(String.Format("{0:0.000}", MBsize)),
                 SitePath = pathSite,
@@ -256,14 +233,14 @@ namespace RenewalTML.Data
                     await file.WriteToStreamAsync(instream);
                     instream.Seek(0, SeekOrigin.Begin);
 
-                    using (var imageFactory = new ImageFactory(preserveExifData: false))
+                    using (var image = await Image.LoadAsync(instream))
                     {
-                        imageFactory.Load(instream)
-                                    .Format(new WebPFormat())
-                                    .Quality(quality)
-                                    .Crop(Rectangle.Round(new RectangleF((float)croppedImageInfo.X, (float)croppedImageInfo.Y, (float)croppedImageInfo.Width, (float)croppedImageInfo.Height)))
-                                    .Save(path);
+                        image.Mutate(i => i.Crop(Rectangle.Round(new RectangleF((float)croppedImageInfo.X, (float)croppedImageInfo.Y, (float)croppedImageInfo.Width, (float)croppedImageInfo.Height))));
 
+                        await image.SaveAsWebpAsync(path, encoder: new WebpEncoder()
+                        {
+                            Quality = quality
+                        });
                     }
                 }
 
@@ -283,16 +260,23 @@ namespace RenewalTML.Data
                     await file.WriteToStreamAsync(instream);
                     instream.Seek(0, SeekOrigin.Begin);
 
-                    using (var imageFactory = new ImageFactory(preserveExifData: false))
+                    using (var image = await Image.LoadAsync(instream))
                     {
-                        await fileServices.CreateFile(x64File);
+                        image.Mutate(i =>
+                        {
+                            i.Crop(Rectangle.Round(new RectangleF((float)croppedImageInfo.X, (float)croppedImageInfo.Y, (float)croppedImageInfo.Width, (float)croppedImageInfo.Height)));
+                            i.Resize(new ResizeOptions()
+                            {
+                                Mode = ResizeMode.Stretch,
+                                Size = new SixLabors.ImageSharp.Size(64, 71)
+                            });
+                            }
+                        );
 
-                        imageFactory.Load(instream)
-                                    .Format(new WebPFormat())
-                                    .Quality(quality)
-                                    .Crop(Rectangle.Round(new RectangleF((float)croppedImageInfo.X, (float)croppedImageInfo.Y, (float)croppedImageInfo.Width, (float)croppedImageInfo.Height)))
-                                    .Resize(new ResizeLayer(new System.Drawing.Size(64, 71), resizeMode: ResizeMode.Stretch))
-                                    .Save(pathx64);
+                        await image.SaveAsWebpAsync(pathx64, encoder: new WebpEncoder()
+                        {
+                            Quality = quality
+                        });
                     }
                 }
 
@@ -309,24 +293,91 @@ namespace RenewalTML.Data
 
                 await fileServices.CreateCropperFile(croppedFilex64);
             }
-            else
-            {
-                using (var instream = new MemoryStream())
-                {
-                    await file.WriteToStreamAsync(instream);
-                    instream.Seek(0, SeekOrigin.Begin);
 
-                    using (var imageFactory = new ImageFactory(preserveExifData: false))
-                    {
-                        imageFactory.Load(instream)
-                                .Format(new WebPFormat())
-                                .Quality(quality)
-                                .Save(path);
-                    }
-                }
-            }
             return new UserImageInfo() { MainImageId = virtualFile.Id, x64CroppedImageId = x64File.Id };
         }
+    }
+
+
+    public class VirtualFileStatic
+    {
+
+        public VirtualFileStatic(IWebHostEnvironment hostingEnvironment, IVirtualFileServices fileServices)
+        {
+            this.hostingEnvironment = hostingEnvironment;
+            this.fileServices = fileServices;
+        }
+
+        public IWebHostEnvironment hostingEnvironment { get; set; }
+        public IVirtualFileServices fileServices { get; set; }
+
+        public async Task DeleteFile(int id)
+        {
+            var mainFile = await fileServices.GetFileById(id);
+            var filePathMain = Path.Combine(mainFile.Path, mainFile.Name + mainFile.Extension);
+            System.IO.File.Delete(filePathMain); // удаляем старый файл
+            await fileServices.DeleteFile(mainFile);
+        }
+
+
+        public async Task<int> GenerateWebpImage(IFileEntry file, double MBsize, string imagePrefix = "img", int quality = 70, int hourseToDelete = -1)
+        {
+            var filename = imagePrefix + ClientAuthServices.GenerateRandomString(15, false);
+
+            var level1 = ClientAuthServices.GenerateRandomString(2, false).ToUpperInvariant();
+            var level2 = ClientAuthServices.GenerateRandomString(2, false).ToUpperInvariant();
+
+            var pathSite = "/imgs/" + "userImages/" + level1 + "/" + level2 + "/";
+
+            var pathAbsolute = Path.Combine(hostingEnvironment.WebRootPath, "imgs", "userImages", level1, level2);
+
+            if (!Directory.Exists(pathAbsolute))
+                Directory.CreateDirectory(pathAbsolute);
+
+            var path = Path.Combine(pathAbsolute,
+                filename + ".webp");
+
+            // Создаем основной файл 
+            var virtualFile = new File()
+            {
+                Extension = ".webp",
+                Name = filename,
+                Path = pathAbsolute,
+                Size = Convert.ToDouble(String.Format("{0:0.000}", MBsize)),
+                SitePath = pathSite,
+                hourseToDelete = hourseToDelete
+            };
+
+            using (var instream = new MemoryStream())
+            {
+                await file.WriteToStreamAsync(instream);
+                instream.Seek(0, SeekOrigin.Begin);
+
+                using (var image = await Image.LoadAsync(instream))
+                {
+                    await image.SaveAsWebpAsync(path, encoder: new WebpEncoder()
+                    {
+                        Quality = quality
+                    });
+                }
+            }
+
+            await fileServices.CreateFile(virtualFile);
+
+            return virtualFile.Id;
+        }
+    }
+
+    public interface IVirtualFileServices
+    {
+        Task CreateFile(File file);
+        Task<string> GetPhysicFileUrl(int id);
+        Task<File> GetFileById(int id);
+        Task CreateCropperFile(CroppedImageFile file);
+        Task<string> GetPhysicCroppedFile(int id);
+        Task<CroppedImageFile> GetCroppedImageFile(int id);
+        Task UpdateFileCrooped(CroppedImageFile file);
+        Task DeleteFile(File file);
     }
 
     public class VirtualFileServices : ApplicationService, IVirtualFileServices

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "gm/VfWDFIjDiAeiREYQ7861H8co2OfvHj3h6/7SQ/QFnvBoDpc/ToDvOI+K92ZrXFQ0E0b15kZ/Df7GF+ipz+g==",
+  "dgSpecHash": "SnuBnbF9pR4Al9XxTr/7MYMpoRLRzATtz/QPWi3xYzt5vGu9h3otCiBL3kpuZxMl0c82lpS1EHaUrIAfHjBY2g==",
   "success": true,
   "projectFilePath": "C:\\Users\\Fearp\\source\\repos\\RenewalTML\\RenewalTML\\RenewalTML.csproj",
   "expectedPackageFiles": [
@@ -20,8 +20,6 @@
     "C:\\Users\\Fearp\\.nuget\\packages\\hangfire.core\\1.7.28\\hangfire.core.1.7.28.nupkg.sha512",
     "C:\\Users\\Fearp\\.nuget\\packages\\hangfire.mysqlstorage\\2.0.3\\hangfire.mysqlstorage.2.0.3.nupkg.sha512",
     "C:\\Users\\Fearp\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
-    "C:\\Users\\Fearp\\.nuget\\packages\\imageprocessor\\2.9.1\\imageprocessor.2.9.1.nupkg.sha512",
-    "C:\\Users\\Fearp\\.nuget\\packages\\imageprocessor.plugins.webp\\1.3.0\\imageprocessor.plugins.webp.1.3.0.nupkg.sha512",
     "C:\\Users\\Fearp\\.nuget\\packages\\jetbrains.annotations\\2021.2.0\\jetbrains.annotations.2021.2.0.nupkg.sha512",
     "C:\\Users\\Fearp\\.nuget\\packages\\microsoft.aspnetcore.authorization\\6.0.0\\microsoft.aspnetcore.authorization.6.0.0.nupkg.sha512",
     "C:\\Users\\Fearp\\.nuget\\packages\\microsoft.aspnetcore.components\\6.0.0-preview.5.21301.17\\microsoft.aspnetcore.components.6.0.0-preview.5.21301.17.nupkg.sha512",
@@ -82,7 +80,7 @@
     "C:\\Users\\Fearp\\.nuget\\packages\\microsoft.extensions.options.configurationextensions\\6.0.0\\microsoft.extensions.options.configurationextensions.6.0.0.nupkg.sha512",
     "C:\\Users\\Fearp\\.nuget\\packages\\microsoft.extensions.primitives\\6.0.0\\microsoft.extensions.primitives.6.0.0.nupkg.sha512",
     "C:\\Users\\Fearp\\.nuget\\packages\\microsoft.jsinterop\\6.0.0-preview.5.21301.17\\microsoft.jsinterop.6.0.0-preview.5.21301.17.nupkg.sha512",
-    "C:\\Users\\Fearp\\.nuget\\packages\\microsoft.netcore.platforms\\2.1.2\\microsoft.netcore.platforms.2.1.2.nupkg.sha512",
+    "C:\\Users\\Fearp\\.nuget\\packages\\microsoft.netcore.platforms\\5.0.0\\microsoft.netcore.platforms.5.0.0.nupkg.sha512",
     "C:\\Users\\Fearp\\.nuget\\packages\\microsoft.netcore.targets\\1.1.0\\microsoft.netcore.targets.1.1.0.nupkg.sha512",
     "C:\\Users\\Fearp\\.nuget\\packages\\microsoft.typescript.msbuild\\4.6.2\\microsoft.typescript.msbuild.4.6.2.nupkg.sha512",
     "C:\\Users\\Fearp\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.14.0\\microsoft.visualstudio.azure.containers.tools.targets.1.14.0.nupkg.sha512",
@@ -126,6 +124,7 @@
     "C:\\Users\\Fearp\\.nuget\\packages\\serilog.sinks.async\\1.5.0\\serilog.sinks.async.1.5.0.nupkg.sha512",
     "C:\\Users\\Fearp\\.nuget\\packages\\serilog.sinks.console\\4.0.1\\serilog.sinks.console.4.0.1.nupkg.sha512",
     "C:\\Users\\Fearp\\.nuget\\packages\\serilog.sinks.file\\5.0.0\\serilog.sinks.file.5.0.0.nupkg.sha512",
+    "C:\\Users\\Fearp\\.nuget\\packages\\sixlabors.imagesharp\\2.1.1\\sixlabors.imagesharp.2.1.1.nupkg.sha512",
     "C:\\Users\\Fearp\\.nuget\\packages\\system.appcontext\\4.3.0\\system.appcontext.4.3.0.nupkg.sha512",
     "C:\\Users\\Fearp\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",
     "C:\\Users\\Fearp\\.nuget\\packages\\system.collections\\4.3.0\\system.collections.4.3.0.nupkg.sha512",
@@ -190,7 +189,7 @@
     "C:\\Users\\Fearp\\.nuget\\packages\\system.security.cryptography.x509certificates\\4.3.0\\system.security.cryptography.x509certificates.4.3.0.nupkg.sha512",
     "C:\\Users\\Fearp\\.nuget\\packages\\system.security.principal.windows\\4.4.0\\system.security.principal.windows.4.4.0.nupkg.sha512",
     "C:\\Users\\Fearp\\.nuget\\packages\\system.text.encoding\\4.3.0\\system.text.encoding.4.3.0.nupkg.sha512",
-    "C:\\Users\\Fearp\\.nuget\\packages\\system.text.encoding.codepages\\4.5.1\\system.text.encoding.codepages.4.5.1.nupkg.sha512",
+    "C:\\Users\\Fearp\\.nuget\\packages\\system.text.encoding.codepages\\5.0.0\\system.text.encoding.codepages.5.0.0.nupkg.sha512",
     "C:\\Users\\Fearp\\.nuget\\packages\\system.text.encoding.extensions\\4.3.0\\system.text.encoding.extensions.4.3.0.nupkg.sha512",
     "C:\\Users\\Fearp\\.nuget\\packages\\system.text.encodings.web\\6.0.0\\system.text.encodings.web.6.0.0.nupkg.sha512",
     "C:\\Users\\Fearp\\.nuget\\packages\\system.text.json\\6.0.0\\system.text.json.6.0.0.nupkg.sha512",
@@ -266,26 +265,5 @@
     "C:\\Users\\Fearp\\.nuget\\packages\\volo.abp.validation.abstractions\\5.1.4\\volo.abp.validation.abstractions.5.1.4.nupkg.sha512",
     "C:\\Users\\Fearp\\.nuget\\packages\\volo.abp.virtualfilesystem\\5.1.4\\volo.abp.virtualfilesystem.5.1.4.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1701",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Пакет \"ImageProcessor 2.9.1\" был восстановлен с помощью \".NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8\", а не целевой платформы проекта \"net6.0\". Этот пакет может быть не полностью совместим с вашим проектом.",
-      "libraryId": "ImageProcessor",
-      "targetGraphs": [
-        "net6.0"
-      ]
-    },
-    {
-      "code": "NU1701",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Пакет \"ImageProcessor.Plugins.WebP 1.3.0\" был восстановлен с помощью \".NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8\", а не целевой платформы проекта \"net6.0\". Этот пакет может быть не полностью совместим с вашим проектом.",
-      "libraryId": "ImageProcessor.Plugins.WebP",
-      "targetGraphs": [
-        "net6.0"
-      ]
-    }
-  ]
+  "logs": []
 }

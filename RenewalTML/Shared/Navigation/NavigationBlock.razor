@@ -46,7 +46,7 @@
     [Parameter]
     public bool IsRender { get; set; }
 
-    private async Task OnClickNavMenu(MenuField item)
+    private void OnClickNavMenu(MenuField item)
     {
         if (item.item.isActive)
         {
@@ -54,7 +54,7 @@
         }
     }
 
-    private async Task OnClickHeader(MainMenuModel item)
+    private void OnClickHeader(MainMenuModel item)
     {
         if (item.isHasCollapsed)
         {

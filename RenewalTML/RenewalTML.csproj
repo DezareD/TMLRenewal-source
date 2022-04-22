@@ -63,6 +63,15 @@
   <ItemGroup>
     <_WebToolingArtifacts Remove="Properties\PublishProfiles\JenkinsProfile.pubxml" />
   </ItemGroup>
+  
+  <Target Name="AssignLibPaths" AfterTargets="AssignTargetPaths">
+    <ItemGroup>
+        <ContentWithTargetPath Include="msvcr120.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <TargetPath>msvcr120.dll</TargetPath>
+        </ContentWithTargetPath>
+    </ItemGroup>
+  </Target>
 
   <ItemGroup>
     <PackageReference Include="Blazorise" Version="0.9.4.1" />
@@ -70,8 +79,6 @@
     <PackageReference Include="Blazorise.Components" Version="0.9.4.1" />
     <PackageReference Include="Blazorise.Icons.FontAwesome" Version="0.9.4.1" />
     <PackageReference Include="BuildWebCompiler" Version="1.12.405" />
-    <PackageReference Include="ImageProcessor" Version="2.9.1" />
-    <PackageReference Include="ImageProcessor.Plugins.WebP" Version="1.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.3">
       <PrivateAssets>all</PrivateAssets>
@@ -91,6 +98,7 @@
     <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.1" />
     <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
     <PackageReference Include="Volo.Abp.AspNetCore" Version="5.1.4" />
     <PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.Bundling" Version="5.1.4" />
@@ -117,6 +125,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
     <None Include="compilerconfig.json" />
     <None Include="Shared\Navigation\PagingBlock.razor" />
   </ItemGroup>

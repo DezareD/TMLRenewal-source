@@ -1,0 +1,141 @@
+﻿@import "../mixins/_colors.scss";
+@import "../mixins/_other_consts.scss";
+@import "../mixins/_typography.scss";
+
+.disabled-cb {
+    opacity: .65 !important;
+}
+
+.centred-table {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-control {
+    position: relative;
+    z-index: 1;
+    display: block;
+    min-height: 1.5rem;
+    padding-left: 1.5rem;
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+    font-size: 13px;
+    text-align: left;
+}
+
+.custom-control-input {
+    position: absolute;
+    left: -50000px;
+    z-index: -1;
+    width: 1rem;
+    height: 1.25rem;
+    opacity: 0;
+    user-select: none;
+
+    &:checked {
+        ~ {
+            .custom-control-label {
+                &::before {
+                    border-color: $checkbox-bg-maincolor;
+                    background-color: $checkbox-bg-maincolor;
+                    color: #fff !important;
+                }
+            }
+        }
+    }
+
+    &:not(:disabled) {
+        &:active {
+            ~ {
+                .custom-control-label {
+                    &::before {
+                        color: #fff !important;
+                        background-color: #ffd5b3;
+                        border-color: #ffd5b3;
+                    }
+                }
+            }
+        }
+    }
+
+    &:focus {
+        &:not(:checked) {
+            ~ {
+                .custom-control-label {
+                    &::before {
+                        border-color: lighten($checkbox-bg-maincolor, 25%);
+                    }
+                }
+            }
+        }
+
+        ~ {
+            .custom-control-label {
+                &::before {
+                    box-shadow: 0 0 0 0.2rem rgba($checkbox-bg-maincolor, .25);
+                }
+            }
+        }
+    }
+}
+
+.custom-control-label {
+    @include caption-1-regular;
+    user-select: none!important;
+
+    position: relative;
+    margin-bottom: 0;
+
+    &::after {
+        position: absolute;
+        top: 0.1rem;
+        left: -1.5rem;
+        display: block;
+        width: 1rem;
+        height: 1rem;
+        content: "";
+        background: 50%/50% 50% no-repeat;
+    }
+
+    &::before {
+        position: absolute;
+        top: 0.1rem;
+        left: -1.5rem;
+        display: block;
+        width: 1rem;
+        height: 1rem;
+        pointer-events: none;
+        content: "";
+        background-color: #fff;
+        border: #adb5bd solid 1px;
+    }
+}
+
+.custom-checkbox {
+    .custom-control-input {
+        &:checked {
+            ~ {
+                .custom-control-label {
+                    &::before {
+                        background-color: $checkbox-bg-maincolor;
+                    }
+
+                    &::after {
+                        background-image: $main-checkbox-bg;
+                    }
+                }
+            }
+        }
+    }
+
+    .custom-control-label {
+        &::before {
+            border-radius: .25rem;
+        }
+    }
+}
+
+.custom-control-label::before, .custom-file-label, .custom-select {
+    transition: background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}

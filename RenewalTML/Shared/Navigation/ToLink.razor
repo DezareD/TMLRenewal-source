@@ -21,10 +21,7 @@
     [CascadingParameter(Name = "_applicationContainer")]
     public App _applicationContainer { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        virtualNavigationServices.PageAddedServices(_applicationContainer, authServices);
-    }
+    protected override void OnInitialized() => virtualNavigationServices.PageAddedServices(_applicationContainer, authServices);
 
     private async Task Navigate()
     {

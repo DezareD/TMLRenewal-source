@@ -88,10 +88,7 @@
     private int PageCount { get; set; }
     private bool isDisable { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        UpdatePageCount();
-    }
+    protected override void OnInitialized() => UpdatePageCount();
 
     public async Task ChangePage(int newPage)
     {

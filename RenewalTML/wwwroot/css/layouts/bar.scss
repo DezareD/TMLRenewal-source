@@ -1,0 +1,69 @@
+﻿@import "../mixins/_consts.scss";
+@import "../mixins/_colors.scss";
+@import "../mixins/_typography.scss";
+@import "../mixins/_adaptive_bp.scss";
+
+/* MAIN.BAR */
+
+.main-bar {
+    width: 100%;
+    height: $bar-height;
+    background: white;
+    border-bottom: 1px solid $main-border-color;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 85;
+}
+
+.bar-inner {
+    display: flex;
+    height: inherit;
+
+    .bar-item {
+        display: flex;
+        align-items: center;
+
+        &.icons-bar-outer {
+            gap: 19px;
+        } 
+        
+        &.right {
+            margin-left: auto;
+        }
+    }
+}
+
+.logotype32x32-outer {
+    width: $bar-logo-size;
+    height: $bar-logo-size;
+}
+
+.logotype-outer {
+    margin-right: 10px;
+}
+
+
+.bar-site-naming {
+    @include title-2-semibold;
+}
+
+.bar-site-naming-postfix {
+    color: $-text-demifocus-color!important;
+    position: relative;
+    top: -12px;
+    left: 1px;
+
+    @include caption-2-semibold;
+}
+
+.bar-icon-item {
+    color: $-text-demifocus-color!important;
+    transition: 0.2s;
+
+    @include subhead-medium;
+
+    &:hover {
+        color: lighten($-text-demifocus-color, 30%);
+    }
+}
