@@ -62,7 +62,7 @@
                                 </Validation>
                                 <Validation @ref="@_sendMoneyModule._fieldValidationStatus["Money"]">
                                     <p class="form-note req">Количество:</p>
-                                    <NumericEdit @bind-Value="_sendMoneyModule._model.Money" Placeholder="Введите количество" TValue="int">
+                                    <NumericEdit @bind-Value="_sendMoneyModule._model.Money" Placeholder="Введите количество" TValue="int" Disabled="transferLoader">
                                         <Feedback>
                                             <ValidationError />
                                         </Feedback>
@@ -90,7 +90,7 @@
                                 </ul>
 
                                 <div class="align-center button-checkbox-panel" style="margin-bottom: 25px;">
-                                    <Button Type="ButtonType.Submit" Class="primary normal icon" Loading="@transferLoader" @onclick="async () => await StartTransfer()">
+                                    <Button Type="ButtonType.Submit" Class="primary normal icon" Disabled="transferLoader" Loading="@transferLoader" @onclick="async eventArgs => await StartTransfer()">
                                         <ChildContent>Перевести<i class="fal fa-forward"></i></ChildContent>
                                         <LoadingTemplate><div class="btn-loader"></div></LoadingTemplate>
                                     </Button>
@@ -309,10 +309,13 @@
             await _js.InvokeVoidAsync("uiUtilsModule", "ScrollToTop");
             StateHasChanged();
             return;
+
+            // TODO: COMPRESS ВЕРХНИЙ КОД до одного мульти метода
         }
 
         transferLoader = true;
-        StateHasChanged();
+
+        //StateHasChanged();
 
         if (_sendMoneyModule._model.Money <= 99 || _sendMoneyModule._model.Money > user.Balance)
         {
